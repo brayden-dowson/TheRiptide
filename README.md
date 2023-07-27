@@ -1,56 +1,61 @@
 # The Riptide's Events/Plugins/Tools/Maps
 ## Contents
-### Events
- - A Strange Alliance
- - Bring  Your Kid To Work
- - Chaos Raid
- - Dog Infection
- - Dogs In The Dark
- - Energy Arena
- - Generator Control
- - Ghost Busters
- - Insanity
- - In Silence
- - Leap Frog
- - Massive EMP
- - Matchups
- - Nuke Run
- - Peanut Dodge Ball
- - Peanut Hide And Seek
- - Protect The Site Manager
- - SCP Mutation
- - Shy Guy Rampage
- - Shy Guy XK
- - Team Deathmatch
- - The Last Stand
- - Traitor Among Us
- - Zombie Escape
- - Zombie Infection
- - Zombie Survival
-### Maps
- - The Skeld (for Traitor Among Us Event)
-### Plugins
- - Add Chaos Ammo In Armory
- - Auto Restart
- - Coin 914
- - Discord Message
- - Escape Rewards
- - Faction Custom Info(untested)
- - MVP
- - Normal Locker Ammo
- - Pink Candy
- - Research Card In 173
- - SCP 127
- - Spawn Height Variation
- - Surface Armory
- - Teleport Commands
+### [Events](https://github.com/brayden-dowson/TheRiptide#event-details)
+ - [A Strange Alliance](https://github.com/brayden-dowson/TheRiptide#a-strange-alliance)
+ - [Bring Your Kid To Work](https://github.com/brayden-dowson/TheRiptide#bring--your-kid-to-work)
+ - [Chaos Raid](https://github.com/brayden-dowson/TheRiptide#chaos-raid)
+ - [Dog Infection](https://github.com/brayden-dowson/TheRiptide#dog-infection)
+ - [Dogs In The Dark](https://github.com/brayden-dowson/TheRiptide#dogs-in-the-dark)
+ - [Energy Arena](https://github.com/brayden-dowson/TheRiptide#energy-arena)
+ - [Generator Control](https://github.com/brayden-dowson/TheRiptide#generator-control)
+ - [Ghost Busters](https://github.com/brayden-dowson/TheRiptide#ghost-busters)
+ - [Insanity](https://github.com/brayden-dowson/TheRiptide#insanity)
+ - [In Silence](https://github.com/brayden-dowson/TheRiptide#in-silence)
+ - [Leap Frog](https://github.com/brayden-dowson/TheRiptide#leap-frog)
+ - [Massive EMP](https://github.com/brayden-dowson/TheRiptide#massive-emp)
+ - [Matchups](https://github.com/brayden-dowson/TheRiptide#matchups)
+ - [Nuke Run](https://github.com/brayden-dowson/TheRiptide#nuke-run)
+ - [Peanut Dodge Ball](https://github.com/brayden-dowson/TheRiptide#peanut-dodge-ball)
+ - [Peanut Hide And Seek](https://github.com/brayden-dowson/TheRiptide#peanut-hide-and-seek)
+ - [Protect The Site Manager](https://github.com/brayden-dowson/TheRiptide#protect-the-site-manager)
+ - [SCP Mutation](https://github.com/brayden-dowson/TheRiptide#scp-mutation)
+ - [Shy Guy Rampage](https://github.com/brayden-dowson/TheRiptide#shy-guy-rampage)
+ - [Shy Guy XK](https://github.com/brayden-dowson/TheRiptide#shy-guy-xk)
+ - [Team Deathmatch](https://github.com/brayden-dowson/TheRiptide#team-deathmatch)
+ - [The Last Stand](https://github.com/brayden-dowson/TheRiptide#the-last-stand)
+ - [Traitor Among Us](https://github.com/brayden-dowson/TheRiptide#traitor-among-us)
+ - [Zombie Escape](https://github.com/brayden-dowson/TheRiptide#zombie-escape)
+ - [Zombie Infection](https://github.com/brayden-dowson/TheRiptide#zombie-infection)
+ - [Zombie Survival](https://github.com/brayden-dowson/TheRiptide#zombie-survival)
+### [Maps](https://github.com/brayden-dowson/TheRiptide#map-details)
+ - [The Skeld](https://github.com/brayden-dowson/TheRiptide#the-riptides-skeld) (for Traitor Among Us Event)
+### [Plugins](https://github.com/brayden-dowson/TheRiptide#plugin-details)
+ - [Add Chaos Ammo In Armory](https://github.com/brayden-dowson/TheRiptide#add-chaos-ammo-in-armory)
+ - [Auto Restart](https://github.com/brayden-dowson/TheRiptide#auto-restart)
+ - [Coin 914](https://github.com/brayden-dowson/TheRiptide#coin-914)
+ - [Discord Message](https://github.com/brayden-dowson/TheRiptide#discord-message)
+ - [Escape Rewards](https://github.com/brayden-dowson/TheRiptide#escape-rewards)
+ - [Faction Custom Info](https://github.com/brayden-dowson/TheRiptide#faction-custom-info)(untested)
+ - [MVP](https://github.com/brayden-dowson/TheRiptide#mvp)
+ - [Normal Locker Ammo](https://github.com/brayden-dowson/TheRiptide#normal-locker-ammo)
+ - [Pink Candy](https://github.com/brayden-dowson/TheRiptide#pink-candy)
+ - [Research Card In 173](https://github.com/brayden-dowson/TheRiptide#research-card-in-173-out-dated-game-play-wise)
+ - [SCP 127](https://github.com/brayden-dowson/TheRiptide#scp-127https://github.com/brayden-dowson/TheRiptide#scp-127)
+ - [Spawn Height Variation](https://github.com/brayden-dowson/TheRiptide#spawn-height-variation)
+ - [Surface Armory](https://github.com/brayden-dowson/TheRiptide#surface-armory)
+ - [Teleport Commands](https://github.com/brayden-dowson/TheRiptide#teleport-commands)
 ### Tools/Utility
- - Event Utility (is required for events)
+ - Event Utility (dependency required for events)
  - Facility Manager (a plugin used for some events/plugins)
  - Teleport (dependency for most events/plugins)
  - Utility (dependency for most events/plugins)
 ### Roles
 Obsolete will be reworked at some point
+### [Install](https://github.com/brayden-dowson/TheRiptide#installation)
+ - [Events](https://github.com/brayden-dowson/TheRiptide#events-1)
+ - [Plugins](https://github.com/brayden-dowson/TheRiptide#plugins-1)
+ - [Dependencies](https://github.com/brayden-dowson/TheRiptide#dependencies)
+ - [Maps](https://github.com/brayden-dowson/TheRiptide#maps-1)
 ## Event Details
 ### A Strange Alliance
 Humans Vs SCPs. All human teams are allied to defeat the SCPs. SCPs gain a speed boost equivilant to a cola, +1000 health and +1000 sheild (at 20% health).
@@ -138,7 +143,7 @@ A few players are Traitors, Detectives and Jesters the rest are Innocents. Trait
 > [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
 > [TheSkeld.dll](https://github.com/brayden-dowson/TheRiptide/releases) (or any other maps) must be inside ``CedmodEvents/TraitorAmongUs/Maps``  
 > [The Riptide's Skeld.sloc](https://github.com/brayden-dowson/TheRiptide/releases) (or any other maps) must be inside ``SlocLoader/Objects``  
-> Maps may have dependencies check Map Descriptions
+> Maps may have dependencies check [Map Details](https://github.com/brayden-dowson/TheRiptide#map-details)
 
 ### Zombie Escape
 Everyone spawns in light. There are one or more zombies the rest are NTF. The NTF have to escape the facility but must do certain objectives first. Zombies infect players on kill but will lose their health doing so. Guns deal knock back based on the ratio of zombies to humans alive. Less humans more zombies = more knockback. The more zombies there are the less health each one has. Zombies and guns increase in strength as more objectives are completed. The path though the facility is fixed based on the objective and a there will be a light to guide you.
@@ -205,7 +210,7 @@ Adds the TP and GP commands. TP can be used to teleport to specific rooms. GP ge
 Go to [releases](https://github.com/brayden-dowson/TheRiptide/releases) to download all the relevant .dlls
 
 ### Events
-You must have [Cedmod](https://cedmod.nl/Servers/Setup) installed to run events. Once you have Installed [Cedmod](https://cedmod.nl/Servers/Setup) place the [[EventName]Event.dll](https://github.com/brayden-dowson/TheRiptide/releases) into the ``Cedmod/CedmodEvents`` folder. Some Events have extra steps and dependencies refer to the [Event Details](https://github.com/brayden-dowson/TheRiptide/master/README.md#event-details) for any extra details for installation. Most Events use [EventUtility.dll](https://github.com/brayden-dowson/TheRiptide/releases), [Utility.dll](https://github.com/brayden-dowson/TheRiptide/releases), and [Teleport.dll](https://github.com/brayden-dowson/TheRiptide/releases) as dependencies so add them to be safe. The dependency folder is ``plugins/"server port" | "global"/dependencies``. Additionally [FacilityManager.dll](https://github.com/brayden-dowson/TheRiptide/releases) should be installed in the plugins folder not the dependency folder.
+You must have [Cedmod](https://cedmod.nl/Servers/Setup) installed to run events. Once you have Installed [Cedmod](https://cedmod.nl/Servers/Setup) place the [[EventName]Event.dll](https://github.com/brayden-dowson/TheRiptide/releases) into the ``Cedmod/CedmodEvents`` folder. Some Events have extra steps and dependencies refer to the [Event Details](https://github.com/brayden-dowson/TheRiptide#event-details) for any extra details for installation. Most Events use [EventUtility.dll](https://github.com/brayden-dowson/TheRiptide/releases), [Utility.dll](https://github.com/brayden-dowson/TheRiptide/releases), and [Teleport.dll](https://github.com/brayden-dowson/TheRiptide/releases) as dependencies so add them to be safe. The dependency folder is ``plugins/"server port" | "global"/dependencies``. Additionally [FacilityManager.dll](https://github.com/brayden-dowson/TheRiptide/releases) should be installed in the plugins folder not the dependency folder.
 ### Plugins
 Plugins must be installed manually. Place the [[PluginName].dll](https://github.com/brayden-dowson/TheRiptide/releases) in your servers ``plugins/"server port" | "global"`` folder. To be safe add [Utility.dll](https://github.com/brayden-dowson/TheRiptide/releases) and [Teleport.dll](https://github.com/brayden-dowson/TheRiptide/releases) as dependencies. The dependency folder is ``plugins/"server port" | "global"/dependencies``. Additionally [FacilityManager.dll](https://github.com/brayden-dowson/TheRiptide/releases) should be installed in the plugins folder not the dependency folder.
 
