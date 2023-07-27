@@ -43,7 +43,7 @@ namespace TheRiptide
         public string EventName { get; } = "Dogs In The Dark";
         public string EvenAuthor { get; } = "The Riptide";
         public string EventDescription { get; set; } = "All facility lights disabled. All SCPs will be SCP939. Everyone will spawn with a Flashlight\n\n";
-        public string EventPrefix { get; } = "DIND";
+        public string EventPrefix { get; } = "DITD";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;
         public PluginHandler PluginHandler { get; }

@@ -281,7 +281,7 @@ namespace TheRiptide
 
         public string EventName { get; } = "Ghost Busters";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "All players spawn in entrance. Some players spawn as NTF specialists and the rest as 106. The specialists get a super micro which can fire with very little wind-up, recharges over time and has a longer duration. The specialists also get a coke, 2x medkit, painkillers, radio, scp500 and the hat. The specialists are also immune from the pocket dimention and will take 30 damage on hit. FriendlyFire is diabled for this event. The last team standing wins!\n\n";
+        public string EventDescription { get; set; } = "All players spawn in entrance. Some players spawn as NTF specialists and the rest as 106. The specialists get a super micro which can fire with very little wind-up, recharges over time and has a longer duration. The specialists also get a coke, 2x medkit, painkillers, radio, scp500 and the hat. The specialists are also immune from the pocket dimention and will take 30 damage on hit. FriendlyFire is disabled for this event. The last team standing wins!\n\n";
         public string EventPrefix { get; } = "GB";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

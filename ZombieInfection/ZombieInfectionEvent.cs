@@ -447,7 +447,7 @@ namespace TheRiptide
 
         public string EventName { get; } = "Zombie Infection";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "The SCPs spawn as mother zombies which have a large max HP. Zombies infect players on kill creating child zombies. Child zombies respawn next to their mother zombie and take some of their mother zombies health. The more child zombies there are the less health each one has. All players have infinite ammo and deal knockback based on the ratio of humans to zombies. Class-Ds spawn with a com-15 and 10 ammo. Scientists spawn with a com-18 with infinite ammo and an upgraded keycard. Class-Ds and Scientists may teamkill to stop the spread of the infection\n\n";
+        public string EventDescription { get; set; } = "The SCPs spawn as mother zombies which have a large max HP. Zombies infect players on kill creating child zombies. Child zombies respawn next to their mother zombie and take some of their mother zombies health. The more child zombies there are the less health each one has. All players have infinite ammo and deal knockback based on the ratio of humans to zombies. Class-Ds spawn with a com-15 and 10 ammo. Scientists spawn with a com-18 with infinite ammo and an upgraded keycard. Class-Ds and Scientists may team kill to stop the spread of the infection\n\n";
         public string EventPrefix { get; } = "ZI";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

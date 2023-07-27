@@ -211,7 +211,7 @@ namespace TheRiptide
 
         public string EventName { get; } = "Dog Infection";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "[recommended player count > 20] Light is locked down and everyone spawns as ClassD in light with one dog. Dog can infect Class-Ds on kill, the last ClassD alive wins\n\n";
+        public string EventDescription { get; set; } = "[recommended player count 30+] Light is locked down and everyone spawns as ClassD in light with one dog. Dog can infect Class-Ds on kill, the last ClassD alive wins\n\n";
         public string EventPrefix { get; } = "DI";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;
