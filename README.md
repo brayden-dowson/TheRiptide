@@ -22,7 +22,7 @@
  - [Shy Guy Rampage](https://github.com/brayden-dowson/TheRiptide#shy-guy-rampage)
  - [Shy Guy XK](https://github.com/brayden-dowson/TheRiptide#shy-guy-xk)
  - [Team Deathmatch](https://github.com/brayden-dowson/TheRiptide#team-deathmatch)
- - [The Last Stand](https://github.com/brayden-dowson/TheRiptide#the-last-stand)
+ - [The Last Stand](https://github.com/brayden-dowson/TheRiptide#the-last-stand)(Untested Might be broken)
  - [Traitor Among Us](https://github.com/brayden-dowson/TheRiptide#traitor-among-us)
  - [Zombie Escape](https://github.com/brayden-dowson/TheRiptide#zombie-escape)
  - [Zombie Infection](https://github.com/brayden-dowson/TheRiptide#zombie-infection)
