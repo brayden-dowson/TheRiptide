@@ -30,13 +30,24 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+
+        public int RoundCount { get; set; } = 3;
+        [Description("how many players per detective")]
+        public float DetectiveRatio { get; set; } = 7.5f;
+        [Description("how many players per traitor (min 1 traitor)")]
+        public float TraitorRatio { get; set; } = 5.0f;
+        [Description("how many players per jester (min 1 jester)")]
+        public float JesterRatio { get; set; } = 15.0f;
+        [Description("chance the jesters will spawn for the round (0 = never, 1 = always)")]
+        public float JesterChancePerRound { get; set; } = 0.3f;
     }
 
     public enum TauRole { Unassigned, Innocent, Detective, Traitor, Jester };
 
     public class TraitorAmongUs
     {
-        private const int round_count = 3;
+        private static Config config;
+        //private const int round_count = 3;
         public static float round_timer;
         private static int round;
 
@@ -86,8 +97,9 @@ namespace TheRiptide
         private static float ff_old;
         private static bool ff_state;
 
-        public static void Start()
+        public static void Start(Config config)
         {
+            TraitorAmongUs.config = config;
             ff_state = Server.FriendlyFire;
             Server.FriendlyFire = true;
             FriendlyFireConfig.PauseDetector = true;
@@ -538,7 +550,7 @@ namespace TheRiptide
             
             ready_up = Timing.RunCoroutine(_ReadyUp(first_ready_up_time));
 
-            while (round < round_count)
+            while (round < config.RoundCount)
             {
                 while (ready_up.IsAliveAndPaused || ready_up.IsRunning)
                     yield return Timing.WaitForSeconds(1.0f);
@@ -634,7 +646,7 @@ namespace TheRiptide
                 Announcements.Stop();
                 yield return Timing.WaitForSeconds(10.0f);
                 round++;
-                if (round >= round_count)
+                if (round >= config.RoundCount)
                     break;
 
                 ResetRound();
@@ -662,24 +674,17 @@ namespace TheRiptide
         {
             foreach (var player in ReadyPlayers())
                 if (!not_ready.Contains(player.PlayerId))
-                    player.ReceiveHint("<b><size=64><color=#87ceeb>Round " + (round + 1) + " of " + round_count + " Starting...</color></size></b>", 4);
+                    player.ReceiveHint("<b><size=64><color=#87ceeb>Round " + (round + 1) + " of " + config.RoundCount + " Starting...</color></size></b>", 4);
 
             yield return Timing.WaitForSeconds(3.0f);
 
             List<Player> players = ReadyPlayers().Where(p => !not_ready.Contains(p.PlayerId) && p != jester_killer && !RDM.OverRDMLimit(p)).ToList();
-            int detective_count = Mathf.RoundToInt(players.Count / 7.5f);
-            int traitor_count = Mathf.RoundToInt(players.Count / 5.0f);
+            int detective_count = Mathf.RoundToInt(players.Count / config.DetectiveRatio);
+            int traitor_count = Mathf.Max(Mathf.RoundToInt(players.Count / config.TraitorRatio), 1);
             int jester_count = 0;
 
-            if (Random.value < 0.3)
-            {
-                jester_count = Mathf.RoundToInt(players.Count / 10.0f);
-                if (jester_count == 0)
-                    jester_count = 1;
-            }
-
-            if (traitor_count <= 0)
-                traitor_count = 1;
+            if (Random.value < config.JesterChancePerRound)
+                jester_count = Mathf.Max(Mathf.RoundToInt(players.Count / config.JesterRatio), 1);
 
             for (int i = 0; i < detective_count; i++)
                 if (!players.IsEmpty())
@@ -844,7 +849,7 @@ namespace TheRiptide
         {
             Log.Info(EventName + " event is preparing");
             IsRunning = true;
-            TraitorAmongUs.Start();
+            TraitorAmongUs.Start(EventConfig);
             Log.Info(EventName + " event is prepared");
             PluginAPI.Events.EventManager.RegisterEvents<TraitorAmongUs>(this);
         }

@@ -174,45 +174,68 @@ namespace TheRiptide
 
         private string BuildCustomInfo()
         {
-            string info = "<color=#00FF00>Health " + HP + "</color>\n";
+            string info = "Health " + HP + "\n";
             if (AHP != 0)
-                info += "<color=#FFFF00>Artificial Health " + AHP + "</color>\n";
+                info += "Artificial Health " + AHP + "\n";
 
             if (HS != 0)
-                info += "<color=#FFFF00>Hume Shield " + HS + "</color>\n";
+                info += "Hume Shield " + HS + "\n";
 
-            if (GodMode || Noclip)
-                info += "<color=#000000>";
             if (GodMode)
                 info += "[God Mode] ";
             if (Noclip)
                 info += "[Noclip]";
             if (GodMode || Noclip)
-                info += "</color>\n";
+                info += "\n";
 
             foreach (var status in EffectStatus.Values)
-            {
                 if (status.Enabled)
-                {
-                    switch (status.Classification)
-                    {
-                        case StatusEffectBase.EffectClassification.Negative:
-                            info += "<color=#FF0000>";
-                            break;
-                        case StatusEffectBase.EffectClassification.Mixed:
-                            info += "<color=#FF80FF>";
-                            break;
-                        case StatusEffectBase.EffectClassification.Positive:
-                            info += "<color=#FF0000>";
-                            break;
-                    }
-                    info += status.Intensity + "x " + status.Name + (status.Duration == 0 ? "" : " " + status.Duration) + "</color>\n";
-                }
-
-            }
+                    info += status.Intensity + "x " + status.Name + (status.Duration == 0 ? "" : " " + status.Duration) + "\n";
 
             return info;
         }
+
+        //private string BuildCustomInfo()
+        //{
+        //    string info = "<color=#00FF00>Health " + HP + "</color>\n";
+        //    if (AHP != 0)
+        //        info += "<color=#FFFF00>Artificial Health " + AHP + "</color>\n";
+
+        //    if (HS != 0)
+        //        info += "<color=#FFFF00>Hume Shield " + HS + "</color>\n";
+
+        //    if (GodMode || Noclip)
+        //        info += "<color=#000000>";
+        //    if (GodMode)
+        //        info += "[God Mode] ";
+        //    if (Noclip)
+        //        info += "[Noclip]";
+        //    if (GodMode || Noclip)
+        //        info += "</color>\n";
+
+        //    foreach (var status in EffectStatus.Values)
+        //    {
+        //        if (status.Enabled)
+        //        {
+        //            switch (status.Classification)
+        //            {
+        //                case StatusEffectBase.EffectClassification.Negative:
+        //                    info += "<color=#FF0000>";
+        //                    break;
+        //                case StatusEffectBase.EffectClassification.Mixed:
+        //                    info += "<color=#FF80FF>";
+        //                    break;
+        //                case StatusEffectBase.EffectClassification.Positive:
+        //                    info += "<color=#FF0000>";
+        //                    break;
+        //            }
+        //            info += status.Intensity + "x " + status.Name + (status.Duration == 0 ? "" : " " + status.Duration) + "</color>\n";
+        //        }
+
+        //    }
+
+        //    return info;
+        //}
 
         private static void SerializeInfo(string info, NetworkWriter writer)
         {
@@ -319,7 +342,7 @@ namespace TheRiptide
 
                 foreach (var p in ReadyPlayers())
                 {
-                    if (p.Role.GetFaction() == faction)
+                    if (p.Role.GetFaction() == faction && p != ev.Player)
                     {
                         player_desync[ev.Player.PlayerId].AddObserver(ev.Player, p);
                         player_desync[p.PlayerId].AddObserver(p, ev.Player);

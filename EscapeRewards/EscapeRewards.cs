@@ -5,6 +5,7 @@ using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,14 @@ using static TheRiptide.Utility;
 
 namespace TheRiptide
 {
+    public class Config
+    {
+        [Description("Enables the rewards for escaping with scp items")]
+        public bool EnableScpRewards { get; set; } = true;
+        [Description("Keeps status effects on escape")]
+        public bool KeepEffectsOnEscape { get; set; } = true;
+    }
+
     public struct PreviousState
     {
         public byte intensity;
@@ -23,6 +32,9 @@ namespace TheRiptide
 
     public class EscapeRewards
     {
+        [PluginConfig]
+        public Config config;
+
         [PluginEntryPoint("Escape Rewards", "1.0.0", "", "The Riptide")]
         public void OnEnabled()
         {
@@ -49,7 +61,14 @@ namespace TheRiptide
             int scp_items_count = player.ReferenceHub.inventory.UserInventory.Items.Values.Where((item) => scp_items.Contains(item.ItemTypeId)).Count();
             List<PreviousState> states = new List<PreviousState>();
             foreach (var seb in player.ReferenceHub.playerEffectsController.AllEffects)
-                states.Add(new PreviousState { intensity = seb.Intensity, duration = seb._timeLeft });
+            {
+                //if (seb.IsEnabled)
+                //    Log.Info("intensity: " + seb.Intensity.ToString() + " time left: " + seb.TimeLeft.ToString() + " duration: " + seb.Duration);
+                if (!(seb is Invisible))
+                    states.Add(new PreviousState { intensity = seb.Intensity, duration = seb._timeLeft });
+                else
+                    states.Add(new PreviousState { intensity = 0, duration = 0 });
+            }
             if (role == RoleTypeId.NtfSpecialist)
             {
                 Timing.CallDelayed(0.1f, () =>
@@ -59,29 +78,35 @@ namespace TheRiptide
 
                     try
                     {
-                        Log.Info("escapee had: " + scp_items_count.ToString() + " scp items");
-                        if (scp_items_count >= 3)
+                        if (config.EnableScpRewards)
                         {
-                            AddOrDropItem(player, ItemType.KeycardNTFCommander);
+                            Log.Info("escapee had: " + scp_items_count.ToString() + " scp items");
+                            if (scp_items_count >= 3)
+                            {
+                                AddOrDropItem(player, ItemType.KeycardNTFCommander);
+                            }
+                            if (scp_items_count >= 2)
+                            {
+                                RemoveItem(player, ItemType.ArmorCombat);
+                                RemoveItem(player, ItemType.ArmorLight);
+                                AddOrDropItem(player, ItemType.ArmorHeavy);
+                                AddOrDropItem(player, ItemType.Adrenaline);
+                                AddOrDropFirearm(player, ItemType.GunShotgun, true);
+                            }
+                            if (scp_items_count >= 1 && scp_items_count != 2)
+                            {
+                                AddOrDropFirearm(player, ItemType.GunCOM18, true);
+                                AddOrDropItem(player, ItemType.Medkit);
+                            }
                         }
-                        if (scp_items_count >= 2)
+                        if (config.KeepEffectsOnEscape)
                         {
-                            RemoveItem(player, ItemType.ArmorCombat);
-                            RemoveItem(player, ItemType.ArmorLight);
-                            AddOrDropItem(player, ItemType.ArmorHeavy);
-                            AddOrDropItem(player, ItemType.Adrenaline);
-                            AddOrDropFirearm(player, ItemType.GunShotgun, true);
-                        }
-                        if (scp_items_count >= 1 && scp_items_count != 2)
-                        {
-                            AddOrDropFirearm(player, ItemType.GunCOM18, true);
-                            AddOrDropItem(player, ItemType.Medkit);
-                        }
-                        int index = 0;
-                        foreach(var seb in player.ReferenceHub.playerEffectsController.AllEffects)
-                        {
-                            seb.ServerSetState(states[index].intensity, states[index].duration);
-                            index++;
+                            int index = 0;
+                            foreach (var seb in player.ReferenceHub.playerEffectsController.AllEffects)
+                            {
+                                seb.ServerSetState(states[index].intensity, states[index].duration);
+                                index++;
+                            }
                         }
                     }
                     catch(System.Exception ex)
@@ -99,27 +124,33 @@ namespace TheRiptide
 
                     try
                     {
-                        Log.Info("escapee had: " + scp_items_count.ToString() + " scp items");
-                        if (scp_items_count >= 2)
+                        if (config.EnableScpRewards)
                         {
-                            RemoveItem(player, ItemType.ArmorCombat);
-                            RemoveItem(player, ItemType.ArmorLight);
-                            AddOrDropItem(player, ItemType.ArmorHeavy);
-                            AddOrDropItem(player, ItemType.Adrenaline);
+                            Log.Info("escapee had: " + scp_items_count.ToString() + " scp items");
+                            if (scp_items_count >= 2)
+                            {
+                                RemoveItem(player, ItemType.ArmorCombat);
+                                RemoveItem(player, ItemType.ArmorLight);
+                                AddOrDropItem(player, ItemType.ArmorHeavy);
+                                AddOrDropItem(player, ItemType.Adrenaline);
+                            }
+                            if (scp_items_count >= 3)
+                            {
+                                AddOrDropFirearm(player, ItemType.GunShotgun, true);
+                            }
+                            if (scp_items_count >= 1 && scp_items_count != 2)
+                            {
+                                AddOrDropFirearm(player, ItemType.GunRevolver, true);
+                            }
                         }
-                        if (scp_items_count >= 3)
+                        if (config.KeepEffectsOnEscape)
                         {
-                            AddOrDropFirearm(player, ItemType.GunShotgun, true);
-                        }
-                        if (scp_items_count >= 1 && scp_items_count != 2)
-                        {
-                            AddOrDropFirearm(player, ItemType.GunRevolver, true);
-                        }
-                        int index = 0;
-                        foreach (var seb in player.ReferenceHub.playerEffectsController.AllEffects)
-                        {
-                            seb.ServerSetState(states[index].intensity, states[index].duration);
-                            index++;
+                            int index = 0;
+                            foreach (var seb in player.ReferenceHub.playerEffectsController.AllEffects)
+                            {
+                                seb.ServerSetState(states[index].intensity, states[index].duration);
+                                index++;
+                            }
                         }
                     }
                     catch (System.Exception ex)

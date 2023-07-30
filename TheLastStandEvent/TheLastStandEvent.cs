@@ -28,10 +28,18 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+
+        [Description("how many players per SCP, this is the ratio for the hard round (only one escape)")]
+        public float ScpRatio { get; set; } = 6.0f;
+        [Description("multiplier for the SCP count for the easy round (adjustment for having a two door room)")]
+        public float EasyMultiplier { get; set; } = 1.333f;
+        [Description("multiplier for the SCP count for the medium round (adjustment for having a two door room)")]
+        public float MediumMultiplier { get; set; } = 1.666f;
     }
 
     public class EventHandler
     {
+        private static Config config;
         private static bool game_over = false;
         private static Difficulty difficulty;
         private static RoomName room;
@@ -57,11 +65,13 @@ namespace TheRiptide
             { RoomName.Hcz079, new Vector3(5.073f, -2.372f, -6.573f)},
             { RoomName.LczGlassroom, new Vector3(-0.122f, 0.960f, -3.868f)},
         };
+        private static bool randomize_side;
 
         enum Difficulty { Easy, Medium, Hard };
 
-        public static void Start()
+        public static void Start(Config config)
         {
+            EventHandler.config = config;
             round_info = "";
             game_over = false;
             WinnerReset();
@@ -177,24 +187,45 @@ namespace TheRiptide
                 return;
             }
 
-            if(role.GetTeam() == Team.SCPs)
+            if(role.GetTeam() == Team.SCPs && role != RoleTypeId.Scp0492)
             {
                 Timing.CallDelayed(0.0f, () =>
                 {
                     if(player.Role.GetTeam() == Team.SCPs)
                     {
-                        if ((adjacent_b == null && player.Role != RoleTypeId.Scp079) || player.Role == RoleTypeId.Scp106 || player.Role == RoleTypeId.Scp939)
-                            ScpDoorTeleport(player, adjacent_a);
-                        else if(player.Role == RoleTypeId.Scp049 || player.Role == RoleTypeId.Scp173 || player.Role == RoleTypeId.Scp096)
-                            ScpDoorTeleport(player, adjacent_b);
-                        else if(player.Role == RoleTypeId.Scp079)
+                        if(player.Role == RoleTypeId.Scp079)
                         {
                             Scp079Camera camera = spawn_room.gameObject.GetComponentInChildren<Scp079Camera>();
                             Scp079Role role_079 = player.RoleBase as Scp079Role;
                             role_079._curCamSync.CurrentCamera = camera;
                         }
-                        if (player.Role != RoleTypeId.Scp079)
+                        else
+                        {
+                            if (adjacent_b != null && randomize_side)
+                            {
+                                ScpDoorTeleport(player, adjacent_b);
+                                randomize_side = false;
+                            }
+                            else
+                            {
+                                ScpDoorTeleport(player, adjacent_a);
+                                randomize_side = true;
+                            }
                             player.EffectsManager.ChangeState<Ensnared>(1, 5);
+                        }
+
+                        //if ((adjacent_b == null && player.Role != RoleTypeId.Scp079) || player.Role == RoleTypeId.Scp106 || player.Role == RoleTypeId.Scp939)
+                        //    ScpDoorTeleport(player, adjacent_a);
+                        //else if(player.Role == RoleTypeId.Scp049 || player.Role == RoleTypeId.Scp173 || player.Role == RoleTypeId.Scp096)
+                        //    ScpDoorTeleport(player, adjacent_b);
+                        //else if(player.Role == RoleTypeId.Scp079)
+                        //{
+                        //    Scp079Camera camera = spawn_room.gameObject.GetComponentInChildren<Scp079Camera>();
+                        //    Scp079Role role_079 = player.RoleBase as Scp079Role;
+                        //    role_079._curCamSync.CurrentCamera = camera;
+                        //}
+                        //if (player.Role != RoleTypeId.Scp079)
+                        //    player.EffectsManager.ChangeState<Ensnared>(1, 5);
                     }
                 });
             }
@@ -278,13 +309,11 @@ namespace TheRiptide
                     break;
             }
 
-            int scp_count = Mathf.RoundToInt(Player.Count / 6.0f);
-            if (scp_count == 0)
-                scp_count = 1;
+            int scp_count = Mathf.Max(Mathf.RoundToInt(Player.Count / config.ScpRatio), 1);
             if (difficulty == Difficulty.Easy)
-                scp_count = Mathf.RoundToInt(scp_count * 1.5f);
+                scp_count = Mathf.RoundToInt(scp_count * config.EasyMultiplier);
             else if (difficulty == Difficulty.Medium)
-                scp_count = Mathf.RoundToInt(scp_count * 2.0f);
+                scp_count = Mathf.RoundToInt(scp_count * config.MediumMultiplier);
 
             List<RoleTypeId> scp_roles = new List<RoleTypeId>()
             {
@@ -527,7 +556,7 @@ namespace TheRiptide
         {
             Log.Info(EventName + " event is preparing");
             IsRunning = true;
-            EventHandler.Start();
+            EventHandler.Start(EventConfig);
             Log.Info(EventName + " event is prepared");
             PluginAPI.Events.EventManager.RegisterEvents<EventHandler>(this);
         }

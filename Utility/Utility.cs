@@ -1,5 +1,7 @@
 ﻿using InventorySystem;
+using InventorySystem.Configs;
 using InventorySystem.Items;
+using InventorySystem.Items.Armor;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
@@ -183,6 +185,25 @@ namespace TheRiptide
             }
         }
 
+        public static ushort GetStandardAmmoLimit(BodyArmor armor, ItemType ammo_type)
+        {
+            ushort limit = 0;
+                if (!InventoryLimits.StandardAmmoLimits.TryGetValue(ammo_type, out limit))
+                    return 200;
+            if (armor != null)
+            {
+                foreach (BodyArmor.ArmorAmmoLimit ammoLimit in armor.AmmoLimits)
+                {
+                    if (ammoLimit.AmmoType == ammo_type)
+                    {
+                        limit += ammoLimit.Limit;
+                        break;
+                    }
+                }
+            }
+            return limit;
+        }
+
         public static Firearm AddFirearm(Player player, ItemType type, bool grant_ammo)
         {
             int ammo_reserve = 0;
@@ -190,7 +211,10 @@ namespace TheRiptide
             uint attachment_code = AttachmentsServerHandler.PlayerPreferences[player.ReferenceHub][type];
             Firearm firearm = player.AddItem(type) as Firearm;
             if (grant_ammo)
-                ammo_reserve = player.GetAmmoLimit(firearm.AmmoType);
+            {
+                BodyArmor bodyArmor;
+                ammo_reserve = GetStandardAmmoLimit(!player.ReferenceHub.inventory.TryGetBodyArmor(out bodyArmor) ? null : bodyArmor, GunAmmoType(type));//  player.GetAmmoLimit(firearm.AmmoType);
+            }
             else
                 ammo_reserve = player.GetAmmo(firearm.AmmoType);
 
