@@ -19,6 +19,7 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+        public string Description { get; set; } = "Normal round but the SCPs have random sizes\n\n";
     }
 
     public class EventHandler
@@ -74,7 +75,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Scp Mutation";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "Normal round but the SCPs have random sizes\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "SM";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

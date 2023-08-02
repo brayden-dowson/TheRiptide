@@ -22,6 +22,8 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+
+        public string Description { get; set; } = "Humans Vs SCPs. All human teams are allied to defeat the SCPs. SCPs gain a speed boost equivilant to a cola, +1000 health and +1000 sheild (at 20% health)\n\n";
     }
 
     public class EventHandler
@@ -29,7 +31,7 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerJoined)]
         void OnPlayerJoined(Player player)
         {
-            player.SendBroadcast("Event being played: A Strange Alliance\n<size=32>Humans Vs SCPs. All human teams are allied to defeat the SCPs. SCPs gain a speed boost equivilant to a cola, +1000 health and +1000 sheild (at 20% health)</size>", 30, shouldClearPrevious: true);
+            player.SendBroadcast("Event being played: " + AStrangeAllianceEvent.Singleton.EventName + "\n<size=30>" + AStrangeAllianceEvent.Singleton.EventDescription.Replace("\n", "") + "</size>", 30, shouldClearPrevious: true);
         }
 
         [PluginEvent(ServerEventType.PlayerDamage)]
@@ -115,7 +117,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "A Strange Alliance Event";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "Humans Vs SCPs. All human teams are allied to defeat the SCPs. SCPs gain a speed boost equivilant to a cola, +1000 health and +1000 sheild (at 20% health)\n\n";
+        public string EventDescription 
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); } 
+        }
         public string EventPrefix { get; } = "ASA";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

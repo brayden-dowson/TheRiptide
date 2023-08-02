@@ -35,6 +35,8 @@ namespace TheRiptide
         public float EasyMultiplier { get; set; } = 1.333f;
         [Description("multiplier for the SCP count for the medium round (adjustment for having a two door room)")]
         public float MediumMultiplier { get; set; } = 1.666f;
+
+        public string Description { get; set; } = "All the NTF get trapped by all the SCPs in a random room. The SCPs must stop all the NTF from escaping. There will be 3 rounds increasing in difficulty. The player that escapes the most difficult round wins!\n\n";
     }
 
     public class EventHandler
@@ -542,7 +544,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "The Last Stand";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "All the NTF get trapped by all the SCPs in a random room. The SCPs must stop all the NTF from escaping. There will be 3 rounds increasing in difficulty. The player that escapes the most difficult round wins!\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "TLS";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

@@ -28,6 +28,7 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+        public string Description { get; set; } = "Everyone will spawn in doctors chamber with the elevators locked. All SCPs will become 939 and everyone else Class-D. The 939s are ensnared so they can only use their lunge ability to attack. A new dog spawns in every minute. Class-D get an adrenaline and painkillers. There is a 50% chance the lights will be out and be given flashlights. The last Class-D alive wins!\n\n";
     }
 
     public class EventHandler
@@ -36,7 +37,6 @@ namespace TheRiptide
         private static bool found_winner;
         private static RoomIdentifier scp049;
         private static bool lights_out;
-        //private static CoroutineHandle breathing_handle;
         private static CoroutineHandle spawn;
 
         public static void Start()
@@ -90,19 +90,8 @@ namespace TheRiptide
             scp049 = RoomIdentifier.AllRoomIdentifiers.First(r => r.Name == RoomName.Hcz049);
             foreach (var door in ElevatorDoor.AllElevatorDoors[ElevatorManager.ElevatorGroup.Scp049])
                 FacilityManager.LockDoor(door, DoorLockReason.AdminCommand);
-            //FacilityManager.LockRoom(scp049, DoorLockReason.AdminCommand);
 
-            //Timing.CallDelayed(1.0f,()=>
-            //{
-            //    while(dogs.Count <= 1)
-            //    {
-            //        Player selected = Player.GetPlayers().Where(p => !dogs.Contains(p.PlayerId)).ToList().RandomItem();
-            //        dogs.Add(selected.PlayerId);
-            //        selected.SetRole(RoleTypeId.Scp939);
-            //    }
-            //});
-
-            spawn = Timing.CallPeriodically(30.0f * 20.0f, 30.0f,()=>
+            spawn = Timing.CallPeriodically(30.0f * 60.0f, 30.0f,()=>
             {
                 List<Player> spectators = Player.GetPlayers().Where(p => p.Role == RoleTypeId.Spectator).ToList();
                 if (!spectators.IsEmpty())
@@ -121,7 +110,6 @@ namespace TheRiptide
                         controller.NetworkLightsEnabled = false;
                 });
             }
-            //breathing_handle = Timing.RunCoroutine(_BreathingUpdate());
         }
 
         [PluginEvent(ServerEventType.TeamRespawn)]
@@ -213,40 +201,6 @@ namespace TheRiptide
             if (!found_winner)
                 found_winner = WinConditionLastClassD(victim);
         }
-
-        private static IEnumerator<float> _BreathingUpdate()
-        {
-            while(true)
-            {
-                try
-                {
-                    List<Player> scp939s = new List<Player>();
-                    List<Player> alive = new List<Player>();
-                    foreach (var p in Player.GetPlayers())
-                    {
-                        if (p.Role == RoleTypeId.Scp939)
-                            scp939s.Add(p);
-                        else if (p.Role == RoleTypeId.ClassD)
-                            alive.Add(p);
-                    }
-
-                    foreach (var scp939 in scp939s)
-                    {
-                        var role = scp939.RoleBase as Scp939Role;
-                        RipplePlayer ripple;
-                        if (role.SubroutineModule.TryGetSubroutine(out ripple))
-                            foreach (var p in alive)
-                                ripple.Play(p.RoleBase as HumanRole);
-                    }
-                }
-                catch(System.Exception ex)
-                {
-                    Log.Error(ex.ToString());
-                }
-
-                yield return Timing.WaitForSeconds(3.0f);
-            }
-        }
     }
 
     public class LeapFrogEvent:IEvent
@@ -258,7 +212,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Leap Frog";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "Everyone will spawn in doctors chamber with the elevators locked. All SCPs will become 939 and everyone else Class-D. The 939s are ensnared so they can only use their lunge ability to attack. A new dogs spawns in every minute. Class-D get an adrenaline and painkillers. There is a 50% chance the lights will be out and be given flashlights. The last Class-D alive wins!\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "LF";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

@@ -24,6 +24,7 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+        public string Description { get; set; } = "All players will spawn in heavy containment zone and both the elevator systems and the entrance zone will be locked down. Everyone will be spawned as a scientist and will have to find some guns to kill the SCP939s that will be trying to find and kill everyone. If a generator is turned on the SCP079 doors will open allowing players access to its armor and pressing the overcharge which will turn the lights back on if they are turned off. The SCP939s will have only 1 hp while having 700 shield\n\n";
     }
 
     public class EventHandler
@@ -169,8 +170,12 @@ namespace TheRiptide
         public PluginHandler Handler;
 
         public string EventName { get; } = "In Silence";
-        public string EvenAuthor { get; } = "The Riptide. idea by Guy in Grey";
-        public string EventDescription { get; set; } = "All players will spawn in heavy containment zone and both the elevator systems and the entrance zone will be locked down. Everyone will be spawned as a scientist and will have to find some guns to kill the SCP939s that will be trying to find and kill everyone. If a generator is turned on the SCP079 doors will open allowing players access to its armor and pressing the overcharge which will turn the lights back on if they are turned off. The SCP939s will have only 1 hp while having 700 shield\n\n";
+        public string EvenAuthor { get; } = "The Riptide. Idea by Guy in Grey";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "IS";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

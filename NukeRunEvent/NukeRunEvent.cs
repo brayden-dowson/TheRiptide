@@ -22,6 +22,8 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+
+        public string Description { get; set; } = "Everyone spawns as a ClassD and are given 2 colas. The nuke is activated and the first person to escape wins!\n\n";
     }
 
 
@@ -178,7 +180,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Nuke Run";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "Everyone spawns as a ClassD and are given 2 colas. The nuke is activated and the first person to escape wins!\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "NR";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

@@ -41,6 +41,8 @@ namespace TheRiptide
         public float SpeedRampingRate { get; set; } = 10.0f;
         public int HealthRampingDelay { get; set; } = 5;
         public float HealthRampingRate { get; set; } = 100.0f;
+
+        public string Description { get; set; } = "Light is locked down and all players spawn in light as Class-D with one zombie. Zombies infect players on kill. Guns deal knock back based on the ratio of zombies to humans alive. Less humans more zombies = more knockback. The more zombies there are the less health each one has. After a certain amount of time zombies speed will start to ramp(increase) and after more time their health aswell. Last one alive wins!\n\n";
     }
 
     public class EventHandler
@@ -546,7 +548,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Zombie Survival";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "Light is locked down and all players spawn in light as Class-D with one zombie. Zombies infect players on kill. Guns deal knock back based on the ratio of zombies to humans alive. Less humans more zombies = more knockback. The more zombies there are the less health each one has. After a certain amount of time zombies speed will start to ramp(increase) and after more time their health aswell. Last one alive wins!\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "ZS";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

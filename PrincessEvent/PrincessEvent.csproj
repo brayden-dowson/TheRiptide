@@ -97,18 +97,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EventUtility\EventUtility.csproj">
+      <Project>{debef2a5-7dda-4ee6-abd6-3f98bc61e727}</Project>
+      <Name>EventUtility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utility\Utility.csproj">
       <Project>{d2b9f1e0-f876-4216-9c8d-1f3e12143c3e}</Project>
       <Name>Utility</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="rubberband-dll-Win32.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="rubberband-dll-x64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\rubberband-sharp.1.0.0\build\rubberband-sharp.targets" Condition="Exists('..\packages\rubberband-sharp.1.0.0\build\rubberband-sharp.targets')" />

@@ -27,6 +27,7 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+        public string Description { get; set; } = "All lights are out and light is locked down. Everyone spawns in light and are given flashlights and have 30 seconds to hide from peanut. Flashlight do not work on peanut.\n\n";
     }
 
 
@@ -246,7 +247,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Peanut Hide and Seek";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "All lights are out and light is locked down. Everyone spawns in light and are given flashlights and have 30 seconds to hide from peanut. Flashlight do not work on peanut.\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "PHAS";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

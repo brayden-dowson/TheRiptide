@@ -24,6 +24,7 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+        public string Description { get; set; } = "[recommended player count 30+] Light is locked down and everyone spawns as ClassD in light with one dog. Dog can infect Class-Ds on kill, the last ClassD alive wins\n\n";
     }
 
     public class EventHandler
@@ -73,7 +74,7 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerJoined)]
         void OnPlayerJoined(Player player)
         {
-            player.SendBroadcast("Event being played: Dog Infection\n<size=32>Light is locked down and everyone spawns as ClassD in light with one dog. The dogs only spawn inside 173s room. Dogs can infect ClassD on kill, the last ClassD alive wins!</size>", 30, shouldClearPrevious: true);
+            player.SendBroadcast("Event being played: " + DogInfectionEvent.Singleton.EventName + "\n<size=30>" + DogInfectionEvent.Singleton.EventDescription.Replace("\n", "") + "</size>", 30, shouldClearPrevious: true);
         }
 
         [PluginEvent(ServerEventType.PlayerLeft)]
@@ -211,7 +212,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Dog Infection";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "[recommended player count 30+] Light is locked down and everyone spawns as ClassD in light with one dog. Dog can infect Class-Ds on kill, the last ClassD alive wins\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "DI";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

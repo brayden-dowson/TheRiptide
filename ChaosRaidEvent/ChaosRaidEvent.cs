@@ -37,6 +37,8 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+
+        public string Description { get; set; } = "Half the players spawn as CHAOS the rest as NTF. CHAOS must steal all the items in the facility while NTF must stop them. The CHAOS can let SCPs and Class-D out. CHAOS receive reward items on successfully stealing items. CHAOS win if they steal all the items while NTF win if they survive all the spawn waves and kill all the CHAOS, SCPs and Class-Ds. If the Nuke goes off the winner is decided by who was in the lead stolen/protected\n\n";
     }
 
     public class EventHandler
@@ -66,8 +68,6 @@ namespace TheRiptide
         private static List<RoleTypeId> mtf_roles = new List<RoleTypeId>();
 
         private static Dictionary<DoorVariant, RoleTypeId> scp_doors = new Dictionary<DoorVariant, RoleTypeId>();
-        //private static List<DoorVariant> doors = new List<DoorVariant>();
-        //private static HashSet<RoleTypeId> spawned_scps = new HashSet<RoleTypeId>();
 
         private static Dictionary<int, LightSourceToy> player_lights = new Dictionary<int, LightSourceToy>();
         private static HashSet<ushort> dropped_lights = new HashSet<ushort>();
@@ -179,16 +179,8 @@ namespace TheRiptide
                 {
                     if (target_items.Contains(item.NetworkInfo.ItemId))
                     {
-                        //if (item.gameObject.transform.position.y < -500)
-                        //{
-                            FreezeItemAtPosition(item, item.Position);
-                            total_items++;
-                        //}
-                        //else
-                        //{
-                        //    Log.Info("Destroyed item above -500");
-                        //    NetworkServer.Destroy(item.gameObject);
-                        //}
+                        FreezeItemAtPosition(item, item.Position);
+                        total_items++;
                     }
                 }
                 items_left = total_items;
@@ -202,12 +194,6 @@ namespace TheRiptide
 
             foreach (var door in DoorVariant.DoorsByRoom[RoomIdentifier.AllRoomIdentifiers.First(r => r.Name == RoomName.Hcz079)])
                 FacilityManager.UnlockDoor(door, DoorLockReason.SpecialDoorFeature);
-
-            //foreach (var door in DoorVariant.DoorsByRoom[RoomIdentifier.AllRoomIdentifiers.First(r => r.Name == RoomName.LczCheckpointA)])
-            //    FacilityManager.LockDoor(door, DoorLockReason.AdminCommand);
-
-            //foreach (var door in DoorVariant.DoorsByRoom[RoomIdentifier.AllRoomIdentifiers.First(r => r.Name == RoomName.LczCheckpointB)])
-            //    FacilityManager.LockDoor(door, DoorLockReason.AdminCommand);
 
             is_first_spawn = true;
             Timing.CallDelayed(30.0f, () => is_first_spawn = false);
@@ -686,7 +672,7 @@ namespace TheRiptide
                     ItemPickupBase[] items = Object.FindObjectsOfType<ItemPickupBase>();
                     foreach (var item in items)
                     {
-                        if (target_items.Contains(item.Info.ItemId) /*&& item.gameObject.transform.position.y < -500*/)
+                        if (target_items.Contains(item.Info.ItemId))
                         {
                             items_left++;
                             if (item.transform.position.y < -1007.0f)
@@ -808,7 +794,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Chaos Raid";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "Spawn as two teams CHAOS and NTF in a ratio of 1:1. CHAOS must steal all the items in the facility while NTF must stop them. The CHAOS can let SCPs and Class-D out. CHAOS receive reward items on successfully stealing items. CHAOS win if they steal all the items while NTF win if they survive all 7 spawn waves and kill all the CHAOS, SCPs and Class-Ds. If the Nuke goes off the winner is decided by who was in the lead stolen/protected\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "CR";
         public bool OverrideWinConditions { get; } = true;
         public bool BulletHolesAllowed { get; set; } = false;

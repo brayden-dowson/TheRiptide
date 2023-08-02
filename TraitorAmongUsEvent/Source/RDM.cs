@@ -21,8 +21,8 @@ namespace TheRiptide
 
     public class RDM
     {
-        private const float damage_threshold = 90.0f;
-        private const int kill_threshold = 2;
+        //private const float damage_threshold = 90.0f;
+        //private const int kill_threshold = 2;
         private static Dictionary<int, float> player_ffdmg = new Dictionary<int, float>();
         private static Dictionary<int, int> player_ffkills = new Dictionary<int, int>();
         private static HashSet<int> player_grace = new HashSet<int>();
@@ -101,7 +101,7 @@ namespace TheRiptide
 
         public static IEnumerator<float> _Update()
         {
-            const float max_leeway = 3.0f;
+            //const float max_leeway = 3.0f;
             Dictionary<int, Leeway> player_leeway = new Dictionary<int, Leeway>();
             while(true)
             {
@@ -150,7 +150,7 @@ namespace TheRiptide
                         float rate = Mathf.Pow(movement - 1, 2) / Vector2.Distance(start, leeway.seen.Collider.transform.position);
                         leeway.avg_rate = (leeway.avg_rate + rate) / 2.0f;
                         leeway.value += leeway.avg_rate * Timing.DeltaTime;
-                        if (leeway.value > max_leeway)
+                        if (leeway.value > TraitorAmongUsEvent.Singleton.EventConfig.UnidedBodyLeeway)
                         {
                             EndGrace(p);
                             leeway.exceeded = true;
@@ -181,16 +181,16 @@ namespace TheRiptide
 
         public static bool OverRDMLimit(Player player)
         {
-            return (player_ffdmg.ContainsKey(player.PlayerId) && player_ffdmg[player.PlayerId] >= damage_threshold) ||
-                (player_ffkills.ContainsKey(player.PlayerId) && player_ffkills[player.PlayerId] >= kill_threshold);
+            return (player_ffdmg.ContainsKey(player.PlayerId) && player_ffdmg[player.PlayerId] >= TraitorAmongUsEvent.Singleton.EventConfig.RdmDamageThreshold) ||
+                (player_ffkills.ContainsKey(player.PlayerId) && player_ffkills[player.PlayerId] >= TraitorAmongUsEvent.Singleton.EventConfig.RdmKillThreshold);
         }
 
         public static void ForcePlayerOverLimit(Player player)
         {
             if (!player_ffkills.ContainsKey(player.PlayerId))
-                player_ffkills.Add(player.PlayerId, kill_threshold);
+                player_ffkills.Add(player.PlayerId, TraitorAmongUsEvent.Singleton.EventConfig.RdmKillThreshold);
             else
-                player_ffkills[player.PlayerId] = kill_threshold;
+                player_ffkills[player.PlayerId] = TraitorAmongUsEvent.Singleton.EventConfig.RdmKillThreshold;
         }
 
         public static void ForgivePlayer(Player player)

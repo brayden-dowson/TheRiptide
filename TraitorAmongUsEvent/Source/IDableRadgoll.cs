@@ -68,11 +68,11 @@ namespace TheRiptide
 
                         Vector3 start = player.ReferenceHub.PlayerCameraReference.position;
                         Vector3 dir = player.ReferenceHub.PlayerCameraReference.rotation * Vector3.forward;
-                        int mask = Physics.AllLayers & ~(1 << 13);
-                        RaycastHit[] hits_forward = Physics.RaycastAll(new Ray(start, dir), 3.5f, mask);
-                        RaycastHit[] hits_backward = Physics.RaycastAll(new Ray(start + (dir * 3.5f), -dir), 3.5f, mask);
+                        RaycastHit[] hits_forward = Physics.RaycastAll(new Ray(start, dir), 3.5f, (1 << 28), QueryTriggerInteraction.Collide);
+                        RaycastHit[] hits_backward = Physics.RaycastAll(new Ray(start + (dir * 3.5f), -dir), 3.5f, (1 << 28), QueryTriggerInteraction.Collide);
                         List<RaycastHit> hits = new List<RaycastHit>(hits_forward);
                         hits.AddRange(hits_backward);
+
                         foreach (var hit in hits)
                         {
                             SphereCollider sc = hit.collider as SphereCollider;
@@ -109,7 +109,7 @@ namespace TheRiptide
                 {
                     Log.Error(ex.ToString());
                 }
-                yield return Timing.WaitForSeconds(0.2f);
+                yield return Timing.WaitForSeconds(0.1f);
             }
         }
 
@@ -233,7 +233,7 @@ namespace TheRiptide
             {
                 dcpf = new GameObject("detector_collider", new System.Type[] { typeof(SphereCollider) });
                 dcpf.GetComponent<SphereCollider>().radius = 1.5f;
-                dcpf.layer = 17;
+                dcpf.layer = 28;
             }
             Collider = Object.Instantiate(dcpf, pos + Vector3.down, Quaternion.identity).GetComponent<SphereCollider>();
             Real = real;

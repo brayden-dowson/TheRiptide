@@ -42,7 +42,7 @@ namespace TheRiptide
         public static void Stop()
         {
             Timing.KillCoroutines(update);
-            BroadcastOverride.ClearLines(BroadcastPriority.Medium);
+            BroadcastOverride.ClearLines(BroadcastPriority.Highest);
             BroadcastOverride.UpdateAllDirty();
         }
 

@@ -29,6 +29,7 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+        public string Description { get; set; } = "Scientists vs Class-D in a random zone with a random loadout, last team alive wins!\n\n";
     }
 
     //1 970 -44
@@ -384,7 +385,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Team Deathmatch";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "Scientists vs Class-D in a random zone with a random loadout, last team alive wins!\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "TD";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

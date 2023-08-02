@@ -29,6 +29,7 @@ namespace TheRiptide
         public bool IsEnabled { get; set; } = true;
 
         public bool LockSurface { get; set; } = true;
+        public string Description { get; set; } = "A Shy Guy spawns in entrance and is triggered by everyone. All other players are Class-D and spawn in their cells. Class-Ds get 6x SCP330, 4x SCP207, medkit, painkillers and a facility manager card. Surface is locked down. The last one alive win!\n\n";
     }
 
     public class EventHandler
@@ -62,7 +63,7 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerJoined)]
         void OnPlayerJoined(Player player)
         {
-            player.SendBroadcast("Event being played: Shy Guy Rampage\n<size=32>Everyone has triggered Shy Guy and there is no escape. Shy Guy spawns in entrance and enrages automaticaly after 30 seconds everyone else becomes a ClassD and spawns in light\nThe last one alive wins!</size>", 30, shouldClearPrevious: true);
+            player.SendBroadcast("Event being played: " + ShyGuyRampageEvent.Singleton.EventName + "\n<size=30>" + ShyGuyRampageEvent.Singleton.EventDescription.Replace("\n", "") + "</size>", 30, shouldClearPrevious: true);
         }
 
         [PluginEvent(ServerEventType.PlayerLeft)]
@@ -318,7 +319,11 @@ namespace TheRiptide
         public PluginHandler Handler;
         public string EventName { get; } = "Shy Guy Rampage";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "A Shy Guy spawns in entrance and is triggered by everyone. All other players are Class-D and spawn in their cells. Class-Ds get 6x SCP330, 4x SCP207, medkit, painkillers and a facility manager card. Surface is locked down. The last one alive win!\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "SGR";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

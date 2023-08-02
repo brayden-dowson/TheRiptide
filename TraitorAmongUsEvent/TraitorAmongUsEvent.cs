@@ -40,14 +40,72 @@ namespace TheRiptide
         public float JesterRatio { get; set; } = 15.0f;
         [Description("chance the jesters will spawn for the round (0 = never, 1 = always)")]
         public float JesterChancePerRound { get; set; } = 0.3f;
-    }
 
+        [Description("amount of damage done to a player with grace to trigger auto slay")]
+        public float RdmDamageThreshold { get; set; } = 90.0f;
+        [Description("amount of kills done to a players with grace or to players on the same team to trigger auto slay")]
+        public int RdmKillThreshold { get; set; } = 2;
+        [Description("how much leeway is given once a player can see a body that is unided until they lose grace. higher values give more time for the player to id the body")]
+        public float UnidedBodyLeeway { get; set; } = 3.0f;
+
+        public string Description { get; set; } = "A few players are Traitors, Detectives and Jesters the rest are Innocents. Traitors must kill all Innocents to win while Innocents must figure out who the Traitors are and kill them. Innocents vastly outnumber Traitors, but dont know who they are. Detectives are proven innocent and must help the Innocents win. Jesters cannot kill and win when an innocent player kills them.\n\n";
+
+        public string DetectiveHint { get; set; } = "<b><size=128><color=#0000FF>Role: Detective</color></size></b>";
+        public string InnocentHint { get; set; } = "<b><size=128><color=#00FF00>Role: Innocent</color></size></b>";
+        public string TraitorHint { get; set; } = "<b><size=128><color=#FF0000>Role: Traitor</color></size></b>";
+        public string JesterHint { get; set; } = "<b><size=128><color=#FF80FF>Role: Jester</color></size></b>";
+
+        public List<string> DetectiveBroadcast { get; set; } = new List<string>{
+            "<b><color=#0000FF><align=left>Detective</color> - Objective: Help innocents win</b>",
+            "As a detective you are proven innocent by default",
+            "You get access to a shop to help you find the traitors(Right click keycard in inventory)",
+            "you earn points for the shop by collecting evidence e.g. ID-ing bodies" };
+
+        public List<string> InnocentBroadcast { get; set; } = new List<string> {
+            "<b><color=#00FF00><align=left>Innocent</color> - Objective: Survive</b>",
+            "You must not RDM(kill with an invalid reason) otherwise you will be slain and miss out the next round",
+            "You get an ID-Gun(the revolver) which when pointed at a body determines if they where a traitor or not(USE IT)",
+            "you can kill players that do not ID bodies right away e.g. a player walks over a body without ID-ing it" };
+
+        public List<string> TraitorBroadcast { get; set; } = new List<string> {
+            "<b><color=#FF0000><align=left>Traitor</color> - Objective: Kill all innocents</b>",
+            "You can see your traitor teammates as they will apear as Class-Ds",
+            "You get access to a shop to help you kill all the innocents(Right click keycard in inventory)",
+            "You can use the vents(press E on them) to get around the map fast",
+            "You can sabotage by pulling certain levers around the ship e.g. turn off the lights in electrical" };
+
+        public List<string> JesterBroadcast { get; set; } = new List<string> {
+            "<b><color=#FF80FF><align=left>Jester</color> - Objective: Die</b>",
+            "You must only die to a innocent to win, traitors dont count",
+            "You are not able to kill anyone as the jester",
+            "You can use vents but traitors can see that you are the jester" };
+
+        public string ReadyUpBroadcast { get; set; } = "<size=20><line-height=80%><color=#00FF00><b>Gamemode:</b></color> Traitor Among US (Adaptation of the CSGO mod [TTT] Trouble in Terrorist Town) - A few players are Traitors, Detectives and Jesters the rest are Innocents. Traitors must kill all Innocents to win while Innocents must figure out who the Traitors are and kill them. Innocents vastly outnumber Traitors, but dont know who they are. Detectives are proven innocent and must help the Innocents win. Jesters cannot kill and win when an innocent player kills them.<size=27><line-height=75%>\n<color=#FF0000><b>Rules:</b> YOU MUST BE CERTAIN THAT A PERSON IS A TRAITOR BEFORE SHOOTING!!!.</color> All players get ID-Guns which when pointed at a body will ID it announcing to the server if the player was innocent or a traitor. If you see someone shoot and kill another person and they do not ID the body or the victim is innocent the attacker is a Traitor. You must see this happen and cant go of your \"feeling\" or because you heard shooting around the corner. Seeing a player use the vents is not proof they are the Traitor as Jesters can use vents too. If you understand these rules to ready up, ID the body on the table (do not tell other people how to ready up other than to say to read the rules)";
+
+        public string JestersWinHint { get; set; } = "<b><size=92>The Jester Was Killed by {name}\n<color=#FF0000>They will sit out next round as punishment</color>\n<color=#FF80FF>The Jester Wins!</color></size></b>";
+        public string InnocentsWinHint { get; set; } = "<b><size=128>All Traitors Eliminated\n<color=#00FF00>Innocents Win!</color></size></b>";
+        public string TraitorsWinHint { get; set; } = "<b><size=128>All Innocents Eliminated\n<color=#FF0000>Traitors Win!</color></size></b>";
+        public string TraitorsOutOfTimeAnnouncement { get; set; } = "<b><size=128>Traitors Ran out of Time</size></b>";
+
+        public string RdmSlainMessage { get; set; } = "You RDM'd to much this round so you were set to spectator!";
+
+        public string ReadyUpNotReadyHint { get; set; } = "<b><size=92><color=#FF0000>READ THE RULES TO READY UP</color>\n<color=#87ceeb>{ready}/{total} Players Ready\nRound starts in {time}</color></size></b>";
+        public string ReadyUpReadyHint { get; set; } = "<b><size=92><color=#00FF00>YOU ARE READY</color>\n<color=#87ceeb>{ready}/{total} Players Ready\nRound starts in {time}</color></size></b>";
+        public string ReadyUpToSlowHint { get; set; } = "<b><size=92><color=#FF0000>YOU DID NOT READY UP IN TIME</color></b>";
+
+        public string KilledJesterHint { get; set; } = "You killed the jester last round!\n Read the rules to make sure this does not happen again";
+        public string RdmedToMuchHint { get; set; } = "You RDM'd to much last round!\n Read the rules to make sure this does not happen again";
+
+        public string StaffDidNotSelectMap { get; set; } = "[ERROR] The staff did not select a map!";
+
+        public string RoundStartingHint { get; set; } = "<b><size=64><color=#87ceeb>Round {round} of {total} Starting...</color></size></b>";
+    }
+ 
     public enum TauRole { Unassigned, Innocent, Detective, Traitor, Jester };
 
     public class TraitorAmongUs
     {
-        private static Config config;
-        //private const int round_count = 3;
+        public static Config config;
         public static float round_timer;
         private static int round;
 
@@ -67,38 +125,15 @@ namespace TheRiptide
         private static CoroutineHandle ready_up;
         private static CoroutineHandle round_setup;
 
-        public static List<string> DetectiveHint = new List<string>{
-            "<b><color=#0000FF><align=left>Detective</color> - Objective: Help innocents win</b>",
-            "As a detective you are proven innocent by default",
-            "You get access to a shop to help you find the traitors(Right click keycard in inventory)",
-            "you earn points for the shop by collecting evidence e.g. ID-ing bodies" };
-
-        public static List<string> InnocentHint = new List<string> {
-            "<b><color=#00FF00><align=left>Innocent</color> - Objective: Survive</b>",
-            "You must not RDM(kill with an invalid reason) otherwise you will be slain and miss out the next round",
-            "You get an ID-Gun(the revolver) which when pointed at a body determines if they where a traitor or not(USE IT)",
-            "you can kill players that do not ID bodies right away e.g. a player walks over a body without ID-ing it" };
-
-        public static List<string> TraitorHint = new List<string> {
-            "<b><color=#FF0000><align=left>Traitor</color> - Objective: Kill all innocents</b>",
-            "You can see your traitor teammates as they will apear as Class-Ds",
-            "You get access to a shop to help you kill all the innocents(Right click keycard in inventory)",
-            "You can use the vents(press E on them) to get around the map fast",
-            "You can sabotage by pulling certain levers around the ship e.g. turn off the lights in electrical" };
-
-        public static List<string> JesterHint = new List<string> {
-            "<b><color=#FF80FF><align=left>Jester</color> - Objective: Die</b>",
-            "You must only die to a innocent to win, traitors dont count",
-            "You are not able to kill anyone as the jester",
-            "You can use vents but traitors can see that you are the jester" };
-
-        private static string ready_up_broadcast = "<size=20><line-height=80%><color=#00FF00><b>Gamemode:</b></color> Traitor Among US (Adaptation of the CSGO mod [TTT] Trouble in Terrorist Town) - A few players are Traitors, Detectives and Jesters the rest are Innocents. Traitors must kill all Innocents to win while Innocents must figure out who the Traitors are and kill them. Innocents vastly outnumber Traitors, but dont know who they are. Detectives are proven innocent and must help the Innocents win. Jesters cannot kill and win when an innocent player kills them.<size=27><line-height=75%>\n<color=#FF0000><b>Rules:</b> YOU MUST BE CERTAIN THAT A PERSON IS A TRAITOR BEFORE SHOOTING!!!.</color> All players get ID-Guns which when pointed at a body will ID it announcing to the server if the player was innocent or a traitor. If you see someone shoot and kill another person and they do not ID the body or the victim is innocent the attacker is a Traitor. You must see this happen and cant go of your \"feeling\" or because you heard shooting around the corner. Seeing a player use the vents is not proof they are the Traitor as Jesters can use vents too. If you understand these rules to ready up, ID the body on the table (do not tell other people how to ready up other than to say to read the rules)";
-
         private static float ff_old;
         private static bool ff_state;
+        private static bool uq_state;
 
         public static void Start(Config config)
         {
+            uq_state = UltraQuaternion.Enabled;
+            UltraQuaternion.Enable();
+            AlphaWarheadController.Singleton._autoDetonate = false;
             TraitorAmongUs.config = config;
             ff_state = Server.FriendlyFire;
             Server.FriendlyFire = true;
@@ -145,6 +180,9 @@ namespace TheRiptide
 
         public static void Stop()
         {
+            if (!uq_state)
+                UltraQuaternion.Disable();
+            jester_killer = null;
             Server.FriendlyFire = ff_state;
             AttackerDamageHandler._ffMultiplier = ff_old;
 
@@ -175,7 +213,7 @@ namespace TheRiptide
             not_ready.Add(player.PlayerId);
             if (Round.IsRoundStarted && is_ready_up)
             {
-                player.SendBroadcast(ready_up_broadcast, 300, shouldClearPrevious: true);
+                player.SendBroadcast(config.ReadyUpBroadcast, 300, shouldClearPrevious: true);
                 player.SetRole(RoleTypeId.Scientist);
                 BodyManager.RespawnReadyupBodyForClient(player);
             }
@@ -201,7 +239,7 @@ namespace TheRiptide
         {
             if (map == null)
                 foreach (var p in ReadyPlayers())
-                    p.SendBroadcast("[ERROR] The staff did not select a map!", 300, shouldClearPrevious: true);
+                    p.SendBroadcast(config.StaffDidNotSelectMap, 300, shouldClearPrevious: true);
             Round.IsLocked = true;
 
             is_ready_up = true;
@@ -272,8 +310,8 @@ namespace TheRiptide
                     player.AddItem(ItemType.Medkit);
                     player.AddItem(ItemType.Painkillers);
 
-                    player.ReceiveHint("<b><size=128><color=#0000FF>Role: Detective</color></size></b>", 15);
-                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, DetectiveHint);
+                    player.ReceiveHint(config.DetectiveHint, 15);
+                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, config.DetectiveBroadcast);
                     BroadcastOverride.UpdateIfDirty(player);
                 });
             }
@@ -294,13 +332,13 @@ namespace TheRiptide
                     
                     if (jesters.Contains(player.PlayerId))
                     {
-                        player.ReceiveHint("<b><size=128><color=#FF80FF>Role: Jester</color></size></b>", 15);
-                        BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, JesterHint);
+                        player.ReceiveHint(config.JesterHint, 15);
+                        BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, config.JesterBroadcast);
                     }
                     else
                     {
-                        player.ReceiveHint("<b><size=128><color=#00FF00>Role: Innocent</color></size></b>", 15);
-                        BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, InnocentHint);
+                        player.ReceiveHint(config.InnocentHint, 15);
+                        BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, config.InnocentBroadcast);
                     }
                     BroadcastOverride.UpdateIfDirty(player);
                 });
@@ -317,8 +355,8 @@ namespace TheRiptide
                     player.AddItem(ItemType.ArmorCombat);
                     AddFirearm(player, ItemType.GunCrossvec, true);
 
-                    player.ReceiveHint("<b><size=128><color=#FF0000>Role: Traitor</color></size></b>", 15);
-                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, TraitorHint);
+                    player.ReceiveHint(config.TraitorHint, 15);
+                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, config.TraitorBroadcast);
                     BroadcastOverride.UpdateIfDirty(player);
                 });
             }
@@ -564,6 +602,7 @@ namespace TheRiptide
 
                 Announcements.Start();
 
+                bool sent_out_of_time_annoucement = false;
                 WinningRole winner;
                 while (true)
                 {
@@ -575,7 +614,7 @@ namespace TheRiptide
                             Timing.CallDelayed(0.0f, () =>
                             {
                                 foreach (var p in ReadyPlayers())
-                                    p.ReceiveHint("<b><size=92>The Jester Was Killed by " + jester_killer.Nickname + "\n<color=#FF0000>They will sit out next round as punishment</color>\n<color=#FF80FF>The Jester Wins!</color></size></b>", 10);
+                                    p.ReceiveHint(config.JestersWinHint.Replace("{name}", jester_killer.Nickname), 10);
                             });
                             break;
                         }
@@ -590,8 +629,8 @@ namespace TheRiptide
                                 if (RDM.OverRDMLimit(p))
                                 {
                                     p.Kill("Cause of Death: Complications from being retarded.");
-                                    p.SendBroadcast(ready_up_broadcast, 300, shouldClearPrevious: true);
-                                    p.ReceiveHint("You RDM'd to much this round so you were set to spectator!", 60);
+                                    p.SendBroadcast(config.ReadyUpBroadcast, 300, shouldClearPrevious: true);
+                                    p.ReceiveHint(config.RdmSlainMessage, 60);
                                     not_ready.Add(p.PlayerId);
                                 }
                                 else
@@ -611,7 +650,7 @@ namespace TheRiptide
                             Timing.CallDelayed(0.0f, () =>
                             {
                                 foreach (var p in ReadyPlayers())
-                                    p.ReceiveHint("<b><size=128>All Traitors Eliminated\n<color=#00FF00>Innocents Win!</color></size></b>", 10);
+                                    p.ReceiveHint(config.InnocentsWinHint, 10);
                             });
                             break;
                         }
@@ -621,7 +660,7 @@ namespace TheRiptide
                             Timing.CallDelayed(0.0f, () =>
                             {
                                 foreach (var p in ReadyPlayers())
-                                    p.ReceiveHint("<b><size=128>All Innocents Eliminated\n<color=#FF0000>Traitors Win!</color></size></b>", 10);
+                                    p.ReceiveHint(config.TraitorsWinHint, 10);
                             });
                             break;
                         }
@@ -630,7 +669,11 @@ namespace TheRiptide
                             foreach (var p in ReadyPlayers())
                                 if (traitors.Contains(p.PlayerId))
                                     p.Kill("you were to slow!");
-                            Announcements.Add(new Announcement("<b><size=128>Traitors Ran out of Time</size></b>", 30.0f));
+                            if (!sent_out_of_time_annoucement)
+                            {
+                                Announcements.Add(new Announcement(config.TraitorsOutOfTimeAnnouncement, 30.0f));
+                                sent_out_of_time_annoucement = true;
+                            }
                         }
                     }
                     catch (System.Exception ex)
@@ -674,7 +717,7 @@ namespace TheRiptide
         {
             foreach (var player in ReadyPlayers())
                 if (!not_ready.Contains(player.PlayerId))
-                    player.ReceiveHint("<b><size=64><color=#87ceeb>Round " + (round + 1) + " of " + config.RoundCount + " Starting...</color></size></b>", 4);
+                    player.ReceiveHint(config.RoundStartingHint.Replace("{round}", (round + 1).ToString()).Replace("{total}", config.RoundCount.ToString()), 4);
 
             yield return Timing.WaitForSeconds(3.0f);
 
@@ -709,16 +752,16 @@ namespace TheRiptide
                     if(jester_killer != null && p == jester_killer)
                     {
                         p.SetRole(RoleTypeId.Spectator);
-                        p.ReceiveHint("You killed the jester last round!\n Read the rules to make sure this does not happen again", 6000);
-                        p.SendBroadcast(ready_up_broadcast, 300, shouldClearPrevious: true);
+                        p.ReceiveHint(config.KilledJesterHint, 6000);
+                        p.SendBroadcast(config.ReadyUpBroadcast, 300, shouldClearPrevious: true);
                         not_ready.Add(p.PlayerId);
                         jester_killer = null;
                     }
                     else if(RDM.OverRDMLimit(p))
                     {
                         p.SetRole(RoleTypeId.Spectator);
-                        p.ReceiveHint("You RDM'd to much last round!\n Read the rules to make sure this does not happen again", 6000);
-                        p.SendBroadcast(ready_up_broadcast, 300, shouldClearPrevious: true);
+                        p.ReceiveHint(config.RdmedToMuchHint, 6000);
+                        p.SendBroadcast(config.ReadyUpBroadcast, 300, shouldClearPrevious: true);
                         not_ready.Add(p.PlayerId);
                     }
                     else
@@ -739,15 +782,10 @@ namespace TheRiptide
             RDM.Start();
 
             List<Player> player_traitors = Player.GetPlayers().Where(p => p.IsAlive && traitors.Contains(p.PlayerId) && p.Role == RoleTypeId.ClassD).ToList();
-
             foreach (var p in Player.GetPlayers())
-            {
                 if (p.IsAlive && (detectives.Contains(p.PlayerId) || jesters.Contains(p.PlayerId) || !traitors.Contains(p.PlayerId)))
-                {
                     foreach (var t in player_traitors)
                         p.Connection.Send(new RoleSyncInfo(t.ReferenceHub, RoleTypeId.Scientist, p.ReferenceHub));
-                }
-            }
         }
 
         private static IEnumerator<float> _ReadyUp(int time)
@@ -756,20 +794,49 @@ namespace TheRiptide
             map.OnReadyUpStart();
             BodyManager.BeginReadyUP(map.ReadyUpBodyPosition);
             foreach (var p in ReadyPlayers())
-                p.SendBroadcast(ready_up_broadcast, 300, shouldClearPrevious: true); 
+                p.SendBroadcast(config.ReadyUpBroadcast, 300, shouldClearPrevious: true);
+
+            HashSet<Player> not_ready_desync = ReadyPlayers().Where(p => p.IsAlive && not_ready.Contains(p.PlayerId)).ToHashSet();
+            foreach (var p in ReadyPlayers().Where(p => p.Role != RoleTypeId.None))
+                foreach (var nr in not_ready_desync)
+                    if (p != nr)
+                        p.Connection.Send(new RoleSyncInfo(nr.ReferenceHub, RoleTypeId.Tutorial, p.ReferenceHub));
+
             int passed = 0;
             while (passed <= time)
             {
                 int ready = 0;
                 try
                 {
-                    foreach(var p in ReadyPlayers())
+                    string ready_str = (Player.Count - not_ready.Count).ToString();
+                    string total_str = Mathf.Max(Player.Count, 2).ToString();
+                    string time_str = pause_ready_up ? "Paused" : (time - passed).ToString();
+                    foreach (var p in ReadyPlayers())
                     {
                         if (not_ready.Contains(p.PlayerId))
-                            p.ReceiveHint("<b><size=92><color=#FF0000>READ THE RULES TO READY UP</color>\n<color=#87ceeb>" + (Player.Count - not_ready.Count) + "/" + Mathf.Max(Player.Count,2) + " Players Ready\nRound starts in " +(pause_ready_up ? "Paused" : (time - passed).ToString()) + "</color></size></b>", 2);
+                        {
+                            if(!not_ready_desync.Contains(p))
+                            {
+                                not_ready_desync.Add(p);
+                                foreach (var player in ReadyPlayers().Where(player => p.Role != RoleTypeId.None))
+                                    if (p != player)
+                                        player.Connection.Send(new RoleSyncInfo(p.ReferenceHub, RoleTypeId.Tutorial, player.ReferenceHub));
+                                foreach (var nr in not_ready_desync)
+                                    if (p != nr)
+                                        p.Connection.Send(new RoleSyncInfo(nr.ReferenceHub, RoleTypeId.Tutorial, p.ReferenceHub));
+                            }
+                            p.ReceiveHint(config.ReadyUpNotReadyHint.Replace("{ready}", ready_str).Replace("{total}", total_str).Replace("{time}", time_str), 2);
+                        }
                         else
                         {
-                            p.ReceiveHint("<b><size=92><color=#00FF00>YOU ARE READY</color>\n<color=#87ceeb>" + (Player.Count - not_ready.Count) + "/" + Mathf.Max(Player.Count, 2) + " Players Ready\nRound starts in " + (pause_ready_up ? "Paused" : (time - passed).ToString()) + "</color></size></b>", 2);
+                            if(not_ready_desync.Contains(p))
+                            {
+                                foreach (var player in ReadyPlayers().Where(player => p.Role != RoleTypeId.None))
+                                    if (p != player)
+                                        player.Connection.Send(new RoleSyncInfo(p.ReferenceHub, RoleTypeId.Scientist, player.ReferenceHub));
+                                not_ready_desync.Remove(p);
+                            }
+                            p.ReceiveHint(config.ReadyUpReadyHint.Replace("{ready}", ready_str).Replace("{total}", total_str).Replace("{time}", time_str), 2);
                             ready++;
                         }
                     }
@@ -792,8 +859,8 @@ namespace TheRiptide
                 if (not_ready.Contains(player.PlayerId))
                 {
                     player.SetRole(RoleTypeId.Spectator);
-                    player.ReceiveHint("<b><size=92><color=#FF0000>YOU DID NOT READY UP IN TIME</color></b>", 30);
-                    player.SendBroadcast(ready_up_broadcast, 300, shouldClearPrevious: true);
+                    player.ReceiveHint(config.ReadyUpToSlowHint, 30);
+                    player.SendBroadcast(config.ReadyUpBroadcast, 300, shouldClearPrevious: true);
                 }
             }
             map.OnReadyUpEnd();
@@ -835,7 +902,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Traitor Among Us";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "A few players are Traitors, Detectives and Jesters the rest are Innocents. Traitors must kill all Innocents to win while Innocents must figure out who the Traitors are and kill them. Innocents vastly outnumber Traitors, but dont know who they are. Detectives are proven innocent and must help the Innocents win. Jesters cannot kill and win when an innocent player kills them.\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "TAU";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Usables.Scp330;
 using Interactables.Interobjects.DoorUtils;
+using static TheRiptide.Utility;
 
 namespace TheRiptide
 {
@@ -76,16 +77,10 @@ namespace TheRiptide
             }
             else
             {
-                Timing.CallDelayed(0.1f, () =>
+                Timing.CallDelayed(0.0f, () =>
                 {
                     player.ClearInventory();
                     Teleport.RoomPos(player, EndRoom, RoomOffset);
-                    //Player p = Player.Get(player_id);
-                    //if (p != null)
-                    //{
-                    //    p.ClearInventory();
-                    //    Teleport.RoomPos(p, EndRoom, RoomOffset);
-                    //}
                 });
             }
         }
@@ -97,7 +92,7 @@ namespace TheRiptide
             winner.SendBroadcast("You Won!", 5, shouldClearPrevious: true);
             Timing.CallDelayed(5.0f, () =>
             {
-                foreach (var p in Player.GetPlayers())
+                foreach (var p in ReadyPlayers())
                 {
                     if (p.PlayerId != WinnerId)
                         p.SetRole(LoserRole);
@@ -114,7 +109,10 @@ namespace TheRiptide
             {
                 Player p = Player.Get(WinnerId);
                 if (p != null)
+                {
                     p.SetRole(RoleTypeId.Spectator);
+                    p.SendBroadcast("you were to slow!", 10, shouldClearPrevious: true);
+                }
             });
         }
 
@@ -125,51 +123,25 @@ namespace TheRiptide
             bool found_winner = false;
 
             int dclass_alive = 0;
-            foreach (var p in Player.GetPlayers())
+            foreach (var p in ReadyPlayers())
                 if (p.Role == RoleTypeId.ClassD)
                     dclass_alive++;
             if (dclass_alive == 0)
             {
                 found_winner = true;
-                WinnerId = victim.PlayerId;
+                FoundWinner(victim);
             }
             else if (dclass_alive == 1)
             {
                 found_winner = true;
-                foreach (var p in Player.GetPlayers())
+                foreach (var p in ReadyPlayers())
                 {
                     if (p.Role == RoleTypeId.ClassD)
                     {
-                        WinnerId = p.PlayerId;
-                        p.IsGodModeEnabled = true;
-                        p.SendBroadcast("You Won!", 5, shouldClearPrevious: true);
+                        found_winner = true;
+                        FoundWinner(p);
                     }
                 }
-            }
-
-            if (found_winner)
-            {
-                Timing.CallDelayed(5.0f, () =>
-                {
-                    foreach (var p in Player.GetPlayers())
-                    {
-                        if (p.PlayerId != WinnerId)
-                            p.SetRole(LoserRole);
-                        else
-                        {
-                            if (p.IsAlive)
-                                GrantWinnerReward(p);
-                            else
-                                p.SetRole(RoleTypeId.ClassD);
-                        }
-                    }
-                });
-                RestartHandler = Timing.CallDelayed(60.0f, () =>
-                {
-                    Player p = Player.Get(WinnerId);
-                    if (p != null)
-                        p.SetRole(RoleTypeId.Spectator);
-                });
             }
             return found_winner;
         }
@@ -181,22 +153,22 @@ namespace TheRiptide
             winner.AddItem(ItemType.MicroHID);
             winner.AddItem(ItemType.GrenadeHE);
             winner.AddItem(ItemType.Jailbird);
-            //ParticleDisruptor pd = winner.AddItem(ItemType.ParticleDisruptor) as ParticleDisruptor;
-            //pd.Status = new FirearmStatus(50, pd.Status.Flags, pd.Status.Attachments);
             winner.AddItem(ItemType.SCP018);
             winner.AddItem(ItemType.SCP244a);
             Firearm gun = winner.AddItem(ItemType.GunCom45) as Firearm;
             gun.Status = new FirearmStatus(255, FirearmStatusFlags.Chambered, gun.Status.Attachments);
             winner.AddAmmo(ItemType.Ammo9x19, 2000);
             Scp330Bag bag = winner.AddItem(ItemType.SCP330) as Scp330Bag;
+            bag.TryAddSpecific(CandyKindID.Pink);
             bag.TryRemove(0);
             bag.TryAddSpecific(CandyKindID.Pink);
             bag.TryAddSpecific(CandyKindID.Pink);
             bag.TryAddSpecific(CandyKindID.Pink);
             bag.TryAddSpecific(CandyKindID.Pink);
             bag.TryAddSpecific(CandyKindID.Pink);
-            bag.TryAddSpecific(CandyKindID.Pink);
             bag.ServerRefreshBag();
+            ParticleDisruptor pd = winner.AddItem(ItemType.ParticleDisruptor) as ParticleDisruptor;
+            pd.Status = new FirearmStatus(50, pd.Status.Flags, pd.Status.Attachments);
             winner.SendBroadcast("Now destroy the losers.\ncheck inv.", 30, shouldClearPrevious: true);
             winner.IsGodModeEnabled = true;
         }

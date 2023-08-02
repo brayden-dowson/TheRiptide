@@ -408,14 +408,14 @@ namespace TheRiptide
 
         public void Enable(Player enabler)
         {
-            ActiveSabotages.Add("ENG" + (Instances.IndexOf(this) + 1), 45);
+            ActiveSabotages.Add("ENG" + (Instances.IndexOf(this) + 1), 30);
             generator_update = Timing.RunCoroutine(_GeneratorUpdate(enabler));
         }
 
         private IEnumerator<float> _GeneratorUpdate(Player enabler)
         {
             Shop.RewardCash(enabler, 15, "<b><color=#00FF00>$15</color> reward for sabotaging Engine! Check shop for options</b>");
-            yield return Timing.WaitForSeconds(45.0f);
+            yield return Timing.WaitForSeconds(30.0f);
             Shop.RewardCash(enabler, 85, "<b><color=#00FF00>$85</color> reward for successful sabotage of Engine! Check shop for options</b>");
             IsDeactivated = true;
             if (Instances[0].IsDeactivated && Instances[1].IsDeactivated)

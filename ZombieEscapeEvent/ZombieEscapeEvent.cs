@@ -40,6 +40,8 @@ namespace TheRiptide
         public int DefendTime { get; set; } = 45;
         public int GeneratorTime { get; set; } = 60;
         public int TransitionTime { get; set; } = 15;
+
+        public string Description { get; set; } = "Everyone spawns in light. There are one or more zombies the rest are NTF. The NTF have to escape the facility but must do certain objectives first. Zombies infect players on kill but will lose their health doing so. Guns deal knock back based on the ratio of zombies to humans alive. Less humans more zombies = more knockback. The more zombies there are the less health each one has. Zombies and guns increase in strength as more objectives are completed. The path though the facility is fixed based on the objective and a there will be a light to guide you.\n\n";
     }
 
     public class EventHandler
@@ -1141,7 +1143,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Zombie Escape";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "Everyone spawns in light. There are one or more zombies the rest are NTF. The NTF have to escape the facility but must do certain objectives first. Zombies infect players on kill but will lose their health doing so. Guns deal knock back based on the ratio of zombies to humans alive. Less humans more zombies = more knockback. The more zombies there are the less health each one has. Zombies and guns increase in strength as more objectives are completed. The path though the facility is fixed based on the objective and a there will be a light to guide you.\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "ZE";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

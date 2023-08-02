@@ -25,6 +25,7 @@ namespace TheRiptide
         public bool IsEnabled { get; set; } = true;
 
         public float ChildSize { get; set; } = 0.65f;
+        public string Description { get; set; } = "Half the players will be small. Small players have 75% max health but get a speed boost equivalent to a cola without the negative effect\n\n";
     }
 
 
@@ -73,7 +74,7 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerJoined)]
         void OnPlayerJoined(Player player)
         {
-            player.SendBroadcast("Event being played: Bring your kid to work\n<size=32>Humans have a 50% chance to spawn as a child. Children gain a speed boost equivilant to a cola but have 75 max hp</size>", 30, shouldClearPrevious: true);
+            player.SendBroadcast("Event being played: " + BringYourKidToWorkEvent.Singleton.EventName + "\n<size=30>" + BringYourKidToWorkEvent.Singleton.EventDescription.Replace("\n", "") + "</size>", 30, shouldClearPrevious: true);
         }
 
         [PluginEvent(ServerEventType.PlayerSpawn)]
@@ -170,7 +171,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Bring Your Kid To Work Event";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "Half the players will be small. Small players have 75% max health but get a speed boost equivalent to a cola without the negative effect\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "BYKTW";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

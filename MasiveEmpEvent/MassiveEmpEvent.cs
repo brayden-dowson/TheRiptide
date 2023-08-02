@@ -59,6 +59,8 @@ namespace TheRiptide
         public int CassieMaxTime { get; set; } = 300;
         [Description("max single random cassie malfunction")]
         public int CassieMaxLength { get; set; } = 7;
+
+        public string Description { get; set; } = "All electronics are malfunctioning. Facility lights will flicker on and off randomly, flashlights and gun flashlights will malfuction so if you want to always have light, you must stick together. Doors will open, close and lock randomly. All scientist and class-d are given flashlights and SCPs have their speed reduced\n\n";
     }
 
 
@@ -318,7 +320,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Massive EMP Event";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "All electronics are malfunctioning. Facility lights will flicker on and off randomly, flashlights and gun flashlights will malfuction so if you want to always have light, you must stick together. Doors will open, close and lock randomly. All scientist and class-d are given flashlights and SCPs have their speed reduced\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "EMP";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

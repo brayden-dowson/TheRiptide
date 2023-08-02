@@ -7,6 +7,7 @@ using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,17 @@ using UnityEngine;
 
 namespace TheRiptide
 {
+    public class Config
+    {
+        public string StartTag { get; set; } = "<b><size=32>";
+        public string MostKillsAsScp { get; set; } = "<color=#00b57f>{name}</color> had the most kills as <color=#d11919>{role}</color> with <color=#d11919>{kills}</color> kills";
+        public string FirstToKillScp { get; set; } = "<color=#00b57f>{name}</color> was the first to kill a <color=#d11919>SCP</color>";
+        public string MostScpsKilled { get; set; } = "<color=#00b57f>{name}</color> killed {scps}";
+        public string MostScpsKilledListItem { get; set; } = "<color=#d11919>{scp}</color>";
+        public string MostKillsAsHuman { get; set; } = "<color=#00b57f>{name}</color> had the most kills as a human with <color=#d11919>{kills}</color> kills";
+        public string FirstToEscape { get; set; } = "<color=#00b57f>{name}</color> was the first to escape in <color=#d11919>{time}</color> as a {role}";
+    }
+
     public class Stats
     {
         public string Name = "";
@@ -35,6 +47,9 @@ namespace TheRiptide
 
     public class MVP
     {
+        [PluginConfig]
+        public Config config;
+
         private static bool normal_round;
         private static Dictionary<int,Stats> player_stats = new Dictionary<int, Stats>();
         private static Stopwatch stopwatch = new Stopwatch();
@@ -175,33 +190,63 @@ namespace TheRiptide
                     top_escape_time = s;
             }
 
-            string bc = "<b><size=32>";
-            //int lines = 0;
-            if (top_kills_as_scp != null)
-                bc += "<color=#00b57f>" + top_kills_as_scp.Name + "</color> had the most kills as <color=#d11919>" + top_kills_as_scp.ScpRole + "</color> with <color=#d11919>" + top_kills_as_scp.KillsAsScp + "</color> kills\n";
+            string bc = config.StartTag;
 
-            if(top_scps_killed != null)
+            if (top_kills_as_scp != null)
+                bc += config.MostKillsAsScp.Replace("{name}", top_kills_as_scp.Name).Replace("{role}", top_kills_as_scp.ScpRole.ToString()).Replace("{kills}", top_kills_as_scp.KillsAsScp.ToString()) + "\n";
+
+            if (top_scps_killed != null)
             {
                 if (top_scps_killed.ScpsKilled.Count == 1 && top_scp_killed_time != null)
-                    bc += "<color=#00b57f>" + top_scp_killed_time.Name + "</color> was the first to kill a <color=#d11919>SCP</color>\n";
+                    bc += config.FirstToKillScp.Replace("{name}", top_scp_killed_time.Name) + "\n";
                 else
                 {
-                    bc += "<color=#00b57f>" + top_scps_killed.Name + "</color> killed ";
                     List<string> roles = new List<string>();
                     foreach (var scp in top_scps_killed.ScpsKilled)
-                        roles.Add("<color=#d11919>" + scp + "</color>");
-                    bc += string.Join(", ", roles) + "\n";
+                        roles.Add(config.MostScpsKilledListItem.Replace("{scp}", scp.ToString()));
+                    bc += config.MostScpsKilled.Replace("{name}", top_scps_killed.Name).Replace("{scps}", string.Join(", ", roles)) + "\n";
                 }
             }
 
-            if(top_total_kills != null)
-                bc += "<color=#00b57f>" + top_total_kills.Name + "</color> had the most kills as a human with <color=#d11919>" + top_total_kills.TotalKills + "</color> kills\n";
+            if (top_total_kills != null)
+                bc += config.MostKillsAsHuman.Replace("{name}", top_total_kills.Name).Replace("{kills}", top_total_kills.TotalKills.ToString()) + "\n";
 
-            if(top_escape_time != null)
+            if (top_escape_time != null)
             {
                 TimeSpan ts = new TimeSpan(0, 0, Mathf.RoundToInt(top_escape_time.EscapeTime));
-                bc += "<color=#00b57f>" + top_escape_time.Name + "</color> was the first to escape in <color=#d11919>" + ts.Minutes + ":" + ts.Seconds.ToString("D2") + "</color> as a " + (top_escape_time.EscapeRole == RoleTypeId.ClassD ? "<color=#ff731c>" : "<color=#fff287>") + top_escape_time.EscapeRole + "</color>";
+                bc += config.FirstToEscape.
+                    Replace("{name}", top_escape_time.Name).
+                    Replace("{time}", ts.Minutes + ":" + ts.Seconds.ToString("D2")).
+                    Replace("{role}", (top_escape_time.EscapeRole == RoleTypeId.ClassD ? "<color=#ff731c>" : "<color=#fff287>") + top_escape_time.EscapeRole + "</color>");
             }
+
+            //string bc = "<b><size=32>";
+            ////int lines = 0;
+            //if (top_kills_as_scp != null)
+            //    bc += "<color=#00b57f>" + top_kills_as_scp.Name + "</color> had the most kills as <color=#d11919>" + top_kills_as_scp.ScpRole + "</color> with <color=#d11919>" + top_kills_as_scp.KillsAsScp + "</color> kills\n";
+
+            //if(top_scps_killed != null)
+            //{
+            //    if (top_scps_killed.ScpsKilled.Count == 1 && top_scp_killed_time != null)
+            //        bc += "<color=#00b57f>" + top_scp_killed_time.Name + "</color> was the first to kill a <color=#d11919>SCP</color>\n";
+            //    else
+            //    {
+            //        bc += "<color=#00b57f>" + top_scps_killed.Name + "</color> killed ";
+            //        List<string> roles = new List<string>();
+            //        foreach (var scp in top_scps_killed.ScpsKilled)
+            //            roles.Add("<color=#d11919>" + scp + "</color>");
+            //        bc += string.Join(", ", roles) + "\n";
+            //    }
+            //}
+
+            //if(top_total_kills != null)
+            //    bc += "<color=#00b57f>" + top_total_kills.Name + "</color> had the most kills as a human with <color=#d11919>" + top_total_kills.TotalKills + "</color> kills\n";
+
+            //if(top_escape_time != null)
+            //{
+            //    TimeSpan ts = new TimeSpan(0, 0, Mathf.RoundToInt(top_escape_time.EscapeTime));
+            //    bc += "<color=#00b57f>" + top_escape_time.Name + "</color> was the first to escape in <color=#d11919>" + ts.Minutes + ":" + ts.Seconds.ToString("D2") + "</color> as a " + (top_escape_time.EscapeRole == RoleTypeId.ClassD ? "<color=#ff731c>" : "<color=#fff287>") + top_escape_time.EscapeRole + "</color>";
+            //}
 
             foreach (var p in Player.GetPlayers())
                 if (p.Role != RoleTypeId.None)

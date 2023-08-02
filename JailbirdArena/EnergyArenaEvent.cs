@@ -28,6 +28,8 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+
+        public string Description { get; set; } = "Class-D vs NTF in a special Jailbird arena. Jailbirds get an extended charge duration, up to 3 seconds and never wearout. Everyone starts with 1000 HP. Random chance for everyone to get a Particle Disruptor or a MicroHID. 50% chance the lights will be very dim. Last team alive wins!\n\n";
     }
 
     enum ExtraWeapon { None, ParticleDisruptor, MicroHid };
@@ -238,8 +240,12 @@ namespace TheRiptide
         public PluginHandler Handler;
 
         public string EventName { get; } = "Energy Arena";
-        public string EvenAuthor { get; } = "The Riptide (map by Aria)";
-        public string EventDescription { get; set; } = "Class-D vs NTF in a special Jailbird arena. Jailbirds get an extended charge duration, up to 3 seconds and never wearout. Everyone starts with 1000 HP. Random chance for everyone to get a Particle Disruptor or a MicroHID. 50% chance the lights will be very dim. Last team alive wins!\n\n";
+        public string EvenAuthor { get; } = "The Riptide (map by zInitial)";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "EA";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

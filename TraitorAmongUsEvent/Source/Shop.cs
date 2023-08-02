@@ -35,9 +35,9 @@ namespace TheRiptide
                 BroadcastOverride.SetEvenLineSizes(player, 6);
                 LoadInventory(player);
                 if (TraitorAmongUs.detectives.Contains(player.PlayerId))
-                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, TraitorAmongUs.DetectiveHint);
+                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, TraitorAmongUs.config.DetectiveBroadcast);
                 if (TraitorAmongUs.traitors.Contains(player.PlayerId))
-                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, TraitorAmongUs.TraitorHint);
+                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, TraitorAmongUs.config.TraitorBroadcast);
                 BroadcastOverride.UpdateIfDirty(player);
                 return false;
             };
@@ -60,9 +60,9 @@ namespace TheRiptide
                 }
 
                 if (TraitorAmongUs.detectives.Contains(player.PlayerId))
-                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, TraitorAmongUs.DetectiveHint);
+                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, TraitorAmongUs.config.DetectiveBroadcast);
                 if (TraitorAmongUs.traitors.Contains(player.PlayerId))
-                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, TraitorAmongUs.TraitorHint);
+                    BroadcastOverride.BroadcastLines(player, 1, 60 * 60, BroadcastPriority.Medium, TraitorAmongUs.config.TraitorBroadcast);
                 BroadcastOverride.UpdateIfDirty(player);
                 return false;
             };

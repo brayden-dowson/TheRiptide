@@ -29,6 +29,8 @@ namespace TheRiptide
 
         public int WaveCount { get; set; } = 5;
         public float WavePeriod { get; set; } = 2.0f;
+
+        public string Description { get; set; } = "CHAOS, NTF and SCPs must each turn on the genrators around the facility and defend them from opposing factions. The Room will glow the color of which ever faction holds the current generator. CHAOS teaming with the SCPs is not allowed. All zones except heavy are locked down. NTF and CHAOS get to respawn. After all respawns the team with the most generators on wins!\n\n";
     }
 
     public class EventHandler
@@ -420,7 +422,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Generator Control";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "CHAOS, NTF and SCPs must each turn on the genrators around the facility and defend them from opposing factions. The Room will glow the color of which ever faction holds the current generator. <color=#0000FF>NTF</color> must kill <color=#00FF00>CHAOS</color> and <color=#FF0000>SCPs</color>. <color=#00FF00>CHAOS</color> must kill <color=#0000FF>NTF</color> and <color=#FF0000>SCPs</color>. <color=#FF0000>SCPs</color> must kill <color=#00FF00>CHAOS</color> and <color=#0000FF>NTF</color>. All zones except heavy are locked down. NTF and CHAOS get to respawn. After all respawns the team with the most generators on wins!\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "GC";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

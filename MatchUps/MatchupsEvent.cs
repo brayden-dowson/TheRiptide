@@ -59,6 +59,8 @@ namespace TheRiptide
         //    { ItemType.GrenadeHE, 1.0f },
         //    { ItemType.SCP018, 0.2f },
         //};
+
+        public string Description { get; set; } = "[recommended player count 10+] Fight between SCPs and NTF with a random weapon in a random zone. Warning! may be very unbalanced!\n\n";
     }
 
     public class EventHandler
@@ -353,7 +355,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Matchups";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "[recommended player count > 10] Fight between SCPs and NTF with a random weapon in a random zone. Warning! may be very unbalanced!\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "MU";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

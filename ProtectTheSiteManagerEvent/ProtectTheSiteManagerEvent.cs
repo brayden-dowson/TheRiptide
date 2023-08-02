@@ -26,6 +26,7 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+        public string Description { get; set; } = "A random player is the site manager. They will be spawned in as a Scientist with a pistol, combat armor, a facility manager card and SCP 268. They will have an certain number of NTF private body guards (Manager and guards will be given 75% damage reduction). The Site manager’s goal is to make it from light containment all the way to surface to turn on the nuke. To turn on the nuke the generators must be done. If the nuke goes off before the Site manager dies then the Site manager and guards win. Chaos will be spawned in and their goal is to simply kill the Site manager before the nuke is detonated.\n\n";
     }
 
     public class EventHandler
@@ -324,8 +325,12 @@ namespace TheRiptide
         public PluginHandler Handler;
 
         public string EventName { get; } = "Protect The Site Manager";
-        public string EvenAuthor { get; } = "The Riptide. idea by guy in grey";
-        public string EventDescription { get; set; } = "A random player is the site manager. They will be spawned in as a Scientist with a pistol, combat armor, a facility manager card and SCP 268. They will have an certain number of NTF private body guards (Manager and guards will be given 75% damage reduction). The Site manager’s goal is to make it from light containment all the way to surface to turn on the nuke. To turn on the nuke the generators must be done. If the nuke goes off before the Site manager dies then the Site manager and guards win. Chaos will be spawned in and their goal is to simply kill the Site manager before the nuke is detonated.\n\n";
+        public string EvenAuthor { get; } = "The Riptide. Idea by Guy in Grey";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "PTSM";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

@@ -1,4 +1,5 @@
 ﻿using CommandSystem;
+using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem;
 using InventorySystem.Items;
@@ -15,6 +16,7 @@ using PluginAPI.Core.Attributes;
 using PluginAPI.Core.Items;
 using PluginAPI.Enums;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,31 +24,58 @@ using UnityEngine;
 
 namespace TheRiptide
 {
+    public class Config
+    {
+        public string PickUpMessage { get; set; } = "You have picked up SCP-127";
+
+        [Description("Maximum clip size")]
+        public byte MaxAmmo { get; set; } = 60;
+        [Description("How much ammo per second to regenerate")]
+        public float RegenRate { get; set; } = 1.0f;
+
+        [Description("Room which SCP127 will spawn it")]
+        public RoomName Room { get; set; } = RoomName.HczArmory;
+        [Description("Offset within room to spawn RifleRack")]
+        public float OffsetX { get; set; } = 4.22f;
+        public float OffsetY { get; set; } = 0.0f;
+        public float OffsetZ { get; set; } = 0.0f;
+        [Description("Rotation in degrees along the y axis of the RifleRack")]
+        public float Rotation { get; set; } = -90.0f;
+    }
+
     public class SCP127
     {
+        [PluginConfig]
+        public Config config;
+
+        public static HashSet<ushort> scp_127 = new HashSet<ushort>();
+        private CoroutineHandle ammo_regen;
+
+        private Harmony harmony;
+
         [PluginEntryPoint("SCP127", "1.0.0", "", "The Riptide")]
         public void OnEnabled()
         {
+            harmony = new Harmony("SCP127");
+            harmony.PatchAll();
             PluginAPI.Events.EventManager.RegisterEvents(this);
         }
 
-        public static Firearm e11;
-        static CoroutineHandle regen_ammo;
+        [PluginUnload]
+        public void OnDisabled()
+        {
+            harmony.UnpatchAll("SCP127");
+            harmony = null;
+        }
 
         [PluginEvent(ServerEventType.RoundStart)]
         void OnRoundStart()
         {
-            //foreach (var v in NetworkClient.prefabs.Values)
-            //    Log.Info(v.name);
-
-            RoomIdentifier hcz_armory = RoomIdentifier.AllRoomIdentifiers.Where((r) => r.Name == RoomName.HczArmory).First();
-            Vector3 offset = new Vector3(4.22f, 0.0f, 0.0f);
-
-            var game_object = Object.Instantiate(NetworkClient.prefabs.Values.First(x => x.name == "RifleRackStructure"), hcz_armory.transform.TransformPoint(offset), hcz_armory.transform.rotation * Quaternion.Euler(Vector3.up * -90));
+            scp_127.Clear();
+            RoomIdentifier target = RoomIdentifier.AllRoomIdentifiers.First((r) => r.Name == config.Room);
+            var game_object = Object.Instantiate(NetworkClient.prefabs.Values.First(x => x.name == "RifleRackStructure"), target.transform.TransformPoint(new Vector3(config.OffsetX, config.OffsetY, config.OffsetZ)), target.transform.rotation * Quaternion.Euler(0.0f, config.Rotation, 0.0f));
             Locker locker = game_object.GetComponent<Locker>();
-
             locker.Loot = new LockerLoot[0];
-
             var chamber = locker.Chambers.First();
             Firearm firearm;
             if (InventoryItemLoader.TryGetItem(ItemType.GunE11SR, out firearm))
@@ -71,129 +100,103 @@ namespace TheRiptide
                         pickup.NetworkStatus = new FirearmStatus(60, FirearmStatusFlags.None, 0);
                         ItemDistributor.SpawnPickup(pickup);
                     }
+                    scp_127.Add(pickup.Info.Serial);
                 }
             }
             NetworkServer.Spawn(game_object);
-            Timing.KillCoroutines(regen_ammo);
-            regen_ammo = Timing.RunCoroutine(_TeethGunAmmoRegen());
+            Timing.KillCoroutines(ammo_regen);
+            ammo_regen = Timing.RunCoroutine(_AmmoRegen());
         }
 
         [PluginEvent(ServerEventType.RoundRestart)]
         void OnRoundRestart()
         {
-            Timing.KillCoroutines(regen_ammo);
+            Timing.KillCoroutines(ammo_regen);
         }
 
         [PluginEvent(ServerEventType.RoundEnd)]
         void OnRoundEnd(RoundSummary.LeadingTeam leadingTeam)
         {
-            Timing.KillCoroutines(regen_ammo);
-        }
-
-        private static bool IsScp127(ItemBase item)
-        {
-            return item.ItemTypeId == ItemType.GunE11SR && item is Firearm firearm && firearm.GetCurrentAttachmentsCode() == 0;
-        }
-
-        [PluginEvent(ServerEventType.PlayerDropItem)]
-        bool OnPlayerDropItem(Player player, ItemBase item)
-        {
-            if (IsScp127(item))
-            {
-                byte ammo = (item as Firearm).Status.Ammo;
-                player.RemoveItem(new Item(item));
-                Timing.CallDelayed(0.1f, () =>
-                {
-                    DropScp127(ammo, player.GameObject.transform.position, player.GameObject.transform.rotation);
-                });
-                return false;
-            }
-            else
-                return true;
+            Timing.KillCoroutines(ammo_regen);
         }
 
         [PluginEvent(ServerEventType.PlayerSearchedPickup)]
-        bool OnSearchedPickup(Player player, ItemPickupBase pickup)
+        void OnSearchedPickup(Player player, ItemPickupBase pickup)
         {
-            if (pickup.Info.ItemId == ItemType.GunE11SR && pickup is FirearmPickup firearm && firearm.NetworkStatus.Attachments == 0)
+            if (pickup.Info.ItemId == ItemType.GunE11SR && pickup is FirearmPickup firearm && scp_127.Contains(pickup.Info.Serial))
             {
-                
-                byte ammo = firearm.Status.Ammo;
-                pickup.DestroySelf();
-                Timing.CallDelayed(0.1f, () =>
+                player.SendBroadcast(config.PickUpMessage, 5);
+                Timing.CallDelayed(0.0f,()=>
                 {
-                    player.SendBroadcast("You have picked up SCP-127", 5);
-                    GiveScp127(player, ammo);
+                    foreach (var item in player.ReferenceHub.inventory.UserInventory.Items.Values)
+                        if (scp_127.Contains(item.ItemSerial) && item is Firearm scp127)
+                            scp127.Status = new FirearmStatus(scp127._status.Ammo, scp127._status.Flags, 0);
                 });
-                return false;
             }
-            else
-                return true;
         }
 
         [PluginEvent(ServerEventType.PlayerUnloadWeapon)]
         bool OnUnloadWeapon(Player player, Firearm gun)
         {
-            if (gun.ItemTypeId == ItemType.GunE11SR && gun.GetCurrentAttachmentsCode() == 0)
-                return false;
-            else
-                return true;
+            return !IsScp127(gun);
         }
 
         [PluginEvent(ServerEventType.PlayerReloadWeapon)]
         bool OnReloadWeapon(Player player, Firearm gun)
         {
-            if (gun.ItemTypeId == ItemType.GunE11SR && gun.GetCurrentAttachmentsCode() == 0)
-                return false;
-            else
-                return true;
+            return !IsScp127(gun);
         }
 
-        public static void GiveScp127(Player player, byte ammo)
+        private bool IsScp127(ItemBase item)
+        {
+            return item.ItemTypeId == ItemType.GunE11SR && scp_127.Contains(item.ItemSerial);
+        }
+
+        public static ItemBase GiveScp127(Player player, byte ammo)
         {
             Firearm scp127 = player.AddItem(ItemType.GunE11SR) as Firearm;
             scp127.Status = new FirearmStatus(ammo, FirearmStatusFlags.MagazineInserted, 0);
             AttachmentsUtils.ApplyAttachmentsCode(scp127, 0, false);
+            scp_127.Add(scp127.ItemSerial);
+            return scp127;
         }
 
-        public static void DropScp127(byte ammo, Vector3 position, Quaternion rotation)
+        private IEnumerator<float> _AmmoRegen()
         {
-            Firearm firearm;
-            if (InventoryItemLoader.TryGetItem(ItemType.GunE11SR, out firearm))
+            while (true)
             {
-                FirearmPickup pickup = Object.Instantiate(firearm.PickupDropModel, position, rotation) as FirearmPickup;
-                if (pickup != null)
+                try
                 {
-                    pickup.NetworkInfo = new PickupSyncInfo(ItemType.GunE11SR, 1.0f);
-                    pickup.NetworkStatus = new FirearmStatus(ammo, FirearmStatusFlags.None, 0);
-                    NetworkServer.Spawn(pickup.gameObject);
-                }
-            }
-        }
-
-        static IEnumerator<float> _TeethGunAmmoRegen()
-        {
-            while(true)
-            {
-                foreach(var player in Player.GetPlayers())
-                {
-                    if(player.IsAlive && player.IsHuman)
+                    foreach (var player in Player.GetPlayers())
                     {
-                        foreach (var item in player.ReferenceHub.inventory.UserInventory.Items)
+                        if (!player.IsHuman)
+                            continue;
+                        foreach (var item in player.ReferenceHub.inventory.UserInventory.Items.Values.ToList())
                         {
-                            if(IsScp127(item.Value))
+                            if (!IsScp127(item) || !(item is Firearm firearm))
+                                continue;
+                            if (firearm.Status.Attachments != 0)
                             {
-                                if (item.Value is Firearm firearm && firearm.Status.Ammo < 60)
-                                    firearm.Status = new FirearmStatus((byte)(firearm.Status.Ammo + 1), FirearmStatusFlags.MagazineInserted, 0);
+                                byte ammo = firearm.Status.Ammo;
+                                bool held = player.CurrentItem == item;
+                                player.RemoveItem(item);
+                                ItemBase scp127 = GiveScp127(player, ammo);
+                                if (held)
+                                    player.CurrentItem = scp127;
                             }
+                            else if (firearm.Status.Ammo < config.MaxAmmo)
+                                firearm.Status = new FirearmStatus((byte)(firearm.Status.Ammo + 1), FirearmStatusFlags.MagazineInserted, 0);
                         }
                     }
                 }
-                yield return Timing.WaitForSeconds(1.0f);
+                catch(System.Exception ex)
+                {
+                    Log.Error(ex.ToString());
+                }
+                yield return Timing.WaitForSeconds(1.0f / config.RegenRate);
             }
         }
     }
-
 
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     public class GiveScp127 : ICommand
@@ -217,35 +220,4 @@ namespace TheRiptide
             return false;
         }
     }
-
-    //[CommandHandler(typeof(RemoteAdminCommandHandler))]
-    //public class sa : ICommand
-    //{
-    //    public string Command { get; } = "sa";
-
-    //    public string[] Aliases { get; } = new string[] { };
-
-    //    public string Description { get; } = "attachments";
-
-    //    public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
-    //    {
-    //        Player player;
-    //        if (Player.TryGet(sender, out player))
-    //        {
-    //            uint code = 0;
-    //            if(!uint.TryParse(arguments.ElementAt(0), out code))
-    //            {
-    //                response = "falied to parse: " + arguments.ElementAt(0);
-    //                return false;
-    //            }
-    //            SCP127.e11 = player.AddItem(ItemType.GunE11SR) as Firearm;
-    //            SCP127.e11.Status = new FirearmStatus(60, FirearmStatusFlags.MagazineInserted, code);
-    //            AttachmentsUtils.ApplyAttachmentsCode(SCP127.e11, code, false);
-    //            response = "success";
-    //            return true;
-    //        }
-    //        response = "failed";
-    //        return false;
-    //    }
-    //}
 }

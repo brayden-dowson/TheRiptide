@@ -174,7 +174,7 @@ namespace TheRiptide
 
         private string BuildCustomInfo()
         {
-            string info = "Health " + HP + "\n";
+            string info = " <voffset=-4em>Health " + HP + "\n";
             if (AHP != 0)
                 info += "Artificial Health " + AHP + "\n";
 
@@ -191,6 +191,8 @@ namespace TheRiptide
             foreach (var status in EffectStatus.Values)
                 if (status.Enabled)
                     info += status.Intensity + "x " + status.Name + (status.Duration == 0 ? "" : " " + status.Duration) + "\n";
+
+            info += "</voffset>";
 
             return info;
         }
@@ -336,6 +338,9 @@ namespace TheRiptide
                 if (!player_desync.ContainsKey(ev.Player.PlayerId))
                     player_desync.Add(ev.Player.PlayerId, new InfoDesync());
                 player_desync[ev.Player.PlayerId].Reset();
+                foreach (var p in ReadyPlayers())
+                    player_desync[p.PlayerId].RemoveObserver(p, ev.Player);
+
                 Faction faction = ev.Player.Role.GetFaction();
                 if (faction == Faction.Unclassified)
                     return;

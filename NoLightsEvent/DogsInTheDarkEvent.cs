@@ -31,6 +31,8 @@ namespace TheRiptide
 
         [Description("how many rooms in the facility every second will have their lights flicker on")]
         public string room_light_flickers_per_second { get; set; } = "2.0";
+
+        public string Description { get; set; } = "All facility lights disabled. All SCPs will be SCP939. Everyone will spawn with a Flashlight\n\n";
     }
 
     public class DogsInTheDarkEvent : IEvent
@@ -42,7 +44,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Dogs In The Dark";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "All facility lights disabled. All SCPs will be SCP939. Everyone will spawn with a Flashlight\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "DITD";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

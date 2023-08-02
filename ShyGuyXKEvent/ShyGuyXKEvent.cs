@@ -25,6 +25,7 @@ namespace TheRiptide
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
         public float HealthScaling { get; set; } = 200.0f;
+        public string Description { get; set; } = "A Shy Guy spawns outside the facility and is triggered by everyone. His rage never runs out and his speed increase the lower his health gets. His health scales with the number of players on the server. NTF are dispatched to stop him at all costs.\n\n";
     }
 
     public class EventHandler
@@ -227,7 +228,11 @@ namespace TheRiptide
 
         public string EventName { get; } = "Shy Guy XK";
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "A Shy Guy spawns outside the facility and is triggered by everyone. His rage never runs out and his speed increase the lower his health gets. His health scales with the number of players on the server. NTF are dispatched to stop him at all costs.\n\n";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "SGXK";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;

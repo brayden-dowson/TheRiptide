@@ -1,23 +1,21 @@
 ﻿using CedMod.Addons.Events;
 using CedMod.Addons.Events.Interfaces;
-using HarmonyLib;
 using MEC;
-using Mirror;
 using PlayerRoles;
-using PlayerRoles.Voice;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
-using System;
+using slocLoader;
+using slocLoader.Objects;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VoiceChat;
-using VoiceChat.Codec;
-using VoiceChat.Networking;
+using UnityEngine;
 using static TheRiptide.Utility;
+using static TheRiptide.EventUtility;
+using Respawning;
+using MapGeneration;
+using System.Linq;
+using PlayerStatsSystem;
 
 namespace TheRiptide
 {
@@ -29,38 +27,23 @@ namespace TheRiptide
 
     public class EventHandler
     {
+        private static Vector3 map_offset = new Vector3(0.0f, 900, 0.0f);
+        private static Vector3 spawn_position = new Vector3(-5.0f, 903.0f, 5.0f);
+        private static bool found_winner;
         private static HashSet<int> dogs = new HashSet<int>();
-
-        private static OpusDecoder decoder = null;
-        private static OpusEncoder encoder = null;
-        //private static float[] samples = null;
-        //private static SMBPitchShifter shifter = new SMBPitchShifter();
-
-        private static RubberBand.RubberBandStretcher stretcher;
-        private static float[][] samples = new float[1][];
+        private static bool late_spawn = false;
+        private static List<string> names = new List<string>();
 
         public static void Start()
         {
-            if (decoder == null)
-                decoder = new OpusDecoder();
-            if (encoder == null)
-                encoder = new OpusEncoder(VoiceChat.Codec.Enums.OpusApplicationType.Voip);
-            //if (samples == null)
-            //    samples = new float[VoiceTransceiver._packageSize];
-
-            RubberBand.RubberBandStretcher.Options options =
-                RubberBand.RubberBandStretcher.Options.ProcessRealTime |
-                RubberBand.RubberBandStretcher.Options.FormantPreserved |
-                RubberBand.RubberBandStretcher.Options.PitchHighQuality |
-                RubberBand.RubberBandStretcher.Options.WindowShort;
-
-            stretcher = new RubberBand.RubberBandStretcher(48000, 1, options);
-            stretcher.SetPitchScale(2.0f);
+            found_winner = false;
+            WinnerReset();
         }
 
         public static void Stop()
         {
-
+            found_winner = false;
+            WinnerReset();
         }
 
         [PluginEvent(ServerEventType.PlayerJoined)]
@@ -72,11 +55,29 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.RoundStart)]
         void OnRoundStart()
         {
-            //List<Player> players = Player.GetPlayers().Where(p => p.Role != RoleTypeId.None).ToList();
+            EndRoom = RoomIdentifier.AllRoomIdentifiers.First((r) => r.Zone == FacilityZone.Surface);
+            RoomOffset = new Vector3(40.000f, 14.080f, -32.600f);
 
-            //int dog_count = 2;
-            //for (int i = 0; i < dog_count; i++)
-            //    dogs.Add(players.PullRandomItem().PlayerId);
+            List<Player> players = ReadyPlayers();
+
+            dogs.Clear();
+            int dog_count = 3;
+            for (int i = 0; i < dog_count; i++)
+                if (!players.IsEmpty())
+                    dogs.Add(players.PullRandomItem().PlayerId);
+
+            List<slocGameObject> objects;
+            if (slocLoader.AutoObjectLoader.AutomaticObjectLoader.TryGetObjects("ariahouse", out objects))
+            {
+                GameObject root = API.SpawnObjects(objects, map_offset, Quaternion.Euler(Vector3.zero));
+            }
+            else
+            {
+                Log.Error("ariahouse.sloc make sure you have this inside the SlocLoader/Objects folder");
+            }
+
+            late_spawn = false;
+            Timing.CallDelayed(15.0f, () => late_spawn = true);
         }
 
         [PluginEvent(ServerEventType.PlayerChangeRole)]
@@ -84,6 +85,12 @@ namespace TheRiptide
         {
             if (player == null || !Round.IsRoundStarted ||
                 new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch)
+                return true;
+
+            if (found_winner)
+                return HandleGameOverRoleChange(player, new_role);
+
+            if (new_role == RoleTypeId.Scp939 && late_spawn)
                 return true;
 
             if(dogs.Contains(player.PlayerId))
@@ -128,14 +135,51 @@ namespace TheRiptide
             if (player == null || !Round.IsRoundStarted)
                 return;
 
-            if(role == RoleTypeId.Scp939)
+            if (found_winner)
+            {
+                HandleGameOverSpawn(player);
+                return;
+            }
+
+            if (role == RoleTypeId.Scp939)
             {
                 Timing.CallDelayed(0.0f, () =>
                 {
                     if (player.Role != RoleTypeId.Scp939)
                         return;
-
-                    
+                    if (names.IsEmpty())
+                    {
+                        names = new List<string>
+                        {
+                            "Daisy",
+                            "Cupcakes",
+                            "Princess",
+                            "Pitbull Gaming",
+                            "Lila",
+                            "Aurora",
+                            "Baby",
+                            "Bella",
+                            "Luna",
+                            "Honey",
+                            "Queen",
+                            "Angel",
+                            "Cookie",
+                            "Sugar",
+                            "Teddy",
+                            "Lulu",
+                            "Dashie"
+                        };
+                    }
+                    player.ReferenceHub.nicknameSync.Network_displayName = names.PullRandomItem();
+                    if (late_spawn)
+                        player.Position = spawn_position;
+                    else
+                    {
+                        player.SendBroadcast("you will teleport in 15 seconds", 15, shouldClearPrevious: true);
+                        player.Position = new Vector3(0.0f, 500.0f, 0.0f);
+                        Timing.CallDelayed(15.0f, () => player.Position = spawn_position);
+                    }
+                    SetScale(player, 0.6f);
                 });
             }
             else if(role == RoleTypeId.ClassD)
@@ -144,6 +188,7 @@ namespace TheRiptide
                 {
                     if (player.Role != RoleTypeId.ClassD)
                         return;
+                    player.Position = spawn_position;
                     SetScale(player, 0.6f);
                 });
             }
@@ -153,24 +198,47 @@ namespace TheRiptide
                 {
                     if (player.Role != RoleTypeId.Scientist)
                         return;
+                    player.Position = spawn_position;
                     SetScale(player, 0.6f);
                 });
             }
         }
 
-        public static void ProcessVoice(VoiceMessage msg)
+        [PluginEvent(ServerEventType.TeamRespawn)]
+        bool OnRespawn(SpawnableTeamType team, List<Player> players, int max)
         {
-            if (msg.Speaker.GetRoleId() == RoleTypeId.Scientist || msg.Speaker.GetRoleId() == RoleTypeId.ClassD)
-            {
-                if (decoder == null || encoder == null)
-                    return;
+            return false;
+        }
 
-                int sample_count = decoder.Decode(msg.Data, msg.DataLength, samples[0]);
-                stretcher.Process(samples, false);
-                //shifter.PitchShift(2.0f, sample_count, 48000, samples);
-                msg.DataLength = encoder.Encode(samples[0], msg.Data);
-                msg.Channel = VoiceChatChannel.RoundSummary;
-                msg.Speaker.connectionToClient.Send(msg);
+        [PluginEvent(ServerEventType.PlayerDeath)]
+        void OnPlayerDeath(Player victim, Player attacker, DamageHandlerBase damageHandler)
+        {
+            if (victim == null || !Round.IsRoundStarted)
+                return;
+
+            if (!found_winner)
+            {
+                int humans_alive = 0;
+                foreach (var p in Player.GetPlayers())
+                    if (p.Role.IsHuman())
+                        humans_alive++;
+                if (humans_alive == 0)
+                {
+                    found_winner = true;
+                    FoundWinner(victim);
+                }
+                else if (humans_alive == 1)
+                {
+                    foreach (var p in Player.GetPlayers())
+                    {
+                        if (p.Role.IsHuman())
+                        {
+                            found_winner = true;
+                            FoundWinner(p);
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
@@ -194,15 +262,11 @@ namespace TheRiptide
         [PluginConfig]
         public Config EventConfig;
 
-        private Harmony harmony;
-
         public void PrepareEvent()
         {
             Log.Info(EventName + " event is preparing");
             IsRunning = true;
             EventHandler.Start();
-            harmony = new Harmony("PrincessBanquetEvent");
-            harmony.PatchAll();
             Log.Info(EventName + " event is prepared");
             PluginAPI.Events.EventManager.RegisterEvents<EventHandler>(this);
         }
@@ -211,7 +275,6 @@ namespace TheRiptide
         {
             IsRunning = false;
             EventHandler.Stop();
-            harmony.UnpatchAll("PrincessBanquetEvent");
             PluginAPI.Events.EventManager.UnregisterEvents<EventHandler>(this);
         }
 
