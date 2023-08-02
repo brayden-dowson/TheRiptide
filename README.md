@@ -203,7 +203,7 @@ Adds pink candy back (can only be obtained with the candy bowl).
 A gun that regenerates 1 ammo per second up to a max of 60. Cannot be reloaded or have attachments. Spawns in HCZ armory inside a wall gun rack.  Uses the E11 with no attachments as a model.
 
 ### Scp Door Break
-Allows 939 to break doors with his lunge abiliy and 173 with his speedbreaker and teleport. Heavily configurable.
+Allows 939 to break doors with his lunge ability and 173 with his speedbreaker and teleport. Heavily configurable.
 
 ### Spawn Height Variation
 Adds random variation to players heights on spawn.
