@@ -17,6 +17,7 @@
  - [Nuke Run](https://github.com/brayden-dowson/TheRiptide#nuke-run)
  - [Peanut Dodge Ball](https://github.com/brayden-dowson/TheRiptide#peanut-dodge-ball)
  - [Peanut Hide And Seek](https://github.com/brayden-dowson/TheRiptide#peanut-hide-and-seek)
+ - [Peanut Multiplication Revised Entry](https://github.com/brayden-dowson/TheRiptide#peanut-multiplication-revised-entry)
  - [Protect The Site Manager](https://github.com/brayden-dowson/TheRiptide#protect-the-site-manager)
  - [SCP Mutation](https://github.com/brayden-dowson/TheRiptide#scp-mutation)
  - [Shy Guy Rampage](https://github.com/brayden-dowson/TheRiptide#shy-guy-rampage)
@@ -40,7 +41,8 @@
  - [Normal Locker Ammo](https://github.com/brayden-dowson/TheRiptide#normal-locker-ammo)
  - [Pink Candy](https://github.com/brayden-dowson/TheRiptide#pink-candy)
  - [Research Card In 173](https://github.com/brayden-dowson/TheRiptide#research-card-in-173-out-dated-game-play-wise)
- - [SCP 127](https://github.com/brayden-dowson/TheRiptide#scp-127https://github.com/brayden-dowson/TheRiptide#scp-127)
+ - [Scp 127](https://github.com/brayden-dowson/TheRiptide#scp-127)
+ - [Scp Door Break](https://github.com/brayden-dowson/TheRiptide#scp-door-break)
  - [Spawn Height Variation](https://github.com/brayden-dowson/TheRiptide#spawn-height-variation)
  - [Surface Armory](https://github.com/brayden-dowson/TheRiptide#surface-armory)
  - [Teleport Commands](https://github.com/brayden-dowson/TheRiptide#teleport-commands)
@@ -69,7 +71,7 @@ Humans have a 50% chance to spawn as a child. Children gain a speed boost equivi
 Spawn as two teams CHAOS and NTF in a ratio of 1:1. CHAOS must steal all the items in the facility while NTF must stop them. The CHAOS can let SCPs and Class-D out. CHAOS receive reward items on successfully stealing items. CHAOS win if they steal all the items while NTF win if they survive all 7 spawn waves and kill all the CHAOS, SCPs and Class-Ds. If the Nuke goes off the winner is decided by who was in the lead stolen/protected.
 
 ### Dog Infection
-[recommended player count 30+] Light is locked down and everyone spawns as ClassD in light with one dog. Dog can infect Class-Ds on kill, the last ClassD alive wins.
+[recommended player count 30+] Light is locked down and everyone spawns as ClassD in light with one dog. Dog can infect Class-Ds on kill, the last ClassD alive wins!
 
 ### Dogs In The Dark
 All facility lights disabled. All SCPs will be SCP939. Everyone will spawn with a Flashlight.
@@ -78,10 +80,10 @@ All facility lights disabled. All SCPs will be SCP939. Everyone will spawn with 
 Class-D vs NTF in a special Jailbird arena. Jailbirds get an extended charge duration, up to 3 seconds and never wearout. Everyone starts with 1000 HP. Random chance for everyone to get a Particle Disruptor or a MicroHID. 50% chance the lights will be very dim. Last team alive wins!
 > [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed  
 > [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
-> [JailbirdArena.sloc](https://github.com/brayden-dowson/TheRiptide/releases) must be inside ``SlocLoader/Objects``
+> [JailbirdArena.sloc](https://github.com/brayden-dowson/TheRiptide/releases) must be inside ``slocLoader/Objects``
 
 ### Generator Control
-CHAOS, NTF and SCPs must each turn on the genrators around the facility and defend them from opposing factions. The Room will glow the color of which ever faction holds the current generator. NTF must kill CHAOS and SCPs. CHAOS must kill NTF and SCPs. SCPs must kill CHAOS and NTF. All zones except heavy are locked down. NTF and CHAOS get to respawn. After all respawns the team with the most generators on wins!
+CHAOS, NTF and SCPs must each turn on the genrators around the facility and defend them from opposing factions. The Room will glow the color of which ever faction holds the current generator. CHAOS teaming with the SCPs is not allowed. All zones except heavy are locked down. NTF and CHAOS get to respawn. After all respawns the team with the most generators on wins!
 > requires [Harmony.dll](https://github.com/brayden-dowson/TheRiptide/releases) as a dependency 
 
 ### Ghost Busters
@@ -107,19 +109,22 @@ Fight between SCPs and NTF with a random weapon in a random zone.
 Everyone spawns as a ClassD and are given 2 colas. The nuke is activated and the first person to escape wins!
 
 ### Peanut Dodge Ball
-Everyone spawns in 173s room with 173. The last one alive wins!
+Everyone spawns in a random room with 173. Round may be modified with many random gamemodes. The last one alive wins!
 
 ### Peanut Hide And Seek
 All lights are out and light is locked down. Everyone spawns in light and are given flashlights and have 30 seconds to hide from peanut. Flashlight do not work on peanut.
+
+### Peanut Multiplication Revised Entry
+Two people spawn as 173 the rest are Class-D. 173 has less health/sheild. 173s multiply on kill. Class-D must escape and kill all the 173s to win. 173s win if they kill all the Chaos/Class-Ds.
 
 ### Protect The Site Manager
 A random player is the site manager. They will be spawned in as a Scientist with a pistol, combat armor, a facility manager card and SCP 268. They will have an certain number of NTF private body guards (Manager and guards will be given 75% damage reduction). The Site manager’s goal is to make it from light containment all the way to surface to turn on the nuke. To turn on the nuke the generators must be done. If the nuke goes off before the Site manager dies then the Site manager and guards win. Chaos will be spawned in and their goal is to simply kill the Site manager before the nuke is detonated.
 
 ### SCP Mutation
-Normal round but the SCPs have random sizes
+Normal round but the SCPs have random sizes.
 
 ### Shy Guy Rampage
-A Shy Guy spawns in entrance and is triggered by everyone. All other players are Class-D and spawn in their cells. Class-Ds get 6x SCP330, 4x SCP207, medkit, painkillers and a facility manager card. Surface is locked down. The last one alive win!
+A Shy Guy spawns in entrance and is triggered by everyone. All other players are Class-D and spawn in their cells. Class-Ds get 6x SCP330, 4x SCP207, medkit, painkillers and a facility manager card. Surface is locked down. The last one alive wins!
 > requires [Harmony.dll](https://github.com/brayden-dowson/TheRiptide/releases) as a dependency 
 
 ### Shy Guy XK
@@ -141,8 +146,8 @@ A few players are Traitors, Detectives and Jesters the rest are Innocents. Trait
  - ``tau_forgive <player_id>`` undo rdm
 > [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed  
 > [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
-> [TheSkeld.dll](https://github.com/brayden-dowson/TheRiptide/releases) (or any other maps) must be inside ``CedmodEvents/TraitorAmongUs/Maps``  
-> [The Riptide's Skeld.sloc](https://github.com/brayden-dowson/TheRiptide/releases) (or any other maps) must be inside ``SlocLoader/Objects``  
+> [TheSkeld.dll](https://github.com/brayden-dowson/TheRiptide/releases) (or any other maps) must be inside ``CedModEvents/Traitor Among Us Event/Maps``  
+> [The Riptide's Skeld.sloc](https://github.com/brayden-dowson/TheRiptide/releases) (or any other maps) must be inside ``slocLoader/Objects``  
 > Maps may have dependencies check [Map Details](https://github.com/brayden-dowson/TheRiptide#map-details)
 
 ### Zombie Escape
@@ -194,8 +199,11 @@ Adds pink candy back (can only be obtained with the candy bowl).
 ### Research Card In 173 (out dated game play wise)
 30% chance of a research card to spawn in 173s old room on the computer desk.
 
-### SCP 127
+### Scp 127
 A gun that regenerates 1 ammo per second up to a max of 60. Cannot be reloaded or have attachments. Spawns in HCZ armory inside a wall gun rack.  Uses the E11 with no attachments as a model.
+
+### Scp Door Break
+Allows 939 to break doors with his lunge ability and 173 with his speedbreaker and teleport. Heavily configurable.
 
 ### Spawn Height Variation
 Adds random variation to players heights on spawn.
@@ -210,7 +218,7 @@ Adds the TP and GP commands. TP can be used to teleport to specific rooms. GP ge
 Go to [releases](https://github.com/brayden-dowson/TheRiptide/releases) to download all the relevant .dlls
 
 ### Events
-You must have [Cedmod](https://cedmod.nl/Servers/Setup) installed to run events. Once you have Installed [Cedmod](https://cedmod.nl/Servers/Setup) place the [[EventName]Event.dll](https://github.com/brayden-dowson/TheRiptide/releases) into the ``Cedmod/CedmodEvents`` folder. Some Events have extra steps and dependencies refer to the [Event Details](https://github.com/brayden-dowson/TheRiptide#event-details) for any extra details for installation. Most Events use [EventUtility.dll](https://github.com/brayden-dowson/TheRiptide/releases), [Utility.dll](https://github.com/brayden-dowson/TheRiptide/releases), and [Teleport.dll](https://github.com/brayden-dowson/TheRiptide/releases) as dependencies so add them to be safe. The dependency folder is ``plugins/"server port" | "global"/dependencies``. Additionally [FacilityManager.dll](https://github.com/brayden-dowson/TheRiptide/releases) should be installed in the plugins folder not the dependency folder.
+You must have [Cedmod](https://cedmod.nl/Servers/Setup) installed to run events. Once you have Installed [Cedmod](https://cedmod.nl/Servers/Setup) place the [[EventName]Event.dll](https://github.com/brayden-dowson/TheRiptide/releases) into the ``CedMod/CedmodEvents`` folder. Some Events have extra steps and dependencies refer to the [Event Details](https://github.com/brayden-dowson/TheRiptide#event-details) for any extra details for installation. Most Events use [EventUtility.dll](https://github.com/brayden-dowson/TheRiptide/releases), [Utility.dll](https://github.com/brayden-dowson/TheRiptide/releases), and [Teleport.dll](https://github.com/brayden-dowson/TheRiptide/releases) as dependencies so add them to be safe. The dependency folder is ``plugins/"server port" | "global"/dependencies``. Additionally [FacilityManager.dll](https://github.com/brayden-dowson/TheRiptide/releases) should be installed in the plugins folder not the dependency folder.
 ### Plugins
 Plugins must be installed manually. Place the [[PluginName].dll](https://github.com/brayden-dowson/TheRiptide/releases) in your servers ``plugins/"server port" | "global"`` folder. To be safe add [Utility.dll](https://github.com/brayden-dowson/TheRiptide/releases) and [Teleport.dll](https://github.com/brayden-dowson/TheRiptide/releases) as dependencies. The dependency folder is ``plugins/"server port" | "global"/dependencies``. Additionally [FacilityManager.dll](https://github.com/brayden-dowson/TheRiptide/releases) should be installed in the plugins folder not the dependency folder.
 
@@ -218,4 +226,4 @@ Plugins must be installed manually. Place the [[PluginName].dll](https://github.
 You must install all dependencies for the events/plugins to work. Install [EventUtility.dll](https://github.com/brayden-dowson/TheRiptide/releases), [Utility.dll](https://github.com/brayden-dowson/TheRiptide/releases), and [Teleport.dll](https://github.com/brayden-dowson/TheRiptide/releases) as dependencies. The dependency folder is ``plugins/"server port" | "global"/dependencies``. Additionally [FacilityManager.dll](https://github.com/brayden-dowson/TheRiptide/releases) should be installed in the plugins folder not the dependency folder. Some Events require additional plugins to work notably [SLOC Loader](https://github.com/Axwabo/slocLoader) and [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion), so make sure you have these installed if they are required otherwise the Events will not work. 
 
 ### Maps
-A map is a special .dll for loading map objects/logic for the Traitor Among Us Event. There is only 1 map at the time of writing (The Riptide's Skeld) but more may be added in the future. There is an existing interface accessible from the [TraitorAmongUs.dll](https://github.com/brayden-dowson/TheRiptide/releases) ``IMap``  which developers can use to make their own maps for the event. Simply compile the .dll once you have implemented the ``IMap`` interface. To load a map add the [[MapName].dll](https://github.com/brayden-dowson/TheRiptide/releases) to the ``Cedmod/CedmodEvents/TraitorAmongUs/Maps`` folder. And in game use the ``tau_map <map_name>`` command to select the map.
+A map is a special .dll for loading map objects/logic for the Traitor Among Us Event. There is only 1 map at the time of writing (The Riptide's Skeld) but more may be added in the future. There is an existing interface accessible from the [TraitorAmongUs.dll](https://github.com/brayden-dowson/TheRiptide/releases) ``IMap``  which developers can use to make their own maps for the event. Simply compile the .dll once you have implemented the ``IMap`` interface. To load a map add the [[MapName].dll](https://github.com/brayden-dowson/TheRiptide/releases) to the ``CedMod/CedmodEvents/Traitor Among Us Event/Maps`` folder. And in game use the ``tau_map <map_name>`` command to select the map.
