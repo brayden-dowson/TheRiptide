@@ -121,8 +121,8 @@ Two people spawn as 173 the rest are Class-D. 173 has less health/sheild. 173s m
 
 ### Princess Banquet
 Some players spawn as the dog the rest as children. Last one alive wins!
-> [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed
-> [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed
+> [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed  
+> [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
 > [ariahouse.sloc](https://github.com/brayden-dowson/TheRiptide/releases) must be inside ``slocLoader/Objects``
 
 ### Protect The Site Manager
