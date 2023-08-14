@@ -19,6 +19,7 @@ namespace TheRiptide
 {
     public class Config
     {
+        public ushort Duration { get; set; } = 20;
         public string StartTag { get; set; } = "<b><size=32>";
         public string MostKillsAsScp { get; set; } = "<color=#00b57f>{name}</color> had the most kills as <color=#d11919>{role}</color> with <color=#d11919>{kills}</color> kills";
         public string FirstToKillScp { get; set; } = "<color=#00b57f>{name}</color> was the first to kill a <color=#d11919>SCP</color>";
@@ -250,7 +251,7 @@ namespace TheRiptide
 
             foreach (var p in Player.GetPlayers())
                 if (p.Role != RoleTypeId.None)
-                    p.SendBroadcast(bc, 15, shouldClearPrevious: true);
+                    p.SendBroadcast(bc, config.Duration, shouldClearPrevious: true);
         }
 
         public static Type GetType(string typeName)

@@ -22,7 +22,7 @@ using Utils.Networking;
 
 namespace TheRiptide
 {
-    public interface IItemSnapshot
+    public interface IItemSnapshot : ISnapshot
     {
         ItemBase Load(Player player);
         void Save(ItemBase item);

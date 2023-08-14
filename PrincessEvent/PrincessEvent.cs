@@ -23,10 +23,15 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+
+        public int DogCount { get; set; } = 5;
+
+        public string Description { get; set; } = "{count} players spawn as the dog the rest as children. Last one alive wins!\n\n";
     }
 
     public class EventHandler
     {
+        private static Config config;
         private static Vector3 map_offset = new Vector3(0.0f, 900, 0.0f);
         private static Vector3 spawn_position = new Vector3(-5.0f, 903.0f, 5.0f);
         private static bool found_winner;
@@ -34,8 +39,9 @@ namespace TheRiptide
         private static bool late_spawn = false;
         private static List<string> names = new List<string>();
 
-        public static void Start()
+        public static void Start(Config config)
         {
+            EventHandler.config = config;
             found_winner = false;
             WinnerReset();
         }
@@ -61,8 +67,7 @@ namespace TheRiptide
             List<Player> players = ReadyPlayers();
 
             dogs.Clear();
-            int dog_count = 3;
-            for (int i = 0; i < dog_count; i++)
+            for (int i = 0; i < config.DogCount; i++)
                 if (!players.IsEmpty())
                     dogs.Add(players.PullRandomItem().PlayerId);
 
@@ -73,7 +78,7 @@ namespace TheRiptide
             }
             else
             {
-                Log.Error("ariahouse.sloc make sure you have this inside the SlocLoader/Objects folder");
+                Log.Error("ariahouse.sloc make sure you have this inside the slocLoader/Objects folder");
             }
 
             late_spawn = false;
@@ -84,7 +89,7 @@ namespace TheRiptide
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
             if (player == null || !Round.IsRoundStarted ||
-                new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch)
+                new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Filmmaker)
                 return true;
 
             if (found_winner)
@@ -189,6 +194,7 @@ namespace TheRiptide
                     if (player.Role != RoleTypeId.ClassD)
                         return;
                     player.Position = spawn_position;
+                    player.ClearInventory();
                     SetScale(player, 0.6f);
                 });
             }
@@ -199,6 +205,7 @@ namespace TheRiptide
                     if (player.Role != RoleTypeId.Scientist)
                         return;
                     player.Position = spawn_position;
+                    player.ClearInventory();
                     SetScale(player, 0.6f);
                 });
             }
@@ -220,7 +227,7 @@ namespace TheRiptide
             {
                 int humans_alive = 0;
                 foreach (var p in Player.GetPlayers())
-                    if (p.Role.IsHuman())
+                    if (p.Role == RoleTypeId.ClassD || p.Role == RoleTypeId.Scientist)
                         humans_alive++;
                 if (humans_alive == 0)
                 {
@@ -231,7 +238,7 @@ namespace TheRiptide
                 {
                     foreach (var p in Player.GetPlayers())
                     {
-                        if (p.Role.IsHuman())
+                        if (p.Role == RoleTypeId.ClassD || p.Role == RoleTypeId.Scientist)
                         {
                             found_winner = true;
                             FoundWinner(p);
@@ -251,8 +258,12 @@ namespace TheRiptide
         public PluginHandler Handler;
 
         public string EventName { get; } = "Princess Banquet";
-        public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "todo\n\n";
+        public string EvenAuthor { get; } = "The Riptide map by zInitial";
+        public string EventDescription
+        {
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description.Replace("{count}", EventConfig.DogCount.ToString()); }
+            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+        }
         public string EventPrefix { get; } = "PB";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;
@@ -266,7 +277,7 @@ namespace TheRiptide
         {
             Log.Info(EventName + " event is preparing");
             IsRunning = true;
-            EventHandler.Start();
+            EventHandler.Start(EventConfig);
             Log.Info(EventName + " event is prepared");
             PluginAPI.Events.EventManager.RegisterEvents<EventHandler>(this);
         }

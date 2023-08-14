@@ -68,7 +68,7 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerChangeRole)]
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
-            if (player == null || new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Tutorial)
+            if (player == null || new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Filmmaker)
                 return true;
 
             int player_id = player.PlayerId;

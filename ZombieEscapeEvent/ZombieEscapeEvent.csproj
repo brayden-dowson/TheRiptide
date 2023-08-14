@@ -88,6 +88,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patches\KillPlayerPatch.cs" />
     <Compile Include="Patches\RoundEndOverride.cs" />
     <Compile Include="Patches\ZombieHealthPatch.cs" />
     <Compile Include="ZombieEscapeEvent.cs" />

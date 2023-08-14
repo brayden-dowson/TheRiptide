@@ -224,12 +224,12 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerChangeRole)]
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
-            if (player == null || !Round.IsRoundStarted)
+            if (player == null || !Round.IsRoundStarted || new_role == RoleTypeId.Filmmaker || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Spectator)
                 return true;
 
             if(team_a.Contains(player.PlayerId))
             {
-                if(new_role != RoleTypeId.ClassD && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Overwatch && new_role != RoleTypeId.Tutorial)
+                if(new_role != RoleTypeId.ClassD)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -240,7 +240,7 @@ namespace TheRiptide
             }
             else if (team_b.Contains(player.PlayerId))
             {
-                if (new_role != RoleTypeId.Scientist && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Overwatch && new_role != RoleTypeId.Tutorial)
+                if (new_role != RoleTypeId.Scientist)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -251,7 +251,7 @@ namespace TheRiptide
             }
             else
             {
-                if(new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Overwatch && new_role != RoleTypeId.Tutorial)
+                if(new_role != RoleTypeId.Spectator)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {

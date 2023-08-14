@@ -37,10 +37,10 @@ namespace TheRiptide
         [Description("scales with the ratio of humans to zombies. this is the value for a 1:1 ratio")]
         public int ZombieHealth { get; set; } = 400;
         public float KnockBackMultiple { get; set; } = 2.00f;
-        public int SpeedRampingDelay { get; set; } = 3;
+        public int SpeedRampingDelay { get; set; } = 2;
         public float SpeedRampingRate { get; set; } = 10.0f;
-        public int HealthRampingDelay { get; set; } = 5;
-        public float HealthRampingRate { get; set; } = 100.0f;
+        public int HealthRampingDelay { get; set; } = 4;
+        public float HealthRampingRate { get; set; } = 50.0f;
 
         public string Description { get; set; } = "Light is locked down and all players spawn in light as Class-D with one zombie. Zombies infect players on kill. Guns deal knock back based on the ratio of zombies to humans alive. Less humans more zombies = more knockback. The more zombies there are the less health each one has. After a certain amount of time zombies speed will start to ramp(increase) and after more time their health aswell. Last one alive wins!\n\n";
     }
@@ -58,10 +58,13 @@ namespace TheRiptide
         private static CoroutineHandle update;
         private static CoroutineHandle speed_handle;
         private static CoroutineHandle health_handle;
+        private static CoroutineHandle knock_back_handle;
         private static Stopwatch stopwatch = new Stopwatch();
 
         public static int health_ramping = 0;
         public static byte speed_ramping = 0;
+
+        private static Dictionary<int, Vector3> knock_back = new Dictionary<int, Vector3>();
 
         public static void Start(Config config)
         {
@@ -95,6 +98,7 @@ namespace TheRiptide
             Timing.KillCoroutines(update);
             Timing.KillCoroutines(speed_handle);
             Timing.KillCoroutines(health_handle);
+            Timing.KillCoroutines(knock_back_handle);
             health_ramping = 0;
             speed_ramping = 0;
         }
@@ -197,6 +201,8 @@ namespace TheRiptide
                         player.AddItem(ItemType.SCP500);
                 }
             });
+
+            knock_back_handle = Timing.RunCoroutine(_KnockBack());
         }
 
         [PluginEvent(ServerEventType.TeamRespawn)]
@@ -208,7 +214,7 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerChangeRole)]
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
-            if (player == null || !Round.IsRoundStarted)
+            if (player == null || !Round.IsRoundStarted || new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Filmmaker || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch)
                 return true;
 
             if(found_winner)
@@ -216,7 +222,7 @@ namespace TheRiptide
 
             if(zombies.Contains(player.PlayerId))
             {
-                if(new_role != RoleTypeId.Scp0492 && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Tutorial && new_role != RoleTypeId.Overwatch)
+                if(new_role != RoleTypeId.Scp0492)
                 {
                     Timing.CallDelayed(0.0f,()=>
                     {
@@ -227,7 +233,7 @@ namespace TheRiptide
             }
             else
             {
-                if (new_role != RoleTypeId.ClassD && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Tutorial && new_role != RoleTypeId.Overwatch)
+                if (new_role != RoleTypeId.ClassD)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -257,7 +263,7 @@ namespace TheRiptide
                 speed_ramping = (byte)Mathf.FloorToInt(Mathf.Clamp((minutes - config.SpeedRampingDelay) * config.SpeedRampingRate, 0.0f, 255.0f));
                 health_ramping = Mathf.FloorToInt(Mathf.Max((minutes - config.HealthRampingDelay) * config.HealthRampingRate, 0.0f));
 
-                Timing.CallDelayed(0.2f,()=>
+                Timing.CallDelayed(0.1f,()=>
                 {
                     RoomIdentifier surface = RoomIdentifier.AllRoomIdentifiers.First(r => r.Zone == FacilityZone.Surface);
                     if (zone != FacilityZone.Surface)
@@ -292,6 +298,7 @@ namespace TheRiptide
                     }
 
                     player.EffectsManager.ChangeState<MovementBoost>(speed_ramping);
+                    player.Health = (health_ramping + config.ZombieHealth) * ((float)humans_alive / zombies_alive);
                 });
             }
             else
@@ -421,14 +428,19 @@ namespace TheRiptide
             {
                 victim.EffectsManager.ChangeState<Disabled>(1, 1);
 
+                if (!knock_back.ContainsKey(victim.PlayerId))
+                    knock_back.Add(victim.PlayerId, Vector3.zero);
                 Vector3 dir = attacker.ReferenceHub.PlayerCameraReference.rotation * Vector3.forward;
-                var fpm = victim.GameObject.GetComponentInChildren<FirstPersonMovementModule>();
-                Timing.CallDelayed(0.0f, () =>
-                {
-                    float ping = (LiteNetLib4MirrorServer.Peers[victim.ReferenceHub.netIdentity.connectionToClient.connectionId].Ping * 4.0f) / 1000.0f;
-                    fpm.CharController.Move((victim.Velocity * ping) + (dir * config.KnockBackMultiple * (zombies_alive / humans_alive) * (firearm.Damage / 100.0f)));
-                    fpm.ServerOverridePosition(fpm.CharController.transform.position, Vector3.zero);
-                });
+                knock_back[victim.PlayerId] += (dir * config.KnockBackMultiple * (zombies_alive / humans_alive) * (firearm.Damage / 100.0f));
+
+                //Vector3 dir = attacker.ReferenceHub.PlayerCameraReference.rotation * Vector3.forward;
+                //var fpm = victim.GameObject.GetComponentInChildren<FirstPersonMovementModule>();
+                //Timing.CallDelayed(0.0f, () =>
+                //{
+                //    float ping = (LiteNetLib4MirrorServer.Peers[victim.ReferenceHub.netIdentity.connectionToClient.connectionId].Ping * 4.0f) / 1000.0f;
+                //    fpm.CharController.Move((victim.Velocity * ping) + (dir * config.KnockBackMultiple * (zombies_alive / humans_alive) * (firearm.Damage / 100.0f)));
+                //    fpm.ServerOverridePosition(fpm.CharController.transform.position, Vector3.zero);
+                //});
             }
         }
 
@@ -534,6 +546,33 @@ namespace TheRiptide
 
 
                 yield return Timing.WaitForSeconds(1.0f);
+            }
+        }
+
+        private IEnumerator<float> _KnockBack()
+        {
+            while (true)
+            {
+                try
+                {
+                    foreach (var p in ReadyPlayers())
+                    {
+                        if (knock_back.ContainsKey(p.PlayerId) && knock_back[p.PlayerId] != Vector3.zero)
+                        {
+                            float ping = (LiteNetLib4MirrorServer.Peers[p.ReferenceHub.netIdentity.connectionToClient.connectionId].Ping * 4.0f) / 1000.0f;
+                            var fpm = p.GameObject.GetComponentInChildren<FirstPersonMovementModule>();
+                            fpm.CharController.Move((p.Velocity * ping) + knock_back[p.PlayerId]);
+                            fpm.ServerOverridePosition(fpm.CharController.transform.position, Vector3.zero);
+                        }
+                    }
+                    knock_back.Clear();
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Error(ex.ToString());
+                }
+
+                yield return Timing.WaitForOneFrame;
             }
         }
     }

@@ -29,15 +29,28 @@ namespace TheRiptide
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
 
-        public string Description { get; set; } = "Class-D vs NTF in a special Jailbird arena. Jailbirds get an extended charge duration, up to 3 seconds and never wearout. Everyone starts with 1000 HP. Random chance for everyone to get a Particle Disruptor or a MicroHID. 50% chance the lights will be very dim. Last team alive wins!\n\n";
+        public string Description { get; set; } = "Class-D vs NTF in a special Jailbird arena. Jailbirds get an extended charge duration, up to 3 seconds and never wearout. Everyone starts with {hp} HP. Random chance for everyone to get a Particle Disruptor or a MicroHID. Theres a chance the lights will be very dim. Last team alive wins!\n\n";
+
+        public float SpawnHealth { get; set; } = 1000.0f;
+        public float DimLightChance { get; set; } = 0.5f;
+        public float DimLightIntensity { get; set; } = 1.0f;
+
+        [Description("weighted chance to only get the Jailbird")]
+        public float NoneWeight { get; set; } = 1.0f;
+        [Description("weighted chance to get the Particle Disruptor")]
+        public float ParticleDisruptorWeight { get; set; } = 1.0f;
+        [Description("weighted chance to get the Micro Hid")]
+        public float MicroHidWeight { get; set; } = 1.0f;
+
     }
 
     enum ExtraWeapon { None, ParticleDisruptor, MicroHid };
 
     public class EventHandler
     {
-        private Vector3 spawn_a = new Vector3(20.71f, 968.19f, -12.16f);
-        private Vector3 spawn_b = new Vector3(-21.26f, 968.19f, -48.57f);
+        private static Config config;
+        private static Vector3 spawn_a = new Vector3(20.71f, 968.19f, -12.16f);
+        private static Vector3 spawn_b = new Vector3(-21.26f, 968.19f, -48.57f);
 
         private static HashSet<int> team_a = new HashSet<int>();
         private static HashSet<int> team_b = new HashSet<int>();
@@ -47,25 +60,32 @@ namespace TheRiptide
         private static List<LightSourceToy> lights = new List<LightSourceToy>();
 
         private static bool old_ff;
+        private static bool old_uq;
 
-        public static void Start()
+        public static void Start(Config config)
         {
+            EventHandler.config = config;
+            old_uq = UltraQuaternion.Enabled;
+            UltraQuaternion.Enable();
             old_ff = Server.FriendlyFire;
             Server.FriendlyFire = false;
             extra = ExtraWeapon.None;
-            float val = Random.value;
-            if (val < 0.6)
+            float total = config.NoneWeight + config.ParticleDisruptorWeight + config.MicroHidWeight;
+            float val = Random.value * total;
+            if(val < config.ParticleDisruptorWeight + config.MicroHidWeight)
             {
                 extra = ExtraWeapon.MicroHid;
-                if (val < 0.3)
+                if (val < config.ParticleDisruptorWeight)
                     extra = ExtraWeapon.ParticleDisruptor;
             }
 
-            lights_out = Random.value < 0.5f;
+            lights_out = Random.value < config.DimLightChance;
         }
 
         public static void Stop()
         {
+            if (!old_uq)
+                UltraQuaternion.Disable();
             Server.FriendlyFire = old_ff;
             team_a.Clear();
             team_b.Clear();
@@ -113,7 +133,7 @@ namespace TheRiptide
                 Timing.CallDelayed(3.0f, () =>
                 {
                     foreach (var light in lights)
-                        light.NetworkLightIntensity = 0.5f;
+                        light.NetworkLightIntensity = config.DimLightIntensity;
                 });
             }
         }
@@ -122,7 +142,7 @@ namespace TheRiptide
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
             if (player == null || !Round.IsRoundStarted ||
-                new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch)
+                new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Filmmaker)
                 return true;
 
             if (team_a.Contains(player.PlayerId))
@@ -243,7 +263,7 @@ namespace TheRiptide
         public string EvenAuthor { get; } = "The Riptide (map by zInitial)";
         public string EventDescription
         {
-            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description.Replace("{hp}", EventConfig.SpawnHealth.ToString("0")); }
             set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
         }
         public string EventPrefix { get; } = "EA";
@@ -259,7 +279,7 @@ namespace TheRiptide
         {
             Log.Info(EventName + " event is preparing");
             IsRunning = true;
-            EventHandler.Start();
+            EventHandler.Start(EventConfig);
             Log.Info(EventName + " event is prepared");
             PluginAPI.Events.EventManager.RegisterEvents<EventHandler>(this);
         }

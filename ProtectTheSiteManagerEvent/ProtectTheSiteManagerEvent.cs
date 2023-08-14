@@ -26,18 +26,24 @@ namespace TheRiptide
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
-        public string Description { get; set; } = "A random player is the site manager. They will be spawned in as a Scientist with a pistol, combat armor, a facility manager card and SCP 268. They will have an certain number of NTF private body guards (Manager and guards will be given 75% damage reduction). The Site manager’s goal is to make it from light containment all the way to surface to turn on the nuke. To turn on the nuke the generators must be done. If the nuke goes off before the Site manager dies then the Site manager and guards win. Chaos will be spawned in and their goal is to simply kill the Site manager before the nuke is detonated.\n\n";
+        public string Description { get; set; } = "A random player is the site manager. They will be spawned in as a Scientist with a pistol, combat armor, a facility manager card and SCP 268. They will have a number of NTF private body guards (Manager and guards will be given {reduction}% damage reduction). The Site manager’s goal is to make it from light containment all the way to surface to turn on the nuke. To turn on the nuke the generators must be done. If the nuke goes off before the Site manager dies then the Site manager and guards win. Chaos will be spawned in and their goal is to simply kill the Site manager before the nuke is detonated.\n\n";
+
+        [Description("Damage reduction as a percentage")]
+        public float DamageReduction { get; set; } = 70.0f;
+        public float PlayerToGuardRatio { get; set; } = 3.5f;
     }
 
     public class EventHandler
     {
+        private static Config config;
         private static int site_manager;
         private static HashSet<int> guards = new HashSet<int>();
         private static int generators = 0;
         private static CoroutineHandle warhead_lever;
 
-        public static void Start()
+        public static void Start(Config config)
         {
+            EventHandler.config = config;
             generators = 0;
             guards.Clear();
             Timing.KillCoroutines(warhead_lever);
@@ -64,7 +70,7 @@ namespace TheRiptide
         {
             if(player.PlayerId == site_manager)
             {
-                List<int> players = Player.GetPlayers().ConvertAll((p) => p.PlayerId).ToList();
+                List<int> players = ReadyPlayers().ConvertAll((p) => p.PlayerId).ToList();
                 players.Remove(player.PlayerId);
                 foreach (var id in guards)
                     players.Remove(id);
@@ -81,12 +87,12 @@ namespace TheRiptide
             }
             else if (guards.Contains(player.PlayerId))
             {
-                List<int> players = Player.GetPlayers().ConvertAll((p) => p.PlayerId).ToList();
+                List<int> players = ReadyPlayers().ConvertAll((p) => p.PlayerId).ToList();
                 players.Remove(site_manager);
                 foreach (var id in guards)
                     players.Remove(id);
                 guards.Remove(player.PlayerId);
-                int missing_count = Mathf.CeilToInt(players.Count / 5) - guards.Count;
+                int missing_count = Mathf.CeilToInt(players.Count / config.PlayerToGuardRatio) - guards.Count;
                 for(int i = 0; i < missing_count; i++)
                 {
                     if (players.Count == 0)
@@ -101,9 +107,9 @@ namespace TheRiptide
         {
             Warhead.IsLocked = true;
             Round.IsLocked = true;
-            List<int> players = Player.GetPlayers().ConvertAll((p) => p.PlayerId).ToList();
+            List<int> players = ReadyPlayers().ConvertAll((p) => p.PlayerId).ToList();
             site_manager = players.PullRandomItem();
-            int guard_count = Mathf.RoundToInt(players.Count / 3.5f);
+            int guard_count = Mathf.RoundToInt(players.Count / config.PlayerToGuardRatio);
             if (guard_count == 0)
                 guard_count = 1;
             for (int i = 0; i < guard_count; i++)
@@ -131,12 +137,12 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerChangeRole)]
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
-            if (player == null || !Round.IsRoundStarted)
+            if (player == null || !Round.IsRoundStarted || new_role == RoleTypeId.Filmmaker || new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch)
                 return true;
 
             if(player.PlayerId == site_manager)
             {
-                if(new_role != RoleTypeId.Scientist && new_role != RoleTypeId.Spectator)
+                if(new_role != RoleTypeId.Scientist)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -147,7 +153,7 @@ namespace TheRiptide
             }
             else if(guards.Contains(player.PlayerId))
             {
-                if(new_role != RoleTypeId.NtfPrivate && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Tutorial && new_role != RoleTypeId.Overwatch)
+                if(new_role != RoleTypeId.NtfPrivate)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -158,7 +164,7 @@ namespace TheRiptide
             }
             else
             {
-                if (new_role.GetTeam() != Team.ChaosInsurgency && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Tutorial && new_role != RoleTypeId.Overwatch)
+                if (new_role.GetTeam() != Team.ChaosInsurgency)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -207,7 +213,7 @@ namespace TheRiptide
                 return;
 
             if (damage is StandardDamageHandler standard && (victim.PlayerId == site_manager || guards.Contains(victim.PlayerId)))
-                standard.Damage = standard.Damage * 0.25f;
+                standard.Damage = standard.Damage * (1.0f - (config.DamageReduction / 100.0f));
         }
 
         [PluginEvent(ServerEventType.PlayerDeath)]
@@ -219,7 +225,7 @@ namespace TheRiptide
             if(victim.PlayerId == site_manager)
             {
                 Round.IsLocked = false;
-                foreach (var p in Player.GetPlayers())
+                foreach (var p in ReadyPlayers())
                 {
                     p.SendBroadcast("CHAOS Insurgency Won!", 10, shouldClearPrevious: true);
 
@@ -238,7 +244,7 @@ namespace TheRiptide
                 Player player_sm = Player.Get(site_manager);
                 if(player_sm != null && player_sm.Role == RoleTypeId.Scientist)
                 {
-                    foreach (var p in Player.GetPlayers())
+                    foreach (var p in ReadyPlayers())
                     {
                         p.SendBroadcast("The Site Manager Won!", 10, shouldClearPrevious: true);
 
@@ -295,6 +301,7 @@ namespace TheRiptide
 
         private static IEnumerator<float> _LockWarheadOnEnabled()
         {
+            AlphaWarheadNukesitePanel warhead = Server.Instance.GetComponent<AlphaWarheadNukesitePanel>(true);
             bool set = false;
             while(true)
             {
@@ -303,12 +310,12 @@ namespace TheRiptide
                     set = true;
                     Player sm = Player.Get(site_manager);
                     if (sm != null)
-                        sm.SendBroadcast("Nuke Enabled(even if it still says disabled). Current objective: get to surface to detonate nuke", 60, shouldClearPrevious: true);
+                        sm.SendBroadcast("Nuke has been Enabled permanently. Current objective: get to surface to detonate nuke", 60, shouldClearPrevious: true);
                 }
                 else
                 {
                     if (Warhead.LeverStatus == false)
-                        Warhead.LeverStatus = true;
+                        warhead.Networkenabled = true;
                 }
                 if (Warhead.IsDetonationInProgress)
                     break;
@@ -328,7 +335,7 @@ namespace TheRiptide
         public string EvenAuthor { get; } = "The Riptide. Idea by Guy in Grey";
         public string EventDescription
         {
-            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
+            get { return EventConfig == null ? "config not loaded" : EventConfig.Description.Replace("{reduction}", EventConfig.DamageReduction.ToString("0")); }
             set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
         }
         public string EventPrefix { get; } = "PTSM";
@@ -344,7 +351,7 @@ namespace TheRiptide
         {
             Log.Info(EventName + " event is preparing");
             IsRunning = true;
-            EventHandler.Start();
+            EventHandler.Start(EventConfig);
             Log.Info(EventName + " event is prepared");
             PluginAPI.Events.EventManager.RegisterEvents<EventHandler>(this);
         }

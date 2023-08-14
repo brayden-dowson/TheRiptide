@@ -142,7 +142,7 @@ namespace TheRiptide
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
             //Log.Info("changed role: " + player.Nickname + " | " + new_role.ToString());
-            if (player == null || !Round.IsRoundStarted || new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Tutorial)
+            if (player == null || !Round.IsRoundStarted || new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Tutorial || new_role != RoleTypeId.Filmmaker)
                 return true;
 
             if (game_over)

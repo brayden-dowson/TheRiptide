@@ -78,6 +78,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patches\KillPlayerPatch.cs" />
     <Compile Include="Patches\ZombieHealthPatch.cs" />
     <Compile Include="ZombieInfectionEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

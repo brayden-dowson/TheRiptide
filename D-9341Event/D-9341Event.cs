@@ -13,6 +13,7 @@ using InventorySystem.Items.Usables;
 using InventorySystem.Items.Usables.Scp1576;
 using InventorySystem.Items.Usables.Scp244;
 using InventorySystem.Items.Usables.Scp330;
+using MapGeneration;
 using MEC;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
@@ -38,13 +39,205 @@ namespace TheRiptide
         public string Description { get; set; } = "Todo\n\n";
     }
 
-    public interface IPlayerSave
+    public interface ISnapshot
+    {
+        object Load();
+        void Save(object obj);
+    }
+
+    public static class Snapshot
+    {
+        private static Dictionary<object, ISnapshot> object_snapshots = new Dictionary<object, ISnapshot>();
+        private static Dictionary<object, ISnapshot> snapshot_objects = new Dictionary<object, ISnapshot>();
+
+        public static ISnapshot GetSnapshot<T>(T value)
+        {
+            if (object_snapshots.ContainsKey(value))
+                return object_snapshots[value];
+            ISnapshot snapshot = null;
+            if (value is ItemBase item)
+                snapshot = ItemSnapshot.CreateSnapshot(item);
+
+            object_snapshots.Add(value, snapshot);
+            return snapshot;
+        }
+
+        public static T GetValue<T>(ISnapshot snapshot)
+        {
+            if (snapshot_objects.ContainsKey(snapshot))
+                return snapshot_objects[snapshot] as T;
+            T value = null;
+        }
+
+        public static void BeginSave()
+        {
+
+        }
+
+        public static void EndSave()
+        {
+
+        }
+
+        public static void BeginLoad()
+        {
+
+        }
+
+        public static void EndLoad()
+        {
+
+        }
+    }
+
+    public interface IPlayerSnapshot
     {
         void Load(Player player);
         void Save(Player player);
     }
 
-    public class HumanSave : IPlayerSave
+    public class KeyFrameSnapshot
+    {
+        private float time;
+        private float value;
+        private float in_tangent;
+        private float out_tangent;
+        private float in_weight;
+        private float out_weight;
+        private WeightedMode mode;
+
+        public KeyFrameSnapshot(Keyframe keyframe)
+        {
+            Save(keyframe);
+        }
+
+        public Keyframe Load()
+        {
+
+        }
+
+        public void Save(Keyframe keyframe)
+        {
+            time = keyframe.time;
+            value = keyframe.value;
+            in_tangent = keyframe.inTangent;
+            out_tangent = keyframe.outTangent;
+            in_weight = keyframe.inWeight;
+            out_weight = keyframe.outWeight;
+            mode = keyframe.weightedMode;
+        }
+    }
+
+    public class AnimationCurveSnapshot
+    {
+        private int length;
+        private KeyFrameSnapshot[] keys;
+        private WrapMode pre_wrap_mode;
+        private WrapMode post_wrap_mode;
+
+        public AnimationCurveSnapshot(AnimationCurve curve)
+        {
+            Save(curve);
+        }
+
+        public AnimationCurve Load()
+        {
+
+        }
+
+        public void Save(AnimationCurve curve)
+        {
+            length = curve.length;
+            keys = curve.keys.ToList().ConvertAll(x => new KeyFrameSnapshot(x)).ToArray();
+            pre_wrap_mode = curve.preWrapMode;
+            post_wrap_mode = curve.postWrapMode;
+        }
+    }
+
+    public class RegenerationProcessSnapshot
+    {
+        private AnimationCurveSnapshot curve;
+        private float speed;
+        private float hp;
+        private float heal;
+        private float elapsed;
+
+        public RegenerationProcessSnapshot(RegenerationProcess process)
+        {
+            Save(process);
+        }
+
+        public RegenerationProcess Load()
+        {
+            var process = new RegenerationProcess(curve.Load(), speed, hp);
+            process._healValue = heal;
+            process._elapsed = elapsed;
+            return process;
+        }
+
+        public void Save(RegenerationProcess process)
+        {
+            curve = new AnimationCurveSnapshot(process._regenCurve);
+            speed = process._speedMultip;
+            hp = process._hpMultip / process._speedMultip;
+            heal = process._healValue;
+            elapsed = process._elapsed;
+        }
+
+    }
+
+    public class PlayerHandlerSnapshot
+    {
+        private UsableSnapshot currently_used_item = null;
+        private float currently_used_start_time = 0.0f;
+        private List<RegenerationProcessSnapshot> regeneration_processes = new List<RegenerationProcessSnapshot>();
+        private Dictionary<ItemType, float> item_cooldowns = new Dictionary<ItemType, float>();
+
+        public PlayerHandlerSnapshot(PlayerHandler handler)
+        {
+            Save(handler);
+        }
+
+        //public PlayerHandler Load()
+        //{
+        //    var handler = new PlayerHandler();
+        //    handler.CurrentUsable = new CurrentlyUsedItem();
+        //    if(currently_used_item != null)
+        //        handler.CurrentUsable.Item = currently_used_item.l
+        //    return handler;
+        //}
+
+        public void Save(PlayerHandler handler)
+        {
+            regeneration_processes.Clear();
+            item_cooldowns.Clear();
+            currently_used_item = handler.CurrentUsable.Item != null ? new UsableSnapshot(handler.CurrentUsable.Item) : null;
+            currently_used_start_time = handler.CurrentUsable.StartTime;
+            regeneration_processes = handler.ActiveRegenerations.ConvertAll(x => new RegenerationProcessSnapshot(x));
+            item_cooldowns = handler.PersonalCooldowns.ToDictionary(x => x.Key, x => x.Value);
+        }
+    }
+
+    public class UsableItemsControllerSnapshot
+    {
+        private Dictionary<int, PlayerHandlerSnapshot> player_handlers = new Dictionary<int, PlayerHandlerSnapshot>();
+        private Dictionary<ushort, float> item_cooldowns = new Dictionary<ushort, float>();
+
+        public void Load()
+        {
+            
+        }
+
+        public void Save()
+        {
+            player_handlers.Clear();
+            item_cooldowns.Clear();
+            player_handlers = UsableItemsController.Handlers.ToDictionary(x => x.Key.PlayerId, x => new PlayerHandlerSnapshot(x.Value));
+            item_cooldowns = UsableItemsController.GlobalItemCooldowns.ToDictionary(x => x.Key, x => x.Value);
+        }
+    }
+
+    public class HumanSnapshot : IPlayerSnapshot
     {
         public RoleTypeId role;
         public Vector3 position;
@@ -55,7 +248,7 @@ namespace TheRiptide
         public List<KeyValuePair<byte, float>> effects;
         public List<float> stats;
 
-        public HumanSave(Player player)
+        public HumanSnapshot(Player player)
         {
             Save(player);
         }
@@ -108,13 +301,13 @@ namespace TheRiptide
 
     public class WorldSave
     {
-        public Dictionary<int, IPlayerSave> player_save = new Dictionary<int, IPlayerSave>();
+        public Dictionary<int, IPlayerSnapshot> player_save = new Dictionary<int, IPlayerSnapshot>();
 
         public void Save()
         {
             player_save.Clear();
             foreach(var p in ReadyPlayers())
-                player_save.Add(p.PlayerId, new HumanSave(p));
+                player_save.Add(p.PlayerId, new HumanSnapshot(p));
         }
 
         public void Load()

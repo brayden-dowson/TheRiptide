@@ -84,7 +84,7 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerChangeRole)]
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
-            if (player == null || !Round.IsRoundStarted)
+            if (player == null || !Round.IsRoundStarted || new_role == RoleTypeId.Filmmaker)
                 return true;
 
             if (dogs.Contains(player.PlayerId))

@@ -71,6 +71,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UltraQuaternion">
+      <HintPath>..\..\..\Users\r-jet\Desktop\The Riptide\UltraQuaternion.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Mathematics, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Unity.Mathematics.dll</HintPath>

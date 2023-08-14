@@ -35,7 +35,7 @@ namespace TheRiptide
         [Description("how many players per detective")]
         public float DetectiveRatio { get; set; } = 7.5f;
         [Description("how many players per traitor (min 1 traitor)")]
-        public float TraitorRatio { get; set; } = 5.0f;
+        public float TraitorRatio { get; set; } = 4.0f;
         [Description("how many players per jester (min 1 jester)")]
         public float JesterRatio { get; set; } = 15.0f;
         [Description("chance the jesters will spawn for the round (0 = never, 1 = always)")]
@@ -118,8 +118,10 @@ namespace TheRiptide
         private static IMap map;
         public static string map_selected = "";
 
+        public static bool force_start = false;
         public static bool pause_ready_up = false;
         public static bool is_ready_up = false;
+        public static bool round_lock = false;
         private static Player jester_killer = null;
         private static CoroutineHandle round_logic;
         private static CoroutineHandle ready_up;
@@ -198,6 +200,9 @@ namespace TheRiptide
             IDGunManager.Stop();
 
             Timing.KillCoroutines(round_logic, round_setup, ready_up);
+            Announcements.Stop();
+            RDM.Stop();
+            BroadcastOverride.Reset();
         }
 
         [PluginEvent(ServerEventType.PlayerJoined)]
@@ -250,7 +255,7 @@ namespace TheRiptide
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
             if (player == null || !Round.IsRoundStarted ||
-                new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch)
+                new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Filmmaker)
                 return true;
 
             InventoryMenu.Singleton.ResetMenuState(player);
@@ -608,71 +613,78 @@ namespace TheRiptide
                 {
                     try
                     {
-                        if (jester_killer != null)
+                        if (!round_lock)
                         {
-                            winner = WinningRole.Jesters;
-                            Timing.CallDelayed(0.0f, () =>
+                            if (jester_killer != null)
                             {
-                                foreach (var p in ReadyPlayers())
-                                    p.ReceiveHint(config.JestersWinHint.Replace("{name}", jester_killer.Nickname), 10);
-                            });
-                            break;
-                        }
+                                winner = WinningRole.Jesters;
+                                Timing.CallDelayed(0.0f, () =>
+                                {
+                                    foreach (var p in ReadyPlayers())
+                                    {
+                                        if (traitors.Contains(p.PlayerId))
+                                            p.Kill("Cause of Death: You let an Innocent kill the Jester");
+                                        p.ReceiveHint(config.JestersWinHint.Replace("{name}", jester_killer.Nickname), 10);
+                                    }
+                                });
+                                break;
+                            }
 
-                        int jesters_alive = 0;
-                        int traitors_alive = 0;
-                        int innocents_alive = 0;
-                        foreach (var p in Player.GetPlayers())
-                        {
-                            if (p.IsAlive && p.Role != RoleTypeId.Tutorial)
+                            int jesters_alive = 0;
+                            int traitors_alive = 0;
+                            int innocents_alive = 0;
+                            foreach (var p in Player.GetPlayers())
                             {
-                                if (RDM.OverRDMLimit(p))
+                                if (p.IsAlive && p.Role != RoleTypeId.Tutorial)
                                 {
-                                    p.Kill("Cause of Death: Complications from being retarded.");
-                                    p.SendBroadcast(config.ReadyUpBroadcast, 300, shouldClearPrevious: true);
-                                    p.ReceiveHint(config.RdmSlainMessage, 60);
-                                    not_ready.Add(p.PlayerId);
-                                }
-                                else
-                                {
-                                    if (traitors.Contains(p.PlayerId))
-                                        traitors_alive++;
-                                    else if (jesters.Contains(p.PlayerId))
-                                        jesters_alive++;
+                                    if (RDM.OverRDMLimit(p))
+                                    {
+                                        p.Kill("Cause of Death: Complications from being retarded.");
+                                        p.SendBroadcast(config.ReadyUpBroadcast, 300, shouldClearPrevious: true);
+                                        p.ReceiveHint(config.RdmSlainMessage, 60);
+                                        not_ready.Add(p.PlayerId);
+                                    }
                                     else
-                                        innocents_alive++;
+                                    {
+                                        if (traitors.Contains(p.PlayerId))
+                                            traitors_alive++;
+                                        else if (jesters.Contains(p.PlayerId))
+                                            jesters_alive++;
+                                        else
+                                            innocents_alive++;
+                                    }
                                 }
                             }
-                        }
-                        if(traitors_alive == 0 && map.InnocentsMetWinCondition())
-                        {
-                            winner = WinningRole.Innocents;
-                            Timing.CallDelayed(0.0f, () =>
+                            if (traitors_alive == 0 && map.InnocentsMetWinCondition())
+                            {
+                                winner = WinningRole.Innocents;
+                                Timing.CallDelayed(0.0f, () =>
+                                {
+                                    foreach (var p in ReadyPlayers())
+                                        p.ReceiveHint(config.InnocentsWinHint, 10);
+                                });
+                                break;
+                            }
+                            else if (innocents_alive == 0)
+                            {
+                                winner = WinningRole.Traitors;
+                                Timing.CallDelayed(0.0f, () =>
+                                {
+                                    foreach (var p in ReadyPlayers())
+                                        p.ReceiveHint(config.TraitorsWinHint, 10);
+                                });
+                                break;
+                            }
+                            if (round_timer > (60.0f * map.RoundTime))
                             {
                                 foreach (var p in ReadyPlayers())
-                                    p.ReceiveHint(config.InnocentsWinHint, 10);
-                            });
-                            break;
-                        }
-                        else if (innocents_alive == 0)
-                        {
-                            winner = WinningRole.Traitors;
-                            Timing.CallDelayed(0.0f, () =>
-                            {
-                                foreach (var p in ReadyPlayers())
-                                    p.ReceiveHint(config.TraitorsWinHint, 10);
-                            });
-                            break;
-                        }
-                        if(round_timer > (60.0f * map.RoundTime))
-                        {
-                            foreach (var p in ReadyPlayers())
-                                if (traitors.Contains(p.PlayerId))
-                                    p.Kill("you were to slow!");
-                            if (!sent_out_of_time_annoucement)
-                            {
-                                Announcements.Add(new Announcement(config.TraitorsOutOfTimeAnnouncement, 30.0f));
-                                sent_out_of_time_annoucement = true;
+                                    if (traitors.Contains(p.PlayerId))
+                                        p.Kill("you were to slow!");
+                                if (!sent_out_of_time_annoucement)
+                                {
+                                    Announcements.Add(new Announcement(config.TraitorsOutOfTimeAnnouncement, 30.0f));
+                                    sent_out_of_time_annoucement = true;
+                                }
                             }
                         }
                     }
@@ -790,6 +802,7 @@ namespace TheRiptide
 
         private static IEnumerator<float> _ReadyUp(int time)
         {
+            force_start = false;
             is_ready_up = true;
             map.OnReadyUpStart();
             BodyManager.BeginReadyUP(map.ReadyUpBodyPosition);
@@ -850,8 +863,9 @@ namespace TheRiptide
                 yield return Timing.WaitForSeconds(1.0f);
                 if (ready >= 3 && !pause_ready_up)
                     passed += 1;
+                if (force_start)
+                    break;
             }
-
             BodyManager.EndReadyUp();
 
             foreach (var player in ReadyPlayers())

@@ -56,11 +56,13 @@ namespace TheRiptide
         private static Vector3 team_b_offset;
 
         private static CoroutineHandle replenish;
+        private static bool round_started = false;
 
         private static bool old_ff;
 
         public static void Start()
         {
+            round_started = false;
             old_ff = Server.FriendlyFire;
             Server.FriendlyFire = false;
             team_a.Clear();
@@ -142,9 +144,9 @@ namespace TheRiptide
             player.SendBroadcast("Event being played: Switch Team Deathmatch\n<size=32>Two teams Scientists and Class-D spawn in a random zone with a random loadout, players switch team on death.\n<color=#FF9000>Zone: " + zone.ToString().Replace("Containment", "") + ", Weapon: " + weapon.ToString().Replace("Gun", "") + ", Armor: " + armor.ToString().Replace("Armor", "") + ", SCP: " + scp.ToString().Replace("SCP", "") + ", Other: " + other.ToString() + "</color></size>", 30, shouldClearPrevious: true);
 
             if (team_a.Count > team_b.Count)
-                team_a.Add(player.PlayerId);
-            else
                 team_b.Add(player.PlayerId);
+            else
+                team_a.Add(player.PlayerId);
         }
 
         [PluginEvent(ServerEventType.PlayerLeft)]
@@ -219,17 +221,19 @@ namespace TheRiptide
             });
 
             replenish = Timing.RunCoroutine(_Replenish());
+
+            Timing.CallDelayed(10.0f, () => round_started = true);
         }
 
         [PluginEvent(ServerEventType.PlayerChangeRole)]
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
-            if (player == null || !Round.IsRoundStarted)
+            if (player == null || !Round.IsRoundStarted || new_role == RoleTypeId.Filmmaker || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Spectator)
                 return true;
 
             if (team_a.Contains(player.PlayerId))
             {
-                if (new_role != RoleTypeId.ClassD && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Overwatch && new_role != RoleTypeId.Tutorial)
+                if (new_role != RoleTypeId.ClassD)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -240,7 +244,7 @@ namespace TheRiptide
             }
             else if (team_b.Contains(player.PlayerId))
             {
-                if (new_role != RoleTypeId.Scientist && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Overwatch && new_role != RoleTypeId.Tutorial)
+                if (new_role != RoleTypeId.Scientist)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -251,7 +255,7 @@ namespace TheRiptide
             }
             else
             {
-                if (new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Overwatch && new_role != RoleTypeId.Tutorial)
+                if (new_role != RoleTypeId.Spectator)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -277,7 +281,8 @@ namespace TheRiptide
                     {
                         SetLoadout(player);
                         Teleport.RoomPos(player, team_a_room, team_a_offset);
-                        player.EffectsManager.EnableEffect<Ensnared>(10);
+                        if (!round_started)
+                            player.EffectsManager.EnableEffect<Ensnared>(10);
                     });
                     Timing.CallDelayed(7.0f, () =>
                     {
@@ -293,7 +298,8 @@ namespace TheRiptide
                     {
                         SetLoadout(player);
                         Teleport.RoomPos(player, team_b_room, team_b_offset);
-                        player.EffectsManager.EnableEffect<Ensnared>(10);
+                        if (!round_started)
+                            player.EffectsManager.EnableEffect<Ensnared>(10);
                     });
                     Timing.CallDelayed(7.0f, () =>
                     {

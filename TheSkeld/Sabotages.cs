@@ -165,7 +165,7 @@ namespace TheRiptide
     {
         public float Price => 0.0f;
 
-        public float ActivationCoolDown => 20.0f;
+        public float ActivationCoolDown => 15.0f;
         public float AutoResetTime => -1;
 
         public void Disable()
@@ -176,10 +176,10 @@ namespace TheRiptide
 
         public void Enable(Player enabler)
         {
-            ActiveSabotages.Add("OXY", 20);
+            ActiveSabotages.Add("OXY", 15);
             OxygenController.Singleton.State = false;
             Shop.RewardCash(enabler, 10, "<b><color=#00FF00>$10</color> reward for sabotaging Oxygen! Check shop for options</b>");
-            Timing.CallDelayed(20.0f, () => { if (OxygenController.Singleton.State == false)
+            Timing.CallDelayed(15.0f, () => { if (OxygenController.Singleton.State == false)
                     Shop.RewardCash(enabler, 65, "<b><color=#00FF00>$65</color> reward for successful sabotage of Oxygen! Check shop for options</b>"); });
         }
     }
@@ -380,7 +380,7 @@ namespace TheRiptide
         public static List<GeneratorSabotage> Instances = new List<GeneratorSabotage>();
 
         public float Price => 0.0f;
-        public float ActivationCoolDown => 30.0f;
+        public float ActivationCoolDown => 20.0f;
         public float AutoResetTime => -1.0f;
 
         private CoroutineHandle generator_update;
@@ -408,18 +408,18 @@ namespace TheRiptide
 
         public void Enable(Player enabler)
         {
-            ActiveSabotages.Add("ENG" + (Instances.IndexOf(this) + 1), 30);
+            ActiveSabotages.Add("ENG" + (Instances.IndexOf(this) + 1), 10);
             generator_update = Timing.RunCoroutine(_GeneratorUpdate(enabler));
         }
 
         private IEnumerator<float> _GeneratorUpdate(Player enabler)
         {
             Shop.RewardCash(enabler, 15, "<b><color=#00FF00>$15</color> reward for sabotaging Engine! Check shop for options</b>");
-            yield return Timing.WaitForSeconds(30.0f);
-            Shop.RewardCash(enabler, 85, "<b><color=#00FF00>$85</color> reward for successful sabotage of Engine! Check shop for options</b>");
+            yield return Timing.WaitForSeconds(10.0f);
             IsDeactivated = true;
             if (Instances[0].IsDeactivated && Instances[1].IsDeactivated)
             {
+                Shop.RewardCash(enabler, 150, "<b><color=#00FF00>$150</color> reward for successful sabotage of Engine! Check shop for options</b>");
                 OxygenController.Singleton.Power = false;
                 LightsController.Singleton.Power = false;
                 DoorsController.Singleton.Power = false;
@@ -428,6 +428,8 @@ namespace TheRiptide
                 foreach (var ds in TheSkeld.Singleton.doors.Values)
                     ds.door_base.NetworkTargetState = true;
             }
+            else
+                Shop.RewardCash(enabler, 35, "<b><color=#00FF00>$35</color> reward for successful sabotage of Engine! Check shop for options</b>");
         }
 
     }
@@ -470,17 +472,17 @@ namespace TheRiptide
                     foreach (var p in Player.GetPlayers())
                         if (p.IsAlive)
                             p.EffectsManager.EnableEffect<Burned>();
-                if(x > 30.0f)
+                if(x > 20.0f)
                     foreach (var p in Player.GetPlayers())
                         if (p.IsAlive)
                             p.EffectsManager.EnableEffect<Concussed>();
 
-                if (x > 45.0f)
+                if (x > 25.0f)
                     foreach (var p in Player.GetPlayers())
                         if (p.IsAlive)
                             p.EffectsManager.EnableEffect<Deafened>();
 
-                if (x > 60.0f)
+                if (x > 30.0f)
                     foreach (var p in Player.GetPlayers())
                         if (p.IsAlive)
                             p.EffectsManager.EnableEffect<Poisoned>();
@@ -511,7 +513,7 @@ namespace TheRiptide
             Shop.RewardCash(enabler, 15, "<b><color=#00FF00>$15</color> reward for sabotaging Shields! Check shop for options</b>");
             ActiveSabotages.Add("SHLD", 15);
             ShieldController.Singleton.State = false;
-            reward_handle = Timing.CallDelayed(15.0f,()=>Timing.CallPeriodically(60.0f, 15.0f, () => Shop.RewardCash(enabler, 15, "<b><color=#00FF00>$15</color> reward for successful sabotage of Shields! Check shop for options</b>")));
+            reward_handle = Timing.CallDelayed(15.0f,()=>Timing.CallPeriodically(20.0f, 5.0f, () => Shop.RewardCash(enabler, 15, "<b><color=#00FF00>$15</color> reward for successful sabotage of Shields! Check shop for options</b>")));
         }
     }
 
@@ -553,7 +555,7 @@ namespace TheRiptide
     public class CommunicationSabotage : ISabotage
     {
         public float Price => 0.0f;
-        public float ActivationCoolDown => 15.0f;
+        public float ActivationCoolDown => 10.0f;
         public float AutoResetTime => -1.0f;
 
         public void Disable()

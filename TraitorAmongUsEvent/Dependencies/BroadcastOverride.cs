@@ -203,6 +203,11 @@ namespace TheRiptide
                 broadcast_info.Remove(player.PlayerId);
         }
 
+        public static void Reset()
+        {
+            broadcast_info.Clear();
+        }
+
         public static void BroadcastLine(Player player, int line, float duration, BroadcastPriority priority, string msg)
         {
             if (broadcast_info.ContainsKey(player.PlayerId))

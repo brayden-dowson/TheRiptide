@@ -46,8 +46,11 @@ namespace TheRiptide
 
         public static CoroutineHandle warhead_handle = new CoroutineHandle();
         public static CoroutineHandle validity_checks_handle = new CoroutineHandle();
+        public static CoroutineHandle knock_back_handle = new CoroutineHandle();
         public static int humans_alive = 1;
         public static int zombies_alive = 1;
+
+        private static Dictionary<int, Vector3> knock_back = new Dictionary<int, Vector3>();
 
         public EventHandler()
         {
@@ -68,7 +71,7 @@ namespace TheRiptide
 
         public static void Stop()
         {
-            Timing.KillCoroutines(warhead_handle, validity_checks_handle);
+            Timing.KillCoroutines(warhead_handle, validity_checks_handle, knock_back_handle);
             zombies.Clear();
             left_as_zombie.Clear();
             kills_as_child.Clear();
@@ -152,6 +155,7 @@ namespace TheRiptide
             });
 
             validity_checks_handle = Timing.RunCoroutine(_Checks());
+            knock_back_handle = Timing.RunCoroutine(_KnockBack());
         }
 
         [PluginEvent(ServerEventType.TeamRespawn)]
@@ -166,40 +170,27 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerChangeRole)]
         bool OnPlayerChangeRole(Player player, PlayerRoleBase oldRole, RoleTypeId new_role, RoleChangeReason reason)
         {
-            if (player != null)
-            {
-                int player_id = player.PlayerId;
-                if (new_role.GetTeam() == Team.SCPs && new_role != RoleTypeId.Scp0492 && !zombies.ContainsKey(player_id))
-                    zombies.Add(player_id, new HashSet<int>());
+            if (player == null || !Round.IsRoundStarted || new_role == RoleTypeId.Filmmaker || new_role == RoleTypeId.Overwatch || new_role == RoleTypeId.Tutorial)
+                return true;
 
-                if (zombies.ContainsKey(player_id))
+            int player_id = player.PlayerId;
+            if (new_role.GetTeam() == Team.SCPs && new_role != RoleTypeId.Scp0492 && !zombies.ContainsKey(player_id))
+                zombies.Add(player_id, new HashSet<int>());
+
+            if (zombies.ContainsKey(player_id))
+            {
+                if (new_role != RoleTypeId.Scp0492 && new_role != RoleTypeId.Spectator)
                 {
-                    if (new_role != RoleTypeId.Scp0492 && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Tutorial && new_role != RoleTypeId.Overwatch)
+                    if (new_role == RoleTypeId.Scp079 || new_role == RoleTypeId.Scp106)
                     {
-                        if (new_role == RoleTypeId.Scp079 || new_role == RoleTypeId.Scp106)
+                        Timing.CallDelayed(0.1f, () =>
                         {
-                            Timing.CallDelayed(0.1f, () =>
-                            {
-                                Player p = Player.Get(player_id);
-                                if (p != null)
-                                    p.SetRole(RoleTypeId.Scp939);
-                            });
-                        }
-                        else
-                        {
-                            Timing.CallDelayed(0.1f, () =>
-                            {
-                                Player p = Player.Get(player_id);
-                                if (p != null)
-                                    p.SetRole(RoleTypeId.Scp0492);
-                            });
-                        }
-                        return false;
+                            Player p = Player.Get(player_id);
+                            if (p != null)
+                                p.SetRole(RoleTypeId.Scp939);
+                        });
                     }
-                }
-                else if (zombies.Any((c) => c.Value.Contains(player_id)))
-                {
-                    if (new_role != RoleTypeId.Scp0492 && new_role != RoleTypeId.Spectator && new_role != RoleTypeId.Tutorial && new_role != RoleTypeId.Overwatch)
+                    else
                     {
                         Timing.CallDelayed(0.1f, () =>
                         {
@@ -207,33 +198,45 @@ namespace TheRiptide
                             if (p != null)
                                 p.SetRole(RoleTypeId.Scp0492);
                         });
-                        return false;
                     }
+                    return false;
                 }
-                else if (new_role == RoleTypeId.ClassD || new_role == RoleTypeId.Scientist)
+            }
+            else if (zombies.Any((c) => c.Value.Contains(player_id)))
+            {
+                if (new_role != RoleTypeId.Scp0492 && new_role != RoleTypeId.Spectator)
                 {
-                    Timing.CallDelayed(1.0f, () =>
+                    Timing.CallDelayed(0.1f, () =>
                     {
                         Player p = Player.Get(player_id);
                         if (p != null)
-                        {
-                            if (new_role == RoleTypeId.ClassD)
-                            {
-                                p.AddItem(ItemType.GunCOM15);
-                                p.AddAmmo(ItemType.Ammo9x19, 10);
-                            }
-                            else if (new_role == RoleTypeId.Scientist)
-                            {
-                                RemoveItem(p, ItemType.KeycardScientist);
-                                p.AddItem(ItemType.KeycardResearchCoordinator);
-                                p.AddItem(ItemType.GunCOM18);
-                            }
-                        }
+                            p.SetRole(RoleTypeId.Scp0492);
                     });
+                    return false;
                 }
             }
-            else
-                Log.Info("null player on change roles");
+            else if (new_role == RoleTypeId.ClassD || new_role == RoleTypeId.Scientist)
+            {
+                Timing.CallDelayed(1.0f, () =>
+                {
+                    Player p = Player.Get(player_id);
+                    if (p != null)
+                    {
+                        if (new_role == RoleTypeId.ClassD)
+                        {
+                            p.AddItem(ItemType.GunCOM15);
+                            p.AddAmmo(ItemType.Ammo9x19, 10);
+                        }
+                        else if (new_role == RoleTypeId.Scientist)
+                        {
+                            RemoveItem(p, ItemType.KeycardScientist);
+                            p.AddItem(ItemType.KeycardResearchCoordinator);
+                            p.AddItem(ItemType.GunCOM18);
+                        }
+                    }
+                });
+            }
+
             return true;
         }
 
@@ -248,26 +251,26 @@ namespace TheRiptide
                     if (zombies.ContainsKey(player_id))
                     {
                         SetScale(player, 1.10f);
-                        Timing.CallDelayed(1.0f, () =>
+                        Timing.CallDelayed(0.0f, () =>
                         {
-                            Player p = Player.Get(player_id);
-                            if (p != null)
-                            {
-                                p.SendBroadcast("You have spawed as a Mother Zombie!\nyou have the ability to open gates", 5);
-                                p.IsBypassEnabled = true;
-                            }
+                            if (player.Role != RoleTypeId.Scp0492)
+                                return;
+   
+                            player.SendBroadcast("You have spawed as a Mother Zombie!\nyou have the ability to open gates", 5);
+                            player.IsBypassEnabled = true;
+                            player.Health = config.MotherZombieHealth;
                         });
                     }
                     else if (zombies.Any((c) => c.Value.Contains(player_id)))
                     {
                         SetScale(player, 0.85f);
-                        Timing.CallDelayed(1.0f, () =>
+                        Timing.CallDelayed(0.0f, () =>
                         {
-                            Player p = Player.Get(player_id);
-                            if (p != null)
-                            {
-                                p.SendBroadcast("You have spawed as a Child Zombie!\n", 5);
-                            }
+                            if (player.Role != RoleTypeId.Scp0492)
+                                return;
+
+                            player.SendBroadcast("You have spawed as a Child Zombie!\n", 5);
+                            player.Health = (float)config.ChildrenHealthPool / zombies.First(c => c.Value.Contains(player_id)).Value.Count;
                         });
 
                         int id = zombies.Where((c) => c.Value.Contains(player_id)).First().Key;
@@ -295,14 +298,19 @@ namespace TheRiptide
                     if (firearm.WeaponType == ItemType.GunCOM15)
                         multiplier = 5.0f;
 
+                    if (!knock_back.ContainsKey(victim.PlayerId))
+                        knock_back.Add(victim.PlayerId, Vector3.zero);
                     Vector3 dir = attacker.ReferenceHub.PlayerCameraReference.rotation * Vector3.forward;
-                    var fpm = victim.GameObject.GetComponentInChildren<FirstPersonMovementModule>();
-                    Timing.CallDelayed(0.0f, () =>
-                    {
-                        float ping = (LiteNetLib4MirrorServer.Peers[victim.ReferenceHub.netIdentity.connectionToClient.connectionId].Ping * 4.0f) / 1000.0f;
-                        fpm.CharController.Move((victim.Velocity * ping) + (multiplier * dir * config.KnockBackMultiple * (zombies_alive / humans_alive) * (mother ? 0.5f : 1.0f) * (firearm.Damage / 100.0f)));
-                        fpm.ServerOverridePosition(fpm.CharController.transform.position, Vector3.zero);
-                    });
+                    knock_back[victim.PlayerId] += (multiplier * dir * config.KnockBackMultiple * (zombies_alive / humans_alive) * (mother ? 0.5f : 1.0f) * (firearm.Damage / 100.0f));
+
+                    //Vector3 dir = attacker.ReferenceHub.PlayerCameraReference.rotation * Vector3.forward;
+                    //var fpm = victim.GameObject.GetComponentInChildren<FirstPersonMovementModule>();
+                    //Timing.CallDelayed(0.0f, () =>
+                    //{
+                    //    float ping = (LiteNetLib4MirrorServer.Peers[victim.ReferenceHub.netIdentity.connectionToClient.connectionId].Ping * 4.0f) / 1000.0f;
+                    //    fpm.CharController.Move((victim.Velocity * ping) + (multiplier * dir * config.KnockBackMultiple * (zombies_alive / humans_alive) * (mother ? 0.5f : 1.0f) * (firearm.Damage / 100.0f)));
+                    //    fpm.ServerOverridePosition(fpm.CharController.transform.position, Vector3.zero);
+                    //});
                 }
             }
         }
@@ -435,6 +443,33 @@ namespace TheRiptide
                         humans_alive++;
                 }
                 yield return Timing.WaitForSeconds(1.0f);
+            }
+        }
+
+        private IEnumerator<float> _KnockBack()
+        {
+            while(true)
+            {
+                try
+                {
+                    foreach(var p in ReadyPlayers())
+                    {
+                        if(knock_back.ContainsKey(p.PlayerId) && knock_back[p.PlayerId] != Vector3.zero)
+                        {
+                            float ping = (LiteNetLib4MirrorServer.Peers[p.ReferenceHub.netIdentity.connectionToClient.connectionId].Ping * 4.0f) / 1000.0f;
+                            var fpm = p.GameObject.GetComponentInChildren<FirstPersonMovementModule>();
+                            fpm.CharController.Move((p.Velocity * ping) + knock_back[p.PlayerId]);
+                            fpm.ServerOverridePosition(fpm.CharController.transform.position, Vector3.zero);
+                        }
+                    }
+                    knock_back.Clear();
+                }
+                catch(System.Exception ex)
+                {
+                    Log.Error(ex.ToString());
+                }
+
+                yield return Timing.WaitForOneFrame;
             }
         }
     }

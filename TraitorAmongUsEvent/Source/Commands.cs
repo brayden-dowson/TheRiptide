@@ -80,6 +80,50 @@ namespace TheRiptide
     }
 
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
+    public class TauStart : ICommand
+    {
+        public string Command { get; } = "tau_start";
+
+        public string[] Aliases { get; } = new string[] { "taus" };
+
+        public string Description { get; } = "force starts the round";
+
+        public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
+        {
+            if (!sender.CheckPermission(PlayerPermissions.PlayersManagement))
+            {
+                response = "No permission";
+                return false;
+            }
+            TraitorAmongUs.force_start = true;
+            response = "Successfully force started the round";
+            return true;
+        }
+    }
+
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
+    public class TauLock : ICommand
+    {
+        public string Command { get; } = "tau_lock";
+
+        public string[] Aliases { get; } = new string[] { "taul" };
+
+        public string Description { get; } = "toggle round lock, prevents win conditions from being triggered while on";
+
+        public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
+        {
+            if (!sender.CheckPermission(PlayerPermissions.PlayersManagement))
+            {
+                response = "No permission";
+                return false;
+            }
+            TraitorAmongUs.round_lock = !TraitorAmongUs.round_lock;
+            response = "Success: " + (TraitorAmongUs.round_lock ? "Round lock enabled" : "Round lock disabled");
+            return true;
+        }
+    }
+
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     public class TauRDM : ICommand
     {
         public string Command { get; } = "tau_rdm";
