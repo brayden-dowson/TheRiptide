@@ -68,12 +68,12 @@ namespace TheRiptide
             };
             InventoryMenu.Singleton.CreateMenu((int)MenuPage.DetectiveMainMenu, "<align=left><color=#0000FF>[Detective Menu]</color> - <color=#FF0000>LEFT/RIGHT CLICK TO SELECT</color>", new List<MenuItem>
             {
-                new MenuItem(ItemType.KeycardNTFCommander, "NTFCommander = <color=#FF0000>EXIT</color>", OnExit),
+                new MenuItem(ItemType.KeycardMTFCaptain, "NTFCommander = <color=#FF0000>EXIT</color>", OnExit),
                 new MenuItem(ItemType.Adrenaline, "Adrenaline - <color=#00FF00>$25</color>", (player) => OnBuy(player, ItemType.Adrenaline, 25)),
                 new MenuItem(ItemType.Painkillers, "Painkillers - <color=#00FF00>$30</color>", (player) => OnBuy(player, ItemType.Painkillers, 30)),
                 new MenuItem(ItemType.Jailbird, "Mind-Scanner - <color=#00FF00>$100</color> (reveals the role of an alive player. one time use)", (player) => OnBuy(player, ItemType.Jailbird, 100)),
                 new MenuItem(ItemType.GunShotgun, "Shotgun - <color=#00FF00>$150</color>", (player) => OnBuy(player, ItemType.GunShotgun, 150)),
-                new MenuItem(ItemType.MicroHID, "DNA-Scanner - <color=#00FF00>$750</color> (reveals who killed the victim when scanned)", (player) => OnBuy(player, ItemType.MicroHID, 750))
+                new MenuItem(ItemType.MicroHID, "DNA-Scanner - <color=#00FF00>$500</color> (reveals who killed the victim when scanned)", (player) => OnBuy(player, ItemType.MicroHID, 500))
             });
             InventoryMenu.Singleton.CreateMenu((int)MenuPage.TraitorMainMenu, "<align=left><color=#FF0000>[Traitor Menu]</color> - <color=#FF0000>LEFT/RIGHT CLICK TO SELECT</color>", new List<MenuItem>
             {

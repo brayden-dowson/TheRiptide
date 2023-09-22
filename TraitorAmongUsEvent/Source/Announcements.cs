@@ -54,7 +54,7 @@ namespace TheRiptide
             {
                 try
                 {
-                    string current_msg = "<size=32><align=left><voffset=-7em>\n<voffset=0em>";
+                    string current_msg = "<size=24><align=left><voffset=-7em>\n<voffset=0em>";
                     for (int i = announcements.Count - 1; i >= 0; i--)
                     {
                         current_msg += announcements[i].msg + "\n";

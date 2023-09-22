@@ -64,7 +64,10 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerJoined)]
         void OnPlayerJoined(Player player)
         {
-            player_stats.Add(player.PlayerId, new Stats(player.Nickname));
+            if (player_stats.ContainsKey(player.PlayerId))
+                player_stats[player.PlayerId] = new Stats(player.Nickname);
+            else
+                player_stats.Add(player.PlayerId, new Stats(player.Nickname));
         }
 
         [PluginEvent(ServerEventType.WaitingForPlayers)]

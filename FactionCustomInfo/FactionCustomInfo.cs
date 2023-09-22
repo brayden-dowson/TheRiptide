@@ -241,16 +241,20 @@ namespace TheRiptide
 
         private static void SerializeInfo(string info, NetworkWriter writer)
         {
+            //Send fake CustomInfo for NinkNameSync for Reference Hub
             writer.Reset();
-            Compression.CompressVarUInt(writer, 1 << 3);
+            Compression.CompressVarUInt(writer, 1 << 3);//network behaviour dirty bits(NickNameSync has an index of 3 inside Reference Hub) must be compressed
             int position1 = writer.Position;
-            writer.WriteByte(0);
+            writer.WriteByte(0);//placeholder for size
             int position2 = writer.Position;
 
-            writer.WriteULong(0L);
-            writer.WriteULong(2L);
-            writer.WriteString(info);
+            writer.WriteULong(0L);//sync obj dirty bits
+            //sync object data
 
+            writer.WriteULong(2L);//sync var dirty bits
+            writer.WriteString(info);//sync var data
+
+            //calculate size and save it in the placeholder
             int position3 = writer.Position;
             writer.Position = position1;
             byte num = (byte)(position3 - position2 & byte.MaxValue);

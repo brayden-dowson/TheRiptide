@@ -83,7 +83,7 @@ namespace TheRiptide
                             Log.Info("escapee had: " + scp_items_count.ToString() + " scp items");
                             if (scp_items_count >= 3)
                             {
-                                AddOrDropItem(player, ItemType.KeycardNTFCommander);
+                                AddOrDropItem(player, ItemType.KeycardMTFCaptain);
                             }
                             if (scp_items_count >= 2)
                             {

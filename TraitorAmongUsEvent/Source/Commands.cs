@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static TheRiptide.Utility;
 
 namespace TheRiptide
 {
@@ -124,6 +125,29 @@ namespace TheRiptide
     }
 
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
+    public class TauForceReady : ICommand
+    {
+        public string Command { get; } = "tau_force_ready";
+
+        public string[] Aliases { get; } = new string[] { "taufr" };
+
+        public string Description { get; } = "force readyup all players";
+
+        public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
+        {
+            if (!sender.CheckPermission(PlayerPermissions.PlayersManagement))
+            {
+                response = "No permission";
+                return false;
+            }
+            foreach(var p in ReadyPlayers())
+                TraitorAmongUs.not_ready.Remove(p.PlayerId);
+            response = "Successfully forced readyup on all players";
+            return true;
+        }
+    }
+
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     public class TauRDM : ICommand
     {
         public string Command { get; } = "tau_rdm";
@@ -196,6 +220,7 @@ namespace TheRiptide
                 return false;
             }
             RDM.ForgivePlayer(target);
+            TraitorAmongUs.not_ready.Remove(target.PlayerId);
             response = "Success: " + target.Nickname + " has been forgiven";
             return true;
         }

@@ -87,11 +87,16 @@ namespace TheRiptide
             Timing.KillCoroutines(update);
         }
 
-        public static void Reset()
+        public static void Clear()
         {
             player_ffdmg.Clear();
             player_ffkills.Clear();
             player_grace.Clear();
+        }
+
+        public static void Reset()
+        {
+            Clear();
             foreach (var p in Player.GetPlayers())
             {
                 if (p.IsReady && !TraitorAmongUs.jesters.Contains(p.PlayerId))

@@ -25,6 +25,16 @@ namespace TheRiptide
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
         public float HealthScaling { get; set; } = 200.0f;
+        [Description("disabled effect slows shyguy down for the entier round allowing him to be not so overpowered at the start of the round")]
+        public bool DisabledEffect { get; set; } = true;
+        [Description("maximum Movement Boost effect applied once hp hits the MaxSpeedBoostAtHp target. Speed scales linearly with health between StartSpeedBoostAtHp and MaxSpeedBoostAtHp")]
+        public byte MaxSpeedBoost { get; set; } = 255;
+        [Description("At what percentage of health should shy guy get the maximum speed boost. 0.0 = 0% health, 0.5 = 50% health")]
+        public float MaxSpeedBoostAtHp { get; set; } = 0.25f;
+        [Description("At what percentage of health should shy guy start getting a speed boost. 1.0 = 100% health, 0.5 = 50% health")]
+        public float StartSpeedBoostAtHp { get; set; } = 1.0f;
+        [Description("Damage reduction to explosion type damage(to prevent elevator grenade cheese)")]
+        public float GrenadeDamageReduction { get; set; } = 0.666f;
         public string Description { get; set; } = "A Shy Guy spawns outside the facility and is triggered by everyone. His rage never runs out and his speed increase the lower his health gets. His health scales with the number of players on the server. NTF are dispatched to stop him at all costs.\n\n";
     }
 
@@ -115,7 +125,8 @@ namespace TheRiptide
                     Player p = Player.Get(player_id);
                     if (p != null && p.Role == RoleTypeId.Scp096)
                         Teleport.RoomPos(player, RoomIdentifier.AllRoomIdentifiers.First(r => r.Zone == FacilityZone.Surface), new Vector3(131.925f, -11.208f, 27.378f));
-                    p.EffectsManager.EnableEffect<Disabled>();
+                    if (config.DisabledEffect)
+                        p.EffectsManager.EnableEffect<Disabled>();
                 });
             }
             else if(role.IsHuman())
@@ -144,13 +155,14 @@ namespace TheRiptide
                 {
                     Scp096Role scp096 = victim.RoleBase as Scp096Role;
                     float x = (victim.Health + scp096.HumeShieldModule.HsCurrent) / (config.HealthScaling * player_count);
-                    if (x < 0.5)
-                        victim.EffectsManager.DisableEffect<Disabled>();
-                    byte speed_boost = (byte)Mathf.Clamp((int)((1.0f - x) * 255.0f), 0, 255);
+                    //if (x < 0.5)
+                    //    victim.EffectsManager.DisableEffect<Disabled>();
+                    byte speed_boost = (byte)(Mathf.Clamp01(Mathf.Lerp(config.StartSpeedBoostAtHp, config.MaxSpeedBoostAtHp, x)) * config.MaxSpeedBoost);
+                    //byte speed_boost = (byte)Mathf.Clamp((int)((1.0f - x) * 255.0f), 0, 255);
                     victim.EffectsManager.ChangeState<MovementBoost>(speed_boost);
                 });
                 if (damageHandler is ExplosionDamageHandler explosion_handler)
-                    explosion_handler.Damage = explosion_handler.Damage * 0.33333f;
+                    explosion_handler.Damage = explosion_handler.Damage * (1.0f - config.GrenadeDamageReduction);
             }
         }
 

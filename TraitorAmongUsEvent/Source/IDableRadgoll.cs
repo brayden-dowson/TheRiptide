@@ -63,7 +63,11 @@ namespace TheRiptide
                 {
                     foreach(var player in Player.GetPlayers().Where(p => p.IsReady))
                     {
-                        if (player.CurrentItem == null || !id_guns.Contains(player.CurrentItem.ItemSerial))
+                        if (player.CurrentItem == null)
+                            continue;
+                        bool idgun = id_guns.Contains(player.CurrentItem.ItemSerial);
+                        bool dna_scanner = player.CurrentItem.ItemTypeId == ItemType.MicroHID;
+                        if (!idgun && !dna_scanner)
                             continue;
 
                         Vector3 start = player.ReferenceHub.PlayerCameraReference.position;
@@ -79,28 +83,41 @@ namespace TheRiptide
                             if (sc == null)
                                 continue;
 
-                            if (!TraitorAmongUs.IsPlayerReady(player) && BodyManager.IsReadyUpBody(sc))
+                            if (idgun)
                             {
-                                TraitorAmongUs.ReadyUpPlayer(player);
-                                BodyManager.ReadyUpBody.IdedSingleClient(player);
+                                if (!TraitorAmongUs.IsPlayerReady(player) && BodyManager.IsReadyUpBody(sc))
+                                {
+                                    TraitorAmongUs.ReadyUpPlayer(player);
+                                    BodyManager.ReadyUpBody.IdedSingleClient(player);
+                                }
+                                else if (BodyManager.UnidedBody(sc) != null)
+                                {
+                                    IDableBody body = BodyManager.UnidedBody(sc);
+                                    body.ServerIded();
+                                    BodyManager.Unided.Remove(sc);
+                                    TauRole scanner_role = TraitorAmongUs.GetPlayerTauRole(player);
+                                    Announcements.Add(new Announcement("<color=#87ceeb><b>" + (scanner_role == TauRole.Detective ? TauRoleToColor(TauRole.Detective) : TauRoleToColor(TauRole.Innocent)) + player.Nickname + "</color></b> has found <b>" + body.Unided.Info.Nickname + "'s</b> body who" + (body.Real == TauRole.Innocent ? " was <b>" : " was a <b>") + TauRoleToColor(body.Real) + body.Real + "</b></color></color>", 30.0f));
+                                    Announcements.RefreshInnocentInfo();
+                                    if (TraitorAmongUs.traitors.Contains(player.PlayerId) || TraitorAmongUs.detectives.Contains(player.PlayerId))
+                                        Shop.RewardCash(player, 50, "<b><color=#00FF00>$50</color> reward for IDing a body! Check shop for options</b>");
+                                }
+                                else if (TraitorAmongUs.detectives.Contains(player.PlayerId) && BodyManager.UnexaminedBody(sc) != null)
+                                {
+                                    IDableBody body = BodyManager.UnexaminedBody(sc);
+                                    BodyManager.Unexamined.Remove(sc);
+                                    Announcements.Add(new Announcement("<color=#87ceeb><b>" + TauRoleToColor(TauRole.Detective) + player.Nickname + "</color></b> has examined <b>" + TauRoleToColor(body.Real) + body.Unided.Info.Nickname + "'s</color></b> body. <color=#FFFF00>" + body.KillReason() + "</color></color>", 30.0f));
+                                    Shop.RewardCash(player, 25, "<b><color=#00FF00>$25</color> reward for examining a body! Check shop for options</b>");
+                                }
                             }
-                            else if (BodyManager.UnidedBody(sc) != null)
+                            else if(dna_scanner)
                             {
-                                IDableBody body = BodyManager.UnidedBody(sc);
-                                body.ServerIded();
-                                BodyManager.Unided.Remove(sc);
-                                TauRole scanner_role = TraitorAmongUs.GetPlayerTauRole(player);
-                                Announcements.Add(new Announcement("<color=#87ceeb><b>" + (scanner_role == TauRole.Detective ? TauRoleToColor(TauRole.Detective) : TauRoleToColor(TauRole.Innocent)) + player.Nickname + "</color></b> has found <b>" + body.Unided.Info.Nickname + "'s</b> body who" + (body.Real == TauRole.Innocent ? " was <b>" : " was a <b>") + TauRoleToColor(body.Real) + body.Real + "</b></color></color>", 30.0f));
-                                Announcements.RefreshInnocentInfo();
-                                if (TraitorAmongUs.traitors.Contains(player.PlayerId) || TraitorAmongUs.detectives.Contains(player.PlayerId))
-                                    Shop.RewardCash(player, 50, "<b><color=#00FF00>$50</color> reward for IDing a body! Check shop for options</b>");
-                            }
-                            else if (TraitorAmongUs.detectives.Contains(player.PlayerId) && BodyManager.UnexaminedBody(sc) != null)
-                            {
-                                IDableBody body = BodyManager.UnexaminedBody(sc);
-                                BodyManager.Unexamined.Remove(sc);
-                                Announcements.Add(new Announcement("<color=#87ceeb><b>" + TauRoleToColor(TauRole.Detective) + player.Nickname + "</color></b> has examined <b>" + TauRoleToColor(body.Real) + body.Unided.Info.Nickname + "'s</color></b> body. <color=#FFFF00>" + KillReason(body.handler) + "</color></color>", 30.0f));
-                                Shop.RewardCash(player, 25, "<b><color=#00FF00>$25</color> reward for examining a body! Check shop for options</b>");
+                                if(BodyManager.UnscannedBody(sc) != null)
+                                {
+                                    IDableBody body = BodyManager.UnscannedBody(sc);
+                                    BodyManager.Unscanned.Remove(sc);
+                                    Announcements.Add(new Announcement("<color=#87ceeb><b>" + TauRoleToColor(TauRole.Detective) + player.Nickname + "</color></b> used DnA scanner on <b>" + TauRoleToColor(body.Real) + body.Unided.Info.Nickname + "'s</color></b> body. <color=#FF0000>Killed " + body.Attacker() + "</color></color>", 30.0f));
+                                    Shop.RewardCash(player, 50, "<b><color=#00FF00>$50</color> reward for scanning a body! Check shop for options</b>");
+                                }
                             }
                         }
                     }
@@ -121,6 +138,7 @@ namespace TheRiptide
         public static List<IDableBody> Bodies = new List<IDableBody>();
         public static Dictionary<SphereCollider, IDableBody> Unided = new Dictionary<SphereCollider, IDableBody>();
         public static Dictionary<SphereCollider, IDableBody> Unexamined = new Dictionary<SphereCollider, IDableBody>();
+        public static Dictionary<SphereCollider, IDableBody> Unscanned = new Dictionary<SphereCollider, IDableBody>();
         private static System.Action<BasicRagdoll> on_ragdoll_spawned;
 
         public static void Start()
@@ -155,6 +173,7 @@ namespace TheRiptide
                     Bodies.Add(idable_body);
                     Unided.Add(idable_body.Collider, idable_body);
                     Unexamined.Add(idable_body.Collider, idable_body);
+                    Unscanned.Add(idable_body.Collider, idable_body);
                     idable_body.ServerSpawned();
                 }
                 catch (System.Exception ex)
@@ -176,6 +195,7 @@ namespace TheRiptide
             Bodies.Clear();
             Unided.Clear();
             Unexamined.Clear();
+            Unscanned.Clear();
             ClearRagdolls();
         }
 
@@ -195,6 +215,13 @@ namespace TheRiptide
         {
             IDableBody result = null;
             Unexamined.TryGetValue(collider, out result);
+            return result;
+        }
+
+        public static IDableBody UnscannedBody(SphereCollider collider)
+        {
+            IDableBody result = null;
+            Unscanned.TryGetValue(collider, out result);
             return result;
         }
 
@@ -276,6 +303,28 @@ namespace TheRiptide
         {
             NetworkServer.SendToAll(new ObjectDestroyMessage { netId = Unided.netId });
             NetworkServer.SendToAll(new ObjectDestroyMessage { netId = IDed.netId });
+        }
+
+        public string KillReason()
+        {
+            string reason = "Cause of death: Unknown.";
+            if (handler is FirearmDamageHandler firearm_handler)
+                reason = "Cause of death: Killed with a <color=#FF0000>" + firearm_handler.WeaponType.ToString().Replace("Gun", "") + ".</color>";
+            else if (handler is ExplosionDamageHandler explosion_handler)
+                reason = "Cause of death: <color=#FF0000>Explosive Grenade</color>";
+            else if (handler is Scp018DamageHandler scp018_handler)
+                reason = "Cause of death: <color=#FF0000>SCP018</color>";
+            else if (handler is UniversalDamageHandler universal_handler)
+                reason = "Cause of death: <color=#FF0000>" + DeathTranslations.TranslationsById[universal_handler.TranslationId].LogLabel + "</color>";
+            return reason;
+        }
+
+        public string Attacker()
+        {
+            string attacker = "him self";
+            if(handler is AttackerDamageHandler attacker_handler && !attacker_handler.IsSuicide)
+                attacker = "by " + attacker_handler.Attacker.Nickname;
+            return attacker;
         }
     }
 }

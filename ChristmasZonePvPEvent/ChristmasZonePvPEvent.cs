@@ -216,7 +216,7 @@ namespace TheRiptide
         private void SetLoadout(Player player)
         {
             player.ClearInventory();
-            player.AddItem(ItemType.KeycardNTFLieutenant);
+            player.AddItem(ItemType.KeycardMTFOperative);
             player.AddItem(ItemType.ArmorCombat);
             AddFirearm(player, ItemType.GunCrossvec, true);
             player.AddItem(ItemType.Medkit);

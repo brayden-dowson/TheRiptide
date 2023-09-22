@@ -90,7 +90,7 @@ namespace TheRiptide
             }
             else
             {
-                if (new_role != RoleTypeId.ClassD)
+                if (new_role.GetTeam() != Team.ChaosInsurgency || new_role != RoleTypeId.ClassD)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
@@ -217,7 +217,7 @@ namespace TheRiptide
             PluginAPI.Events.EventManager.UnregisterEvents<EventHandler>(this);
         }
 
-        [PluginEntryPoint("Team Deathmatch", "1.0.0", "173 revised entry(peanut multiplication)", "The Riptide")]
+        [PluginEntryPoint("Peanut Multiplication Revised", "1.0.0", "173 revised entry(peanut multiplication)", "The Riptide")]
         public void OnEnabled()
         {
             Singleton = this;

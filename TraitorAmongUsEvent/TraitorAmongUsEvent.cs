@@ -202,6 +202,7 @@ namespace TheRiptide
             Timing.KillCoroutines(round_logic, round_setup, ready_up);
             Announcements.Stop();
             RDM.Stop();
+            RDM.Clear();
             BroadcastOverride.Reset();
         }
 
@@ -309,7 +310,7 @@ namespace TheRiptide
                     if (player.Role != RoleTypeId.NtfPrivate)
                         return;
                     PlayerSetup(player);
-                    player.AddItem(ItemType.KeycardNTFCommander);
+                    player.AddItem(ItemType.KeycardMTFCaptain);
                     player.AddItem(ItemType.ArmorHeavy);
                     AddFirearm(player, ItemType.GunE11SR, true);
                     player.AddItem(ItemType.Medkit);
@@ -389,7 +390,7 @@ namespace TheRiptide
             if (!InventoryMenu.Singleton.OnPlayerDropitem(player, item))
                 return false;
 
-            if (detectives.Contains(player.PlayerId) && item.ItemTypeId == ItemType.KeycardNTFCommander)
+            if (detectives.Contains(player.PlayerId) && item.ItemTypeId == ItemType.KeycardMTFCaptain)
             {
                 Shop.SaveInventory(player);
                 Shop.ShowMenu(player, MenuPage.DetectiveMainMenu);
@@ -450,17 +451,23 @@ namespace TheRiptide
             if (victim == null)
                 return;
 
-            if(attacker != null && attacker != victim && handler is JailbirdDamageHandler jailbird_handler && (attacker.CurrentItem as JailbirdItem).TotalChargesPerformed != 5)
+            if(attacker != null && attacker != victim)
             {
-                jailbird_handler.Damage = 0.0f;
-                TauRole victim_role = GetPlayerTauRole(victim);
-                TauRole scanner_role = detectives.Contains(attacker.PlayerId) ? TauRole.Detective : TauRole.Innocent;
-                Announcements.Add(new Announcement(
-                    "<color=#87ceeb><b>" + TauRoleToColor(scanner_role) + attacker.Nickname + "</color></b> proved <b>" +
-                    victim.Nickname + "</b> is " + (victim_role == TauRole.Innocent ? "<b>" : "a <b>") +
-                    TauRoleToColor(victim_role) + victim_role + "</b></color></color>", 60.0f));
-                var jailbird = attacker.CurrentItem as JailbirdItem;
-                jailbird.TotalChargesPerformed = 5;
+                if (handler is JailbirdDamageHandler jailbird_handler)
+                {
+                    jailbird_handler.Damage = 0.0f;
+                    if ((attacker.CurrentItem as JailbirdItem).TotalChargesPerformed != 5)
+                    {
+                        TauRole victim_role = GetPlayerTauRole(victim);
+                        TauRole scanner_role = detectives.Contains(attacker.PlayerId) ? TauRole.Detective : TauRole.Innocent;
+                        Announcements.Add(new Announcement(
+                            "<color=#87ceeb><b>" + TauRoleToColor(scanner_role) + attacker.Nickname + "</color></b> proved <b>" +
+                            victim.Nickname + "</b> is " + (victim_role == TauRole.Innocent ? "<b>" : "a <b>") +
+                            TauRoleToColor(victim_role) + victim_role + "</b></color></color>", 60.0f));
+                    }
+                    var jailbird = attacker.CurrentItem as JailbirdItem;
+                    jailbird.TotalChargesPerformed = 5;
+                }
             }
         }
 
@@ -476,7 +483,7 @@ namespace TheRiptide
             {
                 if (item.ItemTypeId == ItemType.GunRevolver && item is Firearm gun && gun._status.Attachments == 0)
                     to_remove.Add(item);
-                if (item.ItemTypeId == ItemType.KeycardChaosInsurgency || item.ItemTypeId == ItemType.KeycardNTFCommander)
+                if (item.ItemTypeId == ItemType.KeycardChaosInsurgency || item.ItemTypeId == ItemType.KeycardMTFCaptain)
                     to_remove.Add(item);
             }
 

@@ -159,6 +159,8 @@ namespace TheRiptide
             lights.Clear();
             doors.Clear();
             vents.Clear();
+            foreach (var lever in levers.Values)
+                lever.ForceDisable();
             levers.Clear();
             ready_up_blockers.Clear();
             SurveillanceController.Singleton.Stop();

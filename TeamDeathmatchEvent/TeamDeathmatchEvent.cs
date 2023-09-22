@@ -196,7 +196,7 @@ namespace TheRiptide
                     break;
             }
 
-            foreach (var p in Player.GetPlayers())
+            foreach (var p in ReadyPlayers())
                 team_a.Add(p.PlayerId);
 
             int half = team_a.Count / 2;
