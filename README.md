@@ -18,10 +18,12 @@
  - [Peanut Dodge Ball](https://github.com/brayden-dowson/TheRiptide#peanut-dodge-ball)
  - [Peanut Hide And Seek](https://github.com/brayden-dowson/TheRiptide#peanut-hide-and-seek)
  - [Peanut Multiplication Revised Entry](https://github.com/brayden-dowson/TheRiptide#peanut-multiplication-revised-entry)
+ - [Princess Banquet](https://github.com/brayden-dowson/TheRiptide#princess-banquet)
  - [Protect The Site Manager](https://github.com/brayden-dowson/TheRiptide#protect-the-site-manager)
  - [SCP Mutation](https://github.com/brayden-dowson/TheRiptide#scp-mutation)
  - [Shy Guy Rampage](https://github.com/brayden-dowson/TheRiptide#shy-guy-rampage)
  - [Shy Guy XK](https://github.com/brayden-dowson/TheRiptide#shy-guy-xk)
+ - [Switch Team Deathmatch](https://github.com/brayden-dowson/TheRiptide#switch-team-deathmatch)
  - [Team Deathmatch](https://github.com/brayden-dowson/TheRiptide#team-deathmatch)
  - [The Last Stand](https://github.com/brayden-dowson/TheRiptide#the-last-stand)(Untested Might be broken)
  - [Traitor Among Us](https://github.com/brayden-dowson/TheRiptide#traitor-among-us)
@@ -36,7 +38,7 @@
  - [Coin 914](https://github.com/brayden-dowson/TheRiptide#coin-914)
  - [Discord Message](https://github.com/brayden-dowson/TheRiptide#discord-message)
  - [Escape Rewards](https://github.com/brayden-dowson/TheRiptide#escape-rewards)
- - [Faction Custom Info](https://github.com/brayden-dowson/TheRiptide#faction-custom-info)(untested)
+ - [Faction Custom Info](https://github.com/brayden-dowson/TheRiptide#faction-custom-info)(broken)
  - [MVP](https://github.com/brayden-dowson/TheRiptide#mvp)
  - [Normal Locker Ammo](https://github.com/brayden-dowson/TheRiptide#normal-locker-ammo)
  - [Pink Candy](https://github.com/brayden-dowson/TheRiptide#pink-candy)
@@ -117,6 +119,12 @@ All lights are out and light is locked down. Everyone spawns in light and are gi
 ### Peanut Multiplication Revised Entry
 Two people spawn as 173 the rest are Class-D. 173 has less health/sheild. 173s multiply on kill. Class-D must escape and kill all the 173s to win. 173s win if they kill all the Chaos/Class-Ds.
 
+### Princess Banquet
+Some players spawn as the dog the rest as children. Last one alive wins!
+> [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed  
+> [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
+> [ariahouse.sloc](https://github.com/brayden-dowson/TheRiptide/releases) must be inside ``slocLoader/Objects``
+
 ### Protect The Site Manager
 A random player is the site manager. They will be spawned in as a Scientist with a pistol, combat armor, a facility manager card and SCP 268. They will have an certain number of NTF private body guards (Manager and guards will be given 75% damage reduction). The Site manager’s goal is to make it from light containment all the way to surface to turn on the nuke. To turn on the nuke the generators must be done. If the nuke goes off before the Site manager dies then the Site manager and guards win. Chaos will be spawned in and their goal is to simply kill the Site manager before the nuke is detonated.
 
@@ -131,6 +139,9 @@ A Shy Guy spawns in entrance and is triggered by everyone. All other players are
 A Shy Guy spawns outside the facility and is triggered by everyone. His rage never runs out and his speed increase the lower his health gets. His health scales with the number of players on the server. NTF are dispatched to stop him at all costs.
 > requires [Harmony.dll](https://github.com/brayden-dowson/TheRiptide/releases) as a dependency 
 
+### Switch Team Deathmatch
+Scientists vs Class-D in a random zone with a random loadout, players switch team on death. Last team standing wins!
+
 ### Team Deathmatch
 Two teams Scientists and Class-D spawn in a random zone with a random loadout.
 
@@ -144,6 +155,8 @@ A few players are Traitors, Detectives and Jesters the rest are Innocents. Trait
  - ``tau_pause `` toggles ready_up
  - ``tau_rdm <player_id>`` make player sit out next round
  - ``tau_forgive <player_id>`` undo rdm
+ - ``tau_start`` force starts round
+ - ``tau_lock`` toggles round lock
 > [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed  
 > [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
 > [TheSkeld.dll](https://github.com/brayden-dowson/TheRiptide/releases) (or any other maps) must be inside ``CedModEvents/Traitor Among Us Event/Maps``  
@@ -226,4 +239,4 @@ Plugins must be installed manually. Place the [[PluginName].dll](https://github.
 You must install all dependencies for the events/plugins to work. Install [EventUtility.dll](https://github.com/brayden-dowson/TheRiptide/releases), [Utility.dll](https://github.com/brayden-dowson/TheRiptide/releases), and [Teleport.dll](https://github.com/brayden-dowson/TheRiptide/releases) as dependencies. The dependency folder is ``plugins/"server port" | "global"/dependencies``. Additionally [FacilityManager.dll](https://github.com/brayden-dowson/TheRiptide/releases) should be installed in the plugins folder not the dependency folder. Some Events require additional plugins to work notably [SLOC Loader](https://github.com/Axwabo/slocLoader) and [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion), so make sure you have these installed if they are required otherwise the Events will not work. 
 
 ### Maps
-A map is a special .dll for loading map objects/logic for the Traitor Among Us Event. There is only 1 map at the time of writing (The Riptide's Skeld) but more may be added in the future. There is an existing interface accessible from the [TraitorAmongUs.dll](https://github.com/brayden-dowson/TheRiptide/releases) ``IMap``  which developers can use to make their own maps for the event. Simply compile the .dll once you have implemented the ``IMap`` interface. To load a map add the [[MapName].dll](https://github.com/brayden-dowson/TheRiptide/releases) to the ``CedMod/CedmodEvents/Traitor Among Us Event/Maps`` folder. And in game use the ``tau_map <map_name>`` command to select the map.
+A map is a special .dll for loading map objects/logic for the Traitor Among Us Event. There is only 1 map at the time of writing (The Riptide's Skeld) but more may be added in the future. There is an existing interface accessible from the [TraitorAmongUs.dll](https://github.com/brayden-dowson/TheRiptide/releases) ``IMap`` which developers can use to make their own maps for the event. Simply compile the .dll once you have implemented the ``IMap`` interface. To load a map add the [[MapName].dll](https://github.com/brayden-dowson/TheRiptide/releases) to the ``CedMod/CedmodEvents/Traitor Among Us Event/Maps`` folder. And in game use the ``tau_map <map_name>`` command to select the map.
