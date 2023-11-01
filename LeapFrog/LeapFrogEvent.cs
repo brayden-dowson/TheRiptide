@@ -24,20 +24,42 @@ using static TheRiptide.EventUtility;
 
 namespace TheRiptide
 {
-    public sealed class Config : IEventConfig
+    public sealed class Config
+    {
+    }
+
+    public sealed class CedModConfig : IEventConfig
     {
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
+        public Config config { get; set; } = new Config();
+    }
+
+    //public sealed class AutoConfig : AutoEvent.Interfaces.EventConfig
+    //{
+    //    public Config config { get; set; } = new Config();
+    //}
+
+    public sealed class Translation
+    {
+        public string Name { get; set; } = "Leap Frog";
         public string Description { get; set; } = "Everyone will spawn in doctors chamber with the elevators locked. All SCPs will become 939 and everyone else Class-D. The 939s are ensnared so they can only use their lunge ability to attack. A new dog spawns in every minute. Class-D get an adrenaline and painkillers. There is a 50% chance the lights will be out and be given flashlights. The last Class-D alive wins!\n\n";
     }
 
     public class EventHandler
     {
+        public static EventHandler Singleton { get; private set; }
+
         private static HashSet<int> dogs = new HashSet<int>();
-        private static bool found_winner;
+        public static bool found_winner;
         private static RoomIdentifier scp049;
         private static bool lights_out;
         private static CoroutineHandle spawn;
+
+        public EventHandler()
+        {
+            Singleton = this;
+        }
 
         public static void Start()
         {
@@ -46,6 +68,20 @@ namespace TheRiptide
             WinnerReset();
             dogs.Clear();
             scp049 = null;
+
+            if(Round.IsRoundStarted)
+            {
+                Log.Info("Late start");
+                Singleton.OnRoundStart();
+                foreach(var p in Player.GetPlayers())
+                {
+                    if (p.IsReady)
+                    {
+                        Singleton.OnPlayerChangeRole(p, null, p.Role, RoleChangeReason.RoundStart);
+                        Singleton.OnPlayerSpawn(p, p.Role);
+                    }
+                }
+            }
         }
 
         public static void Stop()
@@ -214,8 +250,8 @@ namespace TheRiptide
         public string EvenAuthor { get; } = "The Riptide";
         public string EventDescription
         {
-            get { return EventConfig == null ? "config not loaded" : EventConfig.Description; }
-            set { if (EventConfig != null) EventConfig.Description = value; else Log.Error("EventConfig null when setting value"); }
+            get { return Translation == null ? "Translation not loaded" : Translation.Description; }
+            set { if (Translation != null) Translation.Description = value; else Log.Error("Translation null when setting value"); }
         }
         public string EventPrefix { get; } = "LF";
         public bool OverrideWinConditions { get; }
@@ -224,7 +260,10 @@ namespace TheRiptide
         public IEventConfig Config => EventConfig;
 
         [PluginConfig]
-        public Config EventConfig;
+        public CedModConfig EventConfig;
+
+        [PluginConfig("translation.yml")]
+        public Translation Translation;
 
         public void PrepareEvent()
         {
@@ -256,4 +295,41 @@ namespace TheRiptide
             StopEvent();
         }
     }
+
+    //public class LeapFrogAutoEvent : AutoEvent.Interfaces.Event
+    //{
+    //    [AutoEvent.Interfaces.EventConfig]
+    //    public AutoConfig Config { get; set; } = new AutoConfig();
+
+    //    [AutoEvent.Interfaces.EventConfig]
+    //    private Translation Translation { get; set; } = new Translation();
+
+    //    public override string Name { get { return Translation.Name; } set { Translation.Name = value; } }
+    //    public override string Description { get { return Translation.Description; } set { Translation.Description = value; } }
+    //    public override string Author { get; set; } = "The Riptide";
+    //    public override string CommandName { get; set; } = "LF";
+    //    public override bool AutoLoad { get; protected set; } = true;
+    //    protected override float PostRoundDelay { get; set; } = 0.0f;
+
+    //    protected override void OnStart()
+    //    {
+    //        Log.Info(Name + " event is preparing");
+    //        PluginAPI.Events.EventManager.RegisterEvents<EventHandler>(this);
+    //        EventHandler.Start();
+    //        Log.Info(Name + " event is prepared");
+    //    }
+
+    //    protected override bool IsRoundDone()
+    //    {
+    //        return EventHandler.found_winner;
+    //    }
+
+    //    protected override void OnFinished()
+    //    {
+    //        Log.Info(Name + " event is ending");
+    //        EventHandler.Stop();
+    //        PluginAPI.Events.EventManager.UnregisterEvents<EventHandler>(this);
+    //        Log.Info(Name + " event is ended");
+    //    }
+    //}
 }

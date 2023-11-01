@@ -4,6 +4,7 @@ using PlayerStatsSystem;
 using PluginAPI.Core;
 using Mirror;
 using static TheRiptide.Utility;
+using PlayerRoles.Ragdolls;
 
 namespace TheRiptide.Patches
 {

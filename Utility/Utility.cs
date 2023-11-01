@@ -7,6 +7,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
 using Mirror;
 using PlayerRoles;
+using PlayerRoles.Ragdolls;
 using PlayerStatsSystem;
 using PluginAPI.Core;
 using PluginAPI.Core.Items;

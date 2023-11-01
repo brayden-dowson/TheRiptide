@@ -5,7 +5,6 @@ using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
 using CustomPlayerEffects;
 using InventorySystem.Items;
-using InventorySystem.Items.Flashlight;
 using InventorySystem.Items.Firearms.Attachments;
 using Interactables.Interobjects.DoorUtils;
 using System.Collections.Generic;
@@ -23,6 +22,8 @@ using UnityEngine;
 using InventorySystem.Items.Radio;
 using Interactables.Interobjects;
 using CedMod.Addons.Events.Interfaces;
+using InventorySystem.Items.SwitchableLightSources.Flashlight;
+using InventorySystem.Items.SwitchableLightSources;
 
 namespace TheRiptide
 {

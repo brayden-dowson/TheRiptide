@@ -188,6 +188,7 @@ namespace TheRiptide
                         Teleport.Room(player, spawn_room);
 
                     player.Health = health_pool * ((float)humans_alive / zombies_alive);
+                    player.EffectsManager.EnableEffect<Disabled>();
                 });
             }
             else

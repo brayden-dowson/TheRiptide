@@ -464,6 +464,8 @@ namespace TheRiptide
                             "<color=#87ceeb><b>" + TauRoleToColor(scanner_role) + attacker.Nickname + "</color></b> proved <b>" +
                             victim.Nickname + "</b> is " + (victim_role == TauRole.Innocent ? "<b>" : "a <b>") +
                             TauRoleToColor(victim_role) + victim_role + "</b></color></color>", 60.0f));
+                        if (victim_role == TauRole.Traitor || victim_role == TauRole.Jester)
+                            RDM.EndGrace(victim);
                     }
                     var jailbird = attacker.CurrentItem as JailbirdItem;
                     jailbird.TotalChargesPerformed = 5;

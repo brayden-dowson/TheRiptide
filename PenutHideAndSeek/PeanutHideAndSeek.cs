@@ -1,9 +1,8 @@
 ﻿using CedMod.Addons.Events;
 using CedMod.Addons.Events.Interfaces;
-using Interactables.Interobjects;
-using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
-using InventorySystem.Items.Flashlight;
+using InventorySystem.Items.SwitchableLightSources;
+using InventorySystem.Items.SwitchableLightSources.Flashlight;
 using MapGeneration;
 using MEC;
 using Mirror;
@@ -13,12 +12,9 @@ using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
 using Respawning;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static TheRiptide.EventUtility;
 
 namespace TheRiptide

@@ -1,6 +1,7 @@
 ﻿using CedMod.Addons.Events;
 using CedMod.Addons.Events.Interfaces;
 using CustomPlayerEffects;
+using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms.Attachments;
@@ -10,9 +11,11 @@ using MEC;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using PlayerRoles.FirstPersonControl;
+using PlayerRoles.Ragdolls;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
+using PluginAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,9 +31,16 @@ namespace TheRiptide
         [Description("Indicates whether the event is enabled or not")]
         public bool IsEnabled { get; set; } = true;
 
+        public bool DisableCedModHint { get; set; } = true;
+        public bool DisableWarning { get; set; } = true;
+        public string EventName { get; set; } = "Insanity";
+
         public bool AllowMoving { get; set; } = true;
-        public float Cooldown { get; set; } = 30.0f;
+        public float CooldownPerPlayer { get; set; } = 60.0f;
         public float ItemPdDelay { get; set; } = 60.0f * 1.0f;
+        public float ElevatorTpChance { get; set; } = 0.1f;
+
+        public float LagCompMultiplier { get; set; } = 5.0f;
     }
 
     public class EventHandler
@@ -126,12 +136,20 @@ namespace TheRiptide
                 }
             }
 
-            HashSet<RoomIdentifier> has_ws = new HashSet<RoomIdentifier>();
-            foreach (RoomIdentifier room in type_to_rooms[RoomType.HczTShape])
-                if (room.GetComponentInChildren<WorkstationController>() != null)
-                    has_ws.Add(room);
-
-            type_to_rooms[RoomType.HczTShape].ExceptWith(has_ws);
+            Timing.CallDelayed(1.0f, () =>
+            {
+                foreach (RoomIdentifier room in type_to_rooms[RoomType.HczTShape])
+                {
+                    WorkstationController ws = room.GetComponentInChildren<WorkstationController>();
+                    if (ws != null)
+                        NetworkServer.Destroy(ws.gameObject);
+                }
+            });
+            //HashSet<RoomIdentifier> has_ws = new HashSet<RoomIdentifier>();
+            //foreach (RoomIdentifier room in type_to_rooms[RoomType.HczTShape])
+            //    if (room.GetComponentInChildren<WorkstationController>() != null)
+            //        has_ws.Add(room);
+            //type_to_rooms[RoomType.HczTShape].ExceptWith(has_ws);
 
             type_to_rooms[RoomType.LczXShape].Clear();
 
@@ -170,41 +188,90 @@ namespace TheRiptide
                 ".G6 "
             };
 
-            string cassie = "";
-            for(int i = 0; i < 1000; i++)
+            if (!config.DisableWarning)
             {
-                float pitch = (10.0f / Mathf.Pow(2, i * 0.15f));
-                cassie += "pitch_" + pitch.ToString("0.00") + " "; 
-                for(int j = 0; j < Mathf.CeilToInt(pitch * 0.5f); j++)
-                    cassie += sounds.RandomItem();
+                string cassie = "";
+                for (int i = 0; i < 1000; i++)
+                {
+                    float pitch = (10.0f / Mathf.Pow(2, i * 0.15f));
+                    cassie += "pitch_" + pitch.ToString("0.00") + " ";
+                    for (int j = 0; j < Mathf.CeilToInt(pitch * 0.5f); j++)
+                        cassie += sounds.RandomItem();
 
-                if (pitch < 0.1)
-                    break;
+                    if (pitch < 0.1)
+                        break;
+                }
+
+                Timing.CallDelayed(7.0f, () =>
+                 {
+                     Cassie.Message(cassie);
+                     foreach (var p in Player.GetPlayers())
+                         p.EffectsManager.EnableEffect<Scanned>(7);
+                 });
             }
+        }
 
-            Timing.CallDelayed(7.0f,()=>
+        [PluginEvent(ServerEventType.PlayerInteractElevator)]
+        void OnPlayerInteractElevator(PlayerInteractElevatorEvent e)
+        {
+            if(UnityEngine.Random.value < config.ElevatorTpChance)
             {
-                Cassie.Message(cassie);
-                foreach (var p in Player.GetPlayers())
-                    p.EffectsManager.EnableEffect<Scanned>(7);
-            });
+                Log.Info("elevator door hit");
+                var valid = ElevatorDoor.AllElevatorDoors.Where(d => d.Key != e.Elevator.AssignedGroup && d.Value.All(v => v.ActiveLocks == 0) && ElevatorManager.SpawnedChambers[d.Key].IsReady);
+                if (valid.IsEmpty())
+                    return;
+                Log.Info("elevator door valid");
+                var selected = valid.ToList().RandomItem();
+                int lvl = ElevatorManager.SyncedDestinations[selected.Key] == 0 ? 1 : 0;
+                ElevatorManager.TrySetDestination(selected.Key, lvl);
+                Timing.CallDelayed(3.5f,()=>
+                {
+                    try
+                    {
+                        Log.Info("trying swap");
+                        ElevatorChamber destination_chamber = ElevatorManager.SpawnedChambers[selected.Key];
+                        ElevatorChamber origin_chamber = ElevatorManager.SpawnedChambers[e.Elevator.AssignedGroup];
+                        List<Player> destination = new List<Player>();
+                        List<Player> origin = new List<Player>();
+                        foreach (var p in Player.GetPlayers())
+                        {
+                            if (!p.IsReady || !p.IsAlive)
+                                continue;
+
+                            if (destination_chamber.WorldspaceBounds.Contains(p.Position))
+                                destination.Add(p);
+                            else if (origin_chamber.WorldspaceBounds.Contains(p.Position))
+                                origin.Add(p);
+                        }
+                        foreach (var p in destination)
+                            SeamlessTeleport(p, destination_chamber.gameObject, origin_chamber.gameObject);
+                        foreach (var p in origin)
+                            SeamlessTeleport(p, origin_chamber.gameObject, destination_chamber.gameObject);
+                        Log.Info("successful elevator tp");
+                    }
+                    catch(Exception ex)
+                    {
+                        Log.Error(ex.ToString());
+                    }
+                });
+            }
         }
 
-        [PluginEvent(ServerEventType.PlayerDropItem)]
-        void OnPlayerDropItem(Player player, ItemBase item)
-        {
-            RoomIdentifier room = RoomIdUtils.RoomAtPosition(item.transform.position);
-            if (room != null && room.Name != RoomName.Unnamed && GetRoomType(room) != RoomType.Other && !invalid_time.ContainsKey(room))
-                invalid_time.Add(room, config.ItemPdDelay);
-        }
+        //[PluginEvent(ServerEventType.PlayerDropItem)]
+        //void OnPlayerDropItem(Player player, ItemBase item)
+        //{
+        //    RoomIdentifier room = RoomIdUtils.RoomAtPosition(item.transform.position);
+        //    if (room != null && room.Name != RoomName.Unnamed && GetRoomType(room) != RoomType.Other && !invalid_time.ContainsKey(room))
+        //        invalid_time.Add(room, config.ItemPdDelay);
+        //}
 
-        [PluginEvent(ServerEventType.PlayerThrowItem)]
-        void OnPlayerThrowItem(Player player, ItemBase item, Rigidbody rb)
-        {
-            RoomIdentifier room = RoomIdUtils.RoomAtPosition(item.transform.position);
-            if (room != null && room.Name != RoomName.Unnamed && GetRoomType(room) != RoomType.Other && !invalid_time.ContainsKey(room))
-                invalid_time.Add(room, config.ItemPdDelay);
-        }
+        //[PluginEvent(ServerEventType.PlayerThrowItem)]
+        //void OnPlayerThrowItem(Player player, ItemBase item, Rigidbody rb)
+        //{
+        //    RoomIdentifier room = RoomIdUtils.RoomAtPosition(item.transform.position);
+        //    if (room != null && room.Name != RoomName.Unnamed && GetRoomType(room) != RoomType.Other && !invalid_time.ContainsKey(room))
+        //        invalid_time.Add(room, config.ItemPdDelay);
+        //}
 
         private static RoomType GetRoomType(RoomIdentifier room)
         {
@@ -335,6 +402,12 @@ namespace TheRiptide
         {
             while (true)
             {
+                int alive = 0;
+                foreach (var p in Player.GetPlayers())
+                    if (p.IsAlive && p.Room != null && (p.Room.Zone == FacilityZone.LightContainment || p.Room.Zone == FacilityZone.HeavyContainment))
+                        alive++;
+                alive = Mathf.Max(alive, 1);
+
                 foreach (var player in Player.GetPlayers())
                 {
                     bool met_conditions = false;
@@ -377,16 +450,16 @@ namespace TheRiptide
                             if (available.IsEmpty())
                                 continue;
                             RoomIdentifier dest = available.ElementAt(UnityEngine.Random.Range(0, available.Count()));
-                            SeamlessTeleport(player, room, dest);
+                            SeamlessTeleport(player, room.gameObject, dest.gameObject);
                             foreach (var p in with)
-                                SeamlessTeleport(p, room, dest);
+                                SeamlessTeleport(p, room.gameObject, dest.gameObject);
                             Log.Info("successful tp");
                         }
                         catch (Exception ex)
                         {
                             Log.Error("_UpdatePlayers Error: " + ex.ToString());
                         }
-                        yield return Timing.WaitForSeconds(config.Cooldown);
+                        yield return Timing.WaitForSeconds(config.CooldownPerPlayer / alive);
                     }
                 }
                 yield return Timing.WaitForSeconds(1.0f);
@@ -412,7 +485,7 @@ namespace TheRiptide
                         if (item != null)
                         {
                             RoomIdentifier room = RoomIdUtils.RoomAtPosition(item.transform.position);
-                            if (config != null && room != null && room.Name != RoomName.Unnamed && GetRoomType(room) != RoomType.Other && !invalid_time.ContainsKey(room))
+                            if (config != null && room != null && room.Name == RoomName.Unnamed && GetRoomType(room) != RoomType.Other && !invalid_time.ContainsKey(room))
                                 invalid_time.Add(room, config.ItemPdDelay);
                         }
                     }
@@ -422,7 +495,7 @@ namespace TheRiptide
                         if(ragdoll != null)
                         {
                             RoomIdentifier room = RoomIdUtils.RoomAtPosition(ragdoll.transform.position);
-                            if (config != null && room != null && room.Name != RoomName.Unnamed && GetRoomType(room) != RoomType.Other && !invalid_time.ContainsKey(room))
+                            if (config != null && room != null && room.Name == RoomName.Unnamed && GetRoomType(room) != RoomType.Other && !invalid_time.ContainsKey(room))
                                 invalid_time.Add(room, config.ItemPdDelay);
                         }
                     }
@@ -503,17 +576,29 @@ namespace TheRiptide
             return 0.0f < p.x && p.x < 1.0f && 0.0f < p.y && p.y < 1.0f && 0.0f < p.z;
         }
 
-        private static void SeamlessTeleport(Player player, RoomIdentifier room, RoomIdentifier dest)
+        private static void SeamlessTeleport(Player player, GameObject origin, GameObject dest)
         {
-            float ping = (LiteNetLib4MirrorServer.Peers[player.ReferenceHub.netIdentity.connectionToClient.connectionId].Ping * 4.0f) / 1000.0f;
-            Vector3 pos = room.transform.InverseTransformPoint(player.Position);
+            float ping = (LiteNetLib4MirrorServer.Peers[player.ReferenceHub.netIdentity.connectionToClient.connectionId].Ping * config.LagCompMultiplier) / 1000.0f;
+            Vector3 pos = origin.transform.InverseTransformPoint(player.Position);
             Vector3 delta_pos = dest.transform.TransformPoint(pos) - player.Position;
-            Vector3 delta_rot = dest.transform.rotation.eulerAngles - room.transform.rotation.eulerAngles;
+            Vector3 delta_rot = dest.transform.rotation.eulerAngles - origin.transform.rotation.eulerAngles;
             var fpm = player.GameObject.GetComponentInChildren<FirstPersonMovementModule>();
             fpm.CharController.transform.position += delta_pos;
             fpm.CharController.Move(((Quaternion.Euler(delta_rot) * player.Velocity) * ping));
             fpm.ServerOverridePosition(fpm.CharController.transform.position, delta_rot);
         }
+
+        //private static void SeamlessElevatorTeleport(Player player, ElevatorChamber chamber, ElevatorChamber dest)
+        //{
+        //    float ping = (LiteNetLib4MirrorServer.Peers[player.ReferenceHub.netIdentity.connectionToClient.connectionId].Ping * 4.0f) / 1000.0f;
+        //    Vector3 pos = chamber.transform.InverseTransformPoint(player.Position);
+        //    Vector3 delta_pos = dest.transform.TransformPoint(pos) - player.Position;
+        //    Vector3 delta_rot = dest.transform.rotation.eulerAngles - chamber.transform.rotation.eulerAngles;
+        //    var fpm = player.GameObject.GetComponentInChildren<FirstPersonMovementModule>();
+        //    fpm.CharController.transform.position += delta_pos;
+        //    fpm.CharController.Move(((Quaternion.Euler(delta_rot) * player.Velocity) * ping));
+        //    fpm.ServerOverridePosition(fpm.CharController.transform.position, delta_rot);
+        //}
     }
 
 
@@ -524,9 +609,16 @@ namespace TheRiptide
         public static bool IsRunning = false;
         public PluginHandler Handler;
 
-        public string EventName { get; } = "Insanity";
+        public string EventName { get { return EventConfig.EventName; } }
         public string EvenAuthor { get; } = "The Riptide";
-        public string EventDescription { get; set; } = "[DATA EXPUNGED]\n\n";
+        public string EventDescription
+        {
+            get
+            {
+                return (EventConfig.DisableCedModHint ? "{}" : "") + "[DATA EXPUNGED]\n\n";
+            }
+            set { }
+        }
         public string EventPrefix { get; } = "INS";
         public bool OverrideWinConditions { get; }
         public bool BulletHolesAllowed { get; set; } = false;
