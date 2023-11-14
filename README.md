@@ -88,6 +88,7 @@ Tournament can be run in 3 different ways. Role, Predefined and Scrimmage.
  - ``Predefined`` use the ``predef`` command. sets up the the bracket based on the config, will use the players Role to assign teams. players that do not have a role that is defined in the predefined bracket will not be assigned a team. used for serious well organized events.
  - ``Scrimmage`` use the ``scim <team_count>`` command. sets up a bracket assigning players randomly to all the teams based on the ``team_count``. Roles wont be used to assign the team. good for quick casual unorganized events.
 The idea behind ``Role`` and ``Predefined`` is that you can role sync with a different system e.g. ``CedMod``, ``config_remoteadmin.txt`` etc. to allow quick setup of organized matches.
+Note. ``team_name`` is not the ``Badge Text``(what you see when you press N). ``team_name`` does not contain white space so it can be used for commands and does not have to be the same as the badge. e.g. Badge = ``My Team``, team_name = ``mt``. you defined the ``team_name`` and ``Badge Text`` when you set up the Roles i.e. ``CedMod``, ``config_remoteadmin.txt`` etc.
 #### commands
  - ``tour_save_log`` - ``tsl`` saves log
  - ``tour_undo_win <team_name> <reason>`` undo a teams last win. usage: ``tuw <team_name> <reason> ``
