@@ -36,10 +36,12 @@
 ### [Plugins](https://github.com/brayden-dowson/TheRiptide#plugin-details)
  - [Add Chaos Ammo In Armory](https://github.com/brayden-dowson/TheRiptide#add-chaos-ammo-in-armory)
  - [Auto Restart](https://github.com/brayden-dowson/TheRiptide#auto-restart)
- - [Coin 914](https://github.com/brayden-dowson/TheRiptide#coin-914)
+ - [Candy Override](https://github.com/brayden-dowson/TheRiptide#auto-restart)
+ - [Coin 914](https://github.com/brayden-dowson/TheRiptide#candy-override)
  - [Discord Message](https://github.com/brayden-dowson/TheRiptide#discord-message)
  - [Escape Rewards](https://github.com/brayden-dowson/TheRiptide#escape-rewards)
  - [Faction Custom Info](https://github.com/brayden-dowson/TheRiptide#faction-custom-info)(broken)
+ - [Follow](https://github.com/brayden-dowson/TheRiptide#follow)
  - [MVP](https://github.com/brayden-dowson/TheRiptide#mvp)(might be a little busted)
  - [Normal Locker Ammo](https://github.com/brayden-dowson/TheRiptide#normal-locker-ammo)
  - [Pink Candy](https://github.com/brayden-dowson/TheRiptide#pink-candy)
@@ -211,6 +213,9 @@ Spawns all types of Chaos ammo inside of HCZ armory.
 ###  Auto Restart
 Restart the server at 4:00am local time.
 
+###  Candy Override
+Allow you to configure the amount of candies you can take and the spawn chances for each candy.
+
 ### Coin 914
 Adds the following recipes to coin.
  - Fine - 25% Destroyed, 25% painkillers, 50% coin
@@ -224,6 +229,13 @@ Rewards players based on how many SCP items they brought out of the facility. Ad
 
 ### Faction Custom Info
 Adds HP, AHP, HS, GodMode/Noclip status, status effects to a players custom info display. players info is only visible to players of the same Faction. i.e. Class-D can see Chaos and vice-versa but Class-D cannot see NTF info.
+
+### Follow
+Adds commands to make a player follow another player. Can only work on one player at a time.
+#### commands
+ - ``follow <player_id>`` forces player to follow you.
+ - ``follow <player_id> <target_id>`` forces player to follow target.  
+ - ``unfollow `` stops current follow
 
 ### MVP
 Tracks players statistics during the round and displays any achievements at the end of the round as a Broadcast. Achievements are most kills as SCP, most SCPs killed, first SCP killed(only if "most SCPs killed" was 1), most kills as a human and fastest escape time.
