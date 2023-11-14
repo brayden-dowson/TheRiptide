@@ -82,23 +82,23 @@ All facility lights disabled. All SCPs will be SCP939. Everyone will spawn with 
 ### Elimination Tournament
 Elimination style tournament. PvP fights contained inside a zone. Preround item/zone bans, loadout selection and 'Storm/force field' forces players to fight.
 Tournament can be run in 3 different ways. Role, Predefined and Scrimmage.
- - ``Role`` sets up bracket randomly based on the roles of joined players(all roles are included in the bracket) players without a role will not be assigned a team. used for serious well organized events.
- - ``Predefined`` sets up the the bracket based on the config, will use the players Role to assign teams. players that do not have a role that is defined in the predefined bracket will not be assigned a team. used for serious well organized events.
- - ``Scrimmage`` sets up a bracket assigning players randomly to all the teams. Roles wont be used to assign the team. good for quick casual unorganized events.
+ - ``Role`` the default, sets up bracket randomly based on the roles of joined players(all roles are included in the bracket) players without a role will not be assigned a team. used for serious well organized events.
+ - ``Predefined`` use the ``predef`` command. sets up the the bracket based on the config, will use the players Role to assign teams. players that do not have a role that is defined in the predefined bracket will not be assigned a team. used for serious well organized events.
+ - ``Scrimmage`` use the ``scim <team_count>`` command. sets up a bracket assigning players randomly to all the teams based on the ``team_count``. Roles wont be used to assign the team. good for quick casual unorganized events.
 The idea behind ``Role`` and ``Predefined`` is that you can role sync with a different system e.g. ``CedMod``, ``config_remoteadmin.txt`` etc. to allow quick setup of organized matches.
 #### commands
-``tour_save_log`` - ``tsl`` saves log
-``tour_undo_win <team_name> <reason>`` undo a teams last win. usage: ``tuw <team_name> <reason> ``
-``tour_force_win <team_name>`` force a team to win their next match. usage: ``tfw <team_name>``
-``tour_predefined`` setup predefined bracket defined in the config and load log. usage: ``predef``
-``tour_run_match <team name>`` run match by specifing a team. usage: ``trm <team_name>``
-``tour_auto_run`` Auto runs the tournament(do not use this unless all teams are present e.g. finals) usage: ``tar``
-``tour_scrimmage <team_count>`` setup tournament as a scrimmage with a certain amount of teams assigned randomly to players. usage: ``scrim <team_count>``
-``tour_set_team <player_id> <team_name>`` assign player to team. usage: ``tst <player_id> <team_name>``
-``tour_create_team <team_name>`` create a new team. usage: ``tct <team_name>``
-``tour_remove_team <team_name>`` removes a team. usage: ``trt <team_name>``
-``tour_list_team`` list all teams. usage: ``tlt``
-``clear_hint`` clears hints(any player can use this) sometimes the bracket can appear even when not invoked due to NW spaghetti code this cmd can fix it. usage: ``ch``
+ - ``tour_save_log`` - ``tsl`` saves log
+ - ``tour_undo_win <team_name> <reason>`` undo a teams last win. usage: ``tuw <team_name> <reason> ``
+ - ``tour_force_win <team_name>`` force a team to win their next match. usage: ``tfw <team_name>``
+ - ``tour_predefined`` setup predefined bracket defined in the config and load log. usage: ``predef``
+ - ``tour_run_match <team name>`` run match by specifing a team. usage: ``trm <team_name>``
+ - ``tour_auto_run`` Auto runs the tournament(do not use this unless all teams are present e.g. finals) usage: ``tar``
+ - ``tour_scrimmage <team_count>`` setup tournament as a scrimmage with a certain amount of teams assigned randomly to players. usage: ``scrim <team_count>``
+ - ``tour_set_team <player_id> <team_name>`` assign player to team. usage: ``tst <player_id> <team_name>``
+ - ``tour_create_team <team_name>`` create a new team. usage: ``tct <team_name>``
+ - ``tour_remove_team <team_name>`` removes a team. usage: ``trt <team_name>``
+ - ``tour_list_team`` list all teams. usage: ``tlt``
+ - ``clear_hint`` clears hints(any player can use this) sometimes the bracket can appear even when not invoked due to NW spaghetti code this cmd can fix it. usage: ``ch``
 > [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed  
 > [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
 > [LoadoutRoom.sloc](https://github.com/brayden-dowson/TheRiptide/releases) must be inside ``slocLoader/Objects``
