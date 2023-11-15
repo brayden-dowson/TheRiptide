@@ -1,8 +1,8 @@
 ﻿using CedMod.Addons.Events;
 using CedMod.Addons.Events.Interfaces;
 using InventorySystem.Items;
-using InventorySystem.Items.SwitchableLightSources;
-using InventorySystem.Items.SwitchableLightSources.Flashlight;
+using InventorySystem.Items.ToggleableLights;
+using InventorySystem.Items.ToggleableLights.Flashlight;
 using MapGeneration;
 using MEC;
 using Mirror;

@@ -124,7 +124,20 @@ namespace TheRiptide
             EventHandler.config = config;
             player_cameras.Clear();
             invalid_time.Clear();
+        }
 
+        public static void Stop()
+        {
+            Timing.KillCoroutines(update_player_handle);
+            Timing.KillCoroutines(update_invalid_handle);
+            type_to_rooms.Clear();
+            player_cameras.Clear();
+            invalid_time.Clear();
+        }
+
+        [PluginEvent(ServerEventType.MapGenerated)]
+        void OnMapGenerated(MapGeneratedEvent e)
+        {
             type_to_rooms.Clear();
             foreach (var room in RoomIdentifier.AllRoomIdentifiers)
             {
@@ -145,11 +158,6 @@ namespace TheRiptide
                         NetworkServer.Destroy(ws.gameObject);
                 }
             });
-            //HashSet<RoomIdentifier> has_ws = new HashSet<RoomIdentifier>();
-            //foreach (RoomIdentifier room in type_to_rooms[RoomType.HczTShape])
-            //    if (room.GetComponentInChildren<WorkstationController>() != null)
-            //        has_ws.Add(room);
-            //type_to_rooms[RoomType.HczTShape].ExceptWith(has_ws);
 
             type_to_rooms[RoomType.LczXShape].Clear();
 
@@ -164,15 +172,6 @@ namespace TheRiptide
 
             update_player_handle = Timing.RunCoroutine(_UpdatePlayers());
             update_invalid_handle = Timing.RunCoroutine(_UpdateInvalid());
-        }
-
-        public static void Stop()
-        {
-            Timing.KillCoroutines(update_player_handle);
-            Timing.KillCoroutines(update_invalid_handle);
-            type_to_rooms.Clear();
-            player_cameras.Clear();
-            invalid_time.Clear();
         }
 
         [PluginEvent(ServerEventType.RoundStart)]

@@ -33,53 +33,61 @@ namespace TheRiptide
         {
             Singelton = this;
             PluginAPI.Events.EventManager.RegisterEvents(this);
+            harmony = new Harmony("CandyOverride");
+            harmony.PatchAll();
         }
 
-        [PluginEvent(ServerEventType.WaitingForPlayers)]
-        void OnWaitingForPlayers()
-        {
-            Timing.CallDelayed(0.0f, () =>
-            {
-                try
-                {
-                    Type event_manager_type = GetType("CedMod.Addons.Events.EventManager");
-                    if (!(event_manager_type != null && event_manager_type.GetField("CurrentEvent", BindingFlags.Public | BindingFlags.Static).GetValue(null) != null))
-                    {
-                        harmony = new Harmony("CandyOverride");
-                        harmony.PatchAll();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex.ToString());
-                }
-            });
-        }
-
-        [PluginEvent(ServerEventType.RoundEnd)]
-        void OnRoundEnded(RoundSummary.LeadingTeam leadingTeam)
+        [PluginUnload]
+        public void OnDisabled()
         {
             harmony.UnpatchAll("CandyOverride");
         }
 
-        [PluginEvent(ServerEventType.RoundRestart)]
-        void OnRoundRestart()
-        {
-            harmony.UnpatchAll("CandyOverride");
-        }
+//[PluginEvent(ServerEventType.WaitingForPlayers)]
+//void OnWaitingForPlayers()
+//{
+//    Timing.CallDelayed(0.0f, () =>
+//    {
+//        try
+//        {
+//            Type event_manager_type = GetType("CedMod.Addons.Events.EventManager");
+//            if (!(event_manager_type != null && event_manager_type.GetField("CurrentEvent", BindingFlags.Public | BindingFlags.Static).GetValue(null) != null))
+//            {
+//                harmony = new Harmony("CandyOverride");
+//                harmony.PatchAll();
+//            }
+//        }
+//        catch (Exception ex)
+//        {
+//            Log.Error(ex.ToString());
+//        }
+//    });
+//}
+
+//[PluginEvent(ServerEventType.RoundEnd)]
+//void OnRoundEnded(RoundSummary.LeadingTeam leadingTeam)
+//{
+//    harmony.UnpatchAll("CandyOverride");
+//}
+
+//[PluginEvent(ServerEventType.RoundRestart)]
+//void OnRoundRestart()
+//{
+//    harmony.UnpatchAll("CandyOverride");
+//}
 
 
-        public static Type GetType(string typeName)
-        {
-            var type = Type.GetType(typeName);
-            if (type != null) return type;
-            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                type = a.GetType(typeName);
-                if (type != null)
-                    return type;
-            }
-            return null;
-        }
+//public static Type GetType(string typeName)
+//{
+//    var type = Type.GetType(typeName);
+//    if (type != null) return type;
+//    foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+//    {
+//        type = a.GetType(typeName);
+//        if (type != null)
+//            return type;
+//    }
+//    return null;
+//}
     }
 }

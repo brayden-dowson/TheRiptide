@@ -39,7 +39,7 @@ namespace TheRiptide
         public string Description { get; set; } = "All the NTF get trapped by all the SCPs in a random room. The SCPs must stop all the NTF from escaping. There will be 3 rounds increasing in difficulty. The player that escapes the most difficult round wins!\n\n";
     }
 
-    public class EventHandler
+    public class TlsEventHandler
     {
         private static Config config;
         private static bool game_over = false;
@@ -73,7 +73,7 @@ namespace TheRiptide
 
         public static void Start(Config config)
         {
-            EventHandler.config = config;
+            TlsEventHandler.config = config;
             round_info = "";
             game_over = false;
             WinnerReset();
@@ -425,7 +425,7 @@ namespace TheRiptide
 
             Timing.CallDelayed(3.0f, () =>
             {
-                foreach (var p in Player.GetPlayers())
+                foreach (var p in ReadyPlayers())
                     if (p.Role != RoleTypeId.Spectator)
                         p.SetRole(RoleTypeId.Spectator);
             });
@@ -437,7 +437,7 @@ namespace TheRiptide
                 else if (difficulty == Difficulty.Medium)
                     difficulty = Difficulty.Hard;
                 SetUpRound();
-                foreach (var p in Player.GetPlayers())
+                foreach (var p in ReadyPlayers())
                     p.SendBroadcast(round_info, 20, shouldClearPrevious: true);
             });
 
@@ -447,7 +447,7 @@ namespace TheRiptide
                 RoomIdentifier sr = spawn_room;
                 Timing.CallDelayed(15.0f, () => { FacilityManager.UnlockRoom(sr, DoorLockReason.AdminCommand); });
 
-                foreach (var p in Player.GetPlayers())
+                foreach (var p in ReadyPlayers())
                     p.SetRole(RoleTypeId.ClassD);
             });
 
@@ -462,7 +462,7 @@ namespace TheRiptide
                 try
                 {
                     int mtf_count = 0;
-                    foreach (var p in Player.GetPlayers())
+                    foreach (var p in ReadyPlayers())
                     {
                         if (p.Role.GetTeam() == Team.FoundationForces && p.Role != RoleTypeId.FacilityGuard)
                         {
@@ -513,7 +513,7 @@ namespace TheRiptide
                             else
                             {
                                 Round.IsLocked = false;
-                                foreach (var p in Player.GetPlayers())
+                                foreach (var p in ReadyPlayers())
                                     p.SendBroadcast("There were no winners", 30, shouldClearPrevious: true);
                             }
                             yield break;
@@ -562,16 +562,16 @@ namespace TheRiptide
         {
             Log.Info(EventName + " event is preparing");
             IsRunning = true;
-            EventHandler.Start(EventConfig);
+            TlsEventHandler.Start(EventConfig);
             Log.Info(EventName + " event is prepared");
-            PluginAPI.Events.EventManager.RegisterEvents<EventHandler>(this);
+            PluginAPI.Events.EventManager.RegisterEvents<TlsEventHandler>(this);
         }
 
         public void StopEvent()
         {
             IsRunning = false;
-            EventHandler.Stop();
-            PluginAPI.Events.EventManager.UnregisterEvents<EventHandler>(this);
+            TlsEventHandler.Stop();
+            PluginAPI.Events.EventManager.UnregisterEvents<TlsEventHandler>(this);
         }
 
         [PluginEntryPoint("The Last Stand Event", "1.0.0", "", "The Riptide")]

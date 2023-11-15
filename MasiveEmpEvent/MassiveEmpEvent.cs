@@ -22,8 +22,8 @@ using UnityEngine;
 using InventorySystem.Items.Radio;
 using Interactables.Interobjects;
 using CedMod.Addons.Events.Interfaces;
-using InventorySystem.Items.SwitchableLightSources.Flashlight;
-using InventorySystem.Items.SwitchableLightSources;
+using InventorySystem.Items.ToggleableLights;
+using InventorySystem.Items.ToggleableLights.Flashlight;
 
 namespace TheRiptide
 {
