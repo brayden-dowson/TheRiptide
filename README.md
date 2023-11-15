@@ -6,6 +6,7 @@
  - [Chaos Raid](https://github.com/brayden-dowson/TheRiptide#chaos-raid)
  - [Dog Infection](https://github.com/brayden-dowson/TheRiptide#dog-infection)
  - [Dogs In The Dark](https://github.com/brayden-dowson/TheRiptide#dogs-in-the-dark)
+ - [Elimination Tournament](https://github.com/brayden-dowson/TheRiptide#elimination-tournament)
  - [Energy Arena](https://github.com/brayden-dowson/TheRiptide#energy-arena)
  - [Generator Control](https://github.com/brayden-dowson/TheRiptide#generator-control)
  - [Ghost Busters](https://github.com/brayden-dowson/TheRiptide#ghost-busters)
@@ -25,7 +26,7 @@
  - [Shy Guy XK](https://github.com/brayden-dowson/TheRiptide#shy-guy-xk)
  - [Switch Team Deathmatch](https://github.com/brayden-dowson/TheRiptide#switch-team-deathmatch)
  - [Team Deathmatch](https://github.com/brayden-dowson/TheRiptide#team-deathmatch)
- - [The Last Stand](https://github.com/brayden-dowson/TheRiptide#the-last-stand)(Untested Might be broken)
+ - [The Last Stand](https://github.com/brayden-dowson/TheRiptide#the-last-stand)(curently broken not included int release)
  - [Traitor Among Us](https://github.com/brayden-dowson/TheRiptide#traitor-among-us)
  - [Zombie Escape](https://github.com/brayden-dowson/TheRiptide#zombie-escape)
  - [Zombie Infection](https://github.com/brayden-dowson/TheRiptide#zombie-infection)
@@ -35,11 +36,13 @@
 ### [Plugins](https://github.com/brayden-dowson/TheRiptide#plugin-details)
  - [Add Chaos Ammo In Armory](https://github.com/brayden-dowson/TheRiptide#add-chaos-ammo-in-armory)
  - [Auto Restart](https://github.com/brayden-dowson/TheRiptide#auto-restart)
- - [Coin 914](https://github.com/brayden-dowson/TheRiptide#coin-914)
+ - [Candy Override](https://github.com/brayden-dowson/TheRiptide#auto-restart)
+ - [Coin 914](https://github.com/brayden-dowson/TheRiptide#candy-override)
  - [Discord Message](https://github.com/brayden-dowson/TheRiptide#discord-message)
  - [Escape Rewards](https://github.com/brayden-dowson/TheRiptide#escape-rewards)
  - [Faction Custom Info](https://github.com/brayden-dowson/TheRiptide#faction-custom-info)(broken)
- - [MVP](https://github.com/brayden-dowson/TheRiptide#mvp)
+ - [Follow](https://github.com/brayden-dowson/TheRiptide#follow)
+ - [MVP](https://github.com/brayden-dowson/TheRiptide#mvp)(might be a little busted)
  - [Normal Locker Ammo](https://github.com/brayden-dowson/TheRiptide#normal-locker-ammo)
  - [Pink Candy](https://github.com/brayden-dowson/TheRiptide#pink-candy)
  - [Research Card In 173](https://github.com/brayden-dowson/TheRiptide#research-card-in-173-out-dated-game-play-wise)
@@ -77,6 +80,32 @@ Spawn as two teams CHAOS and NTF in a ratio of 1:1. CHAOS must steal all the ite
 
 ### Dogs In The Dark
 All facility lights disabled. All SCPs will be SCP939. Everyone will spawn with a Flashlight.
+
+### Elimination Tournament
+Elimination style tournament. PvP fights contained inside a zone. Preround item/zone bans, loadout selection and 'Storm/force field' forces players to fight.
+Tournament can be run in 3 different ways. Role, Predefined and Scrimmage.
+ - ``Role`` the default, sets up bracket randomly based on the roles of joined players(all roles are included in the bracket) players without a role will not be assigned a team. used for serious well organized events.
+ - ``Predefined`` use the ``predef`` command. sets up the the bracket based on the config, will use the players Role to assign teams. players that do not have a role that is defined in the predefined bracket will not be assigned a team. used for serious well organized events.
+ - ``Scrimmage`` use the ``scim <team_count>`` command. sets up a bracket assigning players randomly to all the teams based on the ``team_count``. Roles wont be used to assign the team. good for quick casual unorganized events.
+
+The idea behind ``Role`` and ``Predefined`` is that you can role sync with a different system e.g. ``CedMod``, ``config_remoteadmin.txt`` etc. to allow quick setup of organized matches.
+Note. ``team_name`` is not the ``Badge Text``(what you see when you press N). ``team_name`` does not contain white space so it can be used for commands and does not have to be the same as the badge. e.g. Badge = ``My Team``, team_name = ``mt``. you defined the ``team_name`` and ``Badge Text`` when you set up the Roles i.e. ``CedMod``, ``config_remoteadmin.txt`` etc. use the ``tour_list_team`` to see the ``Badge Text`` and ``team_name`` for each team.
+#### commands
+ - ``tour_save_log`` - ``tsl`` saves log
+ - ``tour_undo_win <team_name> <reason>`` undo a teams last win. usage: ``tuw <team_name> <reason> ``
+ - ``tour_force_win <team_name>`` force a team to win their next match. usage: ``tfw <team_name>``
+ - ``tour_predefined`` setup predefined bracket defined in the config and load log. usage: ``predef``
+ - ``tour_run_match <team name>`` run match by specifing a team. usage: ``trm <team_name>``
+ - ``tour_auto_run`` Auto runs the tournament(do not use this unless all teams are present e.g. finals) usage: ``tar``
+ - ``tour_scrimmage <team_count>`` setup tournament as a scrimmage with a certain amount of teams assigned randomly to players. usage: ``scrim <team_count>``
+ - ``tour_set_team <player_id> <team_name>`` assign player to team. usage: ``tst <player_id> <team_name>``
+ - ``tour_create_team <team_name>`` create a new team. usage: ``tct <team_name>``
+ - ``tour_remove_team <team_name>`` removes a team. usage: ``trt <team_name>``
+ - ``tour_list_team`` list all teams. shows the ``Badge Name`` and the ``team_name``. usage: ``tlt``
+ - ``clear_hint`` clears hints(any player can use this) sometimes the bracket can appear even when not invoked due to NW spaghetti code this cmd can fix it. usage: ``ch``
+> [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed  
+> [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
+> [LoadoutRoom.sloc](https://github.com/brayden-dowson/TheRiptide/releases) must be inside ``slocLoader/Objects``
 
 ### Energy Arena
 Class-D vs NTF in a special Jailbird arena. Jailbirds get an extended charge duration, up to 3 seconds and never wearout. Everyone starts with 1000 HP. Random chance for everyone to get a Particle Disruptor or a MicroHID. 50% chance the lights will be very dim. Last team alive wins!
@@ -186,6 +215,9 @@ Spawns all types of Chaos ammo inside of HCZ armory.
 ###  Auto Restart
 Restart the server at 4:00am local time.
 
+###  Candy Override
+Allow you to configure the amount of candies you can take and the spawn chances for each candy.
+
 ### Coin 914
 Adds the following recipes to coin.
  - Fine - 25% Destroyed, 25% painkillers, 50% coin
@@ -199,6 +231,13 @@ Rewards players based on how many SCP items they brought out of the facility. Ad
 
 ### Faction Custom Info
 Adds HP, AHP, HS, GodMode/Noclip status, status effects to a players custom info display. players info is only visible to players of the same Faction. i.e. Class-D can see Chaos and vice-versa but Class-D cannot see NTF info.
+
+### Follow
+Adds commands to make a player follow another player. Can only work on one player at a time.
+#### commands
+ - ``follow <player_id>`` forces player to follow you.
+ - ``follow <player_id> <target_id>`` forces player to follow target.  
+ - ``unfollow `` stops current follow
 
 ### MVP
 Tracks players statistics during the round and displays any achievements at the end of the round as a Broadcast. Achievements are most kills as SCP, most SCPs killed, first SCP killed(only if "most SCPs killed" was 1), most kills as a human and fastest escape time.
