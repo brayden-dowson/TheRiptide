@@ -89,7 +89,7 @@ Tournament can be run in 3 different ways. Role, Predefined and Scrimmage.
  - ``Scrimmage`` use the ``scim <team_count>`` command. sets up a bracket assigning players randomly to all the teams based on the ``team_count``. Roles wont be used to assign the team. good for quick casual unorganized events.
 
 The idea behind ``Role`` and ``Predefined`` is that you can role sync with a different system e.g. ``CedMod``, ``config_remoteadmin.txt`` etc. to allow quick setup of organized matches.
-Note. ``team_name`` is not the ``Badge Text``(what you see when you press N). ``team_name`` does not contain white space so it can be used for commands and does not have to be the same as the badge. e.g. Badge = ``My Team``, team_name = ``mt``. you defined the ``team_name`` and ``Badge Text`` when you set up the Roles i.e. ``CedMod``, ``config_remoteadmin.txt`` etc.
+Note. ``team_name`` is not the ``Badge Text``(what you see when you press N). ``team_name`` does not contain white space so it can be used for commands and does not have to be the same as the badge. e.g. Badge = ``My Team``, team_name = ``mt``. you defined the ``team_name`` and ``Badge Text`` when you set up the Roles i.e. ``CedMod``, ``config_remoteadmin.txt`` etc. use the ``tour_list_team`` to see the ``Badge Text`` and ``team_name`` for each team.
 #### commands
  - ``tour_save_log`` - ``tsl`` saves log
  - ``tour_undo_win <team_name> <reason>`` undo a teams last win. usage: ``tuw <team_name> <reason> ``
@@ -101,7 +101,7 @@ Note. ``team_name`` is not the ``Badge Text``(what you see when you press N). ``
  - ``tour_set_team <player_id> <team_name>`` assign player to team. usage: ``tst <player_id> <team_name>``
  - ``tour_create_team <team_name>`` create a new team. usage: ``tct <team_name>``
  - ``tour_remove_team <team_name>`` removes a team. usage: ``trt <team_name>``
- - ``tour_list_team`` list all teams. usage: ``tlt``
+ - ``tour_list_team`` list all teams. shows the ``Badge Name`` and the ``team_name``. usage: ``tlt``
  - ``clear_hint`` clears hints(any player can use this) sometimes the bracket can appear even when not invoked due to NW spaghetti code this cmd can fix it. usage: ``ch``
 > [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed  
 > [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
