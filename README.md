@@ -40,11 +40,10 @@
  - [Coin 914](https://github.com/brayden-dowson/TheRiptide#candy-override)
  - [Discord Message](https://github.com/brayden-dowson/TheRiptide#discord-message)
  - [Escape Rewards](https://github.com/brayden-dowson/TheRiptide#escape-rewards)
- - [Faction Custom Info](https://github.com/brayden-dowson/TheRiptide#faction-custom-info)(broken)
+ - [Faction Custom Info](https://github.com/brayden-dowson/TheRiptide#faction-custom-info)(might be a little busted)
  - [Follow](https://github.com/brayden-dowson/TheRiptide#follow)
- - [MVP](https://github.com/brayden-dowson/TheRiptide#mvp)(might be a little busted)
+ - [MVP](https://github.com/brayden-dowson/TheRiptide#mvp)
  - [Normal Locker Ammo](https://github.com/brayden-dowson/TheRiptide#normal-locker-ammo)
- - [Pink Candy](https://github.com/brayden-dowson/TheRiptide#pink-candy)
  - [Research Card In 173](https://github.com/brayden-dowson/TheRiptide#research-card-in-173-out-dated-game-play-wise)
  - [Scp 127](https://github.com/brayden-dowson/TheRiptide#scp-127)
  - [Scp Door Break](https://github.com/brayden-dowson/TheRiptide#scp-door-break)
@@ -244,9 +243,6 @@ Tracks players statistics during the round and displays any achievements at the 
 
 ### Normal Locker Ammo
 Adds 30x 9mm ammo to a random light containment locker.
-
-### Pink Candy
-Adds pink candy back (can only be obtained with the candy bowl).
 
 ### Research Card In 173 (out dated game play wise)
 30% chance of a research card to spawn in 173s old room on the computer desk.
