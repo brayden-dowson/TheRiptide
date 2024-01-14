@@ -137,8 +137,6 @@ namespace TheRiptide
             UltraQuaternion.Enable();
             AlphaWarheadController.Singleton._autoDetonate = false;
             TraitorAmongUs.config = config;
-            ff_state = Server.FriendlyFire;
-            Server.FriendlyFire = true;
             FriendlyFireConfig.PauseDetector = true;
             ff_old = AttackerDamageHandler._ffMultiplier;
             AttackerDamageHandler._ffMultiplier = 1.0f;
@@ -243,6 +241,9 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.RoundStart)]
         void OnRoundStart()
         {
+            ff_state = Server.FriendlyFire;
+            Server.FriendlyFire = true;
+
             if (map == null)
                 foreach (var p in ReadyPlayers())
                     p.SendBroadcast(config.StaffDidNotSelectMap, 300, shouldClearPrevious: true);
@@ -742,7 +743,7 @@ namespace TheRiptide
 
             yield return Timing.WaitForSeconds(3.0f);
 
-            List<Player> players = ReadyPlayers().Where(p => !not_ready.Contains(p.PlayerId) && p != jester_killer && !RDM.OverRDMLimit(p)).ToList();
+            List<Player> players = ReadyPlayers().Where(p => p.Role != RoleTypeId.Overwatch && !not_ready.Contains(p.PlayerId) && p != jester_killer && !RDM.OverRDMLimit(p)).ToList();
             int detective_count = Mathf.RoundToInt(players.Count / config.DetectiveRatio);
             int traitor_count = Mathf.Max(Mathf.RoundToInt(players.Count / config.TraitorRatio), 1);
             int jester_count = 0;
@@ -835,6 +836,9 @@ namespace TheRiptide
                     string time_str = pause_ready_up ? "Paused" : (time - passed).ToString();
                     foreach (var p in ReadyPlayers())
                     {
+                        if (!p.IsAlive)
+                            continue;
+
                         if (not_ready.Contains(p.PlayerId))
                         {
                             if(!not_ready_desync.Contains(p))
@@ -862,7 +866,7 @@ namespace TheRiptide
                             ready++;
                         }
                     }
-                    if (ready >= 3 && ready >= (Player.Count - 1) && (time - passed) > 10)
+                    if (ready >= 3 && ready >= (Player.GetPlayers().Where(p => p.Role != RoleTypeId.Overwatch).Count() - 1) && (time - passed) > 10)
                         passed = time - 10;
                 }
                 catch (System.Exception ex)

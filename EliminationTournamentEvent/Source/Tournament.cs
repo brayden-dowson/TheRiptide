@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static TheRiptide.Utility;
+using static TheRiptide.StaticTranslation;
 
 namespace TheRiptide
 {
@@ -206,17 +207,17 @@ namespace TheRiptide
                         }
                         else
                         {
-                            p.SendBroadcast("<b><color=#FF0000>Your team: " + local_group + " is not apart of the predefined bracket for this tournament if you believe this is an error speak to a tournament organiser", 60, shouldClearPrevious: true);
+                            p.SendBroadcast(Translation.TeamMissingOut.Replace("{local_group}", local_group) , 60, shouldClearPrevious: true);
                         }
                     }
                     else
                     {
-                        p.SendBroadcast("Error could not get UserGroup from local_group try rejoining server and contact a tournament organiser", 60, shouldClearPrevious: true);
+                        p.SendBroadcast(Translation.LocalGroupError, 60, shouldClearPrevious: true);
                     }
                 }
                 else
                 {
-                    p.SendBroadcast("<b><color=#FF0000>Could not assign a team because you have either\n1. Not linked your dicord to steam\n2. Not logged into Cedmod", 60, shouldClearPrevious: true);
+                    p.SendBroadcast(Translation.PlayerFailureToLinkCedmod, 60, shouldClearPrevious: true);
                 }
             }
 
@@ -256,7 +257,7 @@ namespace TheRiptide
                 team.Users.Add(p.UserId);
                 p.ReferenceHub.serverRoles.Network_myColor = "silver";
                 p.ReferenceHub.serverRoles.Network_myText = team.BadgeName;
-                p.SendBroadcast("Scrimmage Mode - You have been assigned to: <b>" + team.BadgeColor + team.BadgeName + "</b></color>", 15);
+                p.SendBroadcast(Translation.ScrimmageAssignedTeamFormat.Replace("{team}", team.BadgeColor + team.BadgeName + "</color>"), 15);
                 index++;
             }
 
@@ -493,63 +494,6 @@ namespace TheRiptide
                         valid_matches.RemoveAll(m => m.Value != max);
                         StartMatch(valid_matches.RandomItem().Key);
                     }
-
-
-                    ////List<Zone> available_zones = ArenaManager.AvailableZones();
-                    //List<MatchInfo> valid_matches = new List<MatchInfo>();
-                    //if (!available_matches.IsEmpty() /*&& !available_zones.IsEmpty()*/)
-                    //{
-                    //    foreach (var match in available_matches)
-                    //    {
-                    //        if (matches.Any(m => m.Bracket == match.Key))
-                    //            continue;
-
-                    //        MatchInfo info = new MatchInfo { stage = match.Value };
-                    //        info.team_a = match.Key.team_a.winner;
-                    //        info.team_b = match.Key.team_b.winner;
-                    //        //info.zones = available_zones.Except(info.team_a.ZoneBans).Except(info.team_b.ZoneBans).ToList();
-                    //        //if (info.zones.IsEmpty())
-                    //        //    continue;
-                    //        info.bracket = match.Key;
-                    //        valid_matches.Add(info);
-                    //    }
-                    //}
-                    //if (!valid_matches.IsEmpty())
-                    //{
-                    //    valid_matches.Sort((x, y) => x.stage - y.stage);
-                    //    valid_matches.Reverse();
-                    //    int max = valid_matches.First().stage;
-                    //    foreach (var info in valid_matches.ToList())
-                    //        if (info.stage != max)
-                    //            valid_matches.Remove(info);
-
-                    //    MatchInfo selected = valid_matches.RandomItem();
-                    //    bool team_a_empty = selected.team_a.Users.IsEmpty() || selected.team_a.Users.All(u => Player.Get(u) == null);
-                    //    bool team_b_empty = selected.team_b.Users.IsEmpty() || selected.team_b.Users.All(u => Player.Get(u) == null);
-                    //    if (team_a_empty && team_b_empty)
-                    //    {
-                    //        if (Random.value < 0.5f)
-                    //            OnTeamWon(selected.team_a, selected.team_b, 0, 0, "\n<b>" + selected.team_b.BadgeColor + selected.team_b.BadgeName + "</b></color> Surrendered");
-                    //        else
-                    //            OnTeamWon(selected.team_b, selected.team_a, 0, 0, "\n<b>" + selected.team_a.BadgeColor + selected.team_a.BadgeName + "</b></color> Surrendered");
-                    //        continue;
-                    //    }
-                    //    else if (team_a_empty)
-                    //    {
-                    //        OnTeamWon(selected.team_b, selected.team_a, 0, 0, "\n<b>" + selected.team_a.BadgeColor + selected.team_a.BadgeName + "</b></color> Surrendered");
-                    //        continue;
-                    //    }
-                    //    else if (team_b_empty)
-                    //    {
-                    //        OnTeamWon(selected.team_a, selected.team_b, 0, 0, "\n<b>" + selected.team_b.BadgeColor + selected.team_b.BadgeName + "</b></color> Surrendered");
-                    //        continue;
-                    //    }
-                    //    AddMatch(selected.bracket);
-                    //    //Match match = new Match(/*selected.zones.RandomItem(), */selected.team_a, selected.team_b, config.ScoreThreshold, selected.bracket);
-                    //    //match.Run();
-                    //    //matches.Add(match);
-                    //    //Timing.CallDelayed(0.5f,()=> StandingDisplay.UpdateStanding(bracket.GetCurrentStandingHint()));
-                    //}
                 }
                 catch (System.Exception ex)
                 {
@@ -559,8 +503,8 @@ namespace TheRiptide
 
             PluginAPI.Core.Log.Info("Winner found");
 
-            foreach(var p in ReadyPlayers())
-                p.ReceiveHint("<size=64><b>" + bracket.Winner.BadgeColor + bracket.Winner.BadgeName + " Won!</color></b></size>", 15);
+            foreach (var p in ReadyPlayers())
+                p.ReceiveHint(Translation.TournamentWon.Replace("{team}", bracket.Winner.BadgeColor + bracket.Winner.BadgeName), 15);
 
             yield return Timing.WaitForSeconds(15.0f);
 
@@ -577,19 +521,19 @@ namespace TheRiptide
             if (team_a_empty && team_b_empty)
             {
                 if (Random.value < 0.5f)
-                    OnTeamWon(team_a, team_b, 0, 0, "\n<b>" + team_b.BadgeColor + team_b.BadgeName + "</b></color> Surrendered");
+                    OnTeamWon(team_a, team_b, 0, 0, Translation.TeamSurrendered.Replace("{team}", team_b.BadgeColor + team_b.BadgeName));
                 else
-                    OnTeamWon(team_b, team_a, 0, 0, "\n<b>" + team_a.BadgeColor + team_a.BadgeName + "</b></color> Surrendered");
+                    OnTeamWon(team_b, team_a, 0, 0, Translation.TeamSurrendered.Replace("{team}", team_a.BadgeColor + team_a.BadgeName));
                 return;
             }
             else if (team_a_empty)
             {
-                OnTeamWon(team_b, team_a, 0, 0, "\n<b>" + team_a.BadgeColor + team_a.BadgeName + "</b></color> Surrendered");
+                OnTeamWon(team_b, team_a, 0, 0, Translation.TeamSurrendered.Replace("{team}", team_a.BadgeColor + team_a.BadgeName));
                 return;
             }
             else if (team_b_empty)
             {
-                OnTeamWon(team_a, team_b, 0, 0, "\n<b>" + team_b.BadgeColor + team_b.BadgeName + "</b></color> Surrendered");
+                OnTeamWon(team_a, team_b, 0, 0, Translation.TeamSurrendered.Replace("{team}", team_b.BadgeColor + team_b.BadgeName));
                 return;
             }
 
@@ -607,7 +551,13 @@ namespace TheRiptide
 
             foreach (var p in ReadyPlayers())
                 if (p.Role == RoleTypeId.Spectator)
-                    p.SendBroadcast("<b>" + winner.BadgeColor + winner.BadgeName + "</b></color> Defeated <b>" + loser.BadgeColor + loser.BadgeName + "</b></color> " + winner_score + " - " + loser_score + reason, 15);
+                    p.SendBroadcast(Translation.MatchWon.
+                        Replace("{winner_team}", winner.BadgeColor + winner.BadgeName).
+                        Replace("{loser_team}", loser.BadgeColor + loser.BadgeName).
+                        Replace("{winner_score}", winner_score.ToString()).
+                        Replace("{loser_score}", loser_score.ToString()).
+                        Replace("{reason}", reason), 15);
+                    //p.SendBroadcast("<b>" + winner.BadgeColor + winner.BadgeName + "</b></color> Defeated <b>" + loser.BadgeColor + loser.BadgeName + "</b></color> " + winner_score + " - " + loser_score + reason, 15);
             SaveLog();
         }
 

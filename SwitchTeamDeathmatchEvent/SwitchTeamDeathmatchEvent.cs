@@ -63,8 +63,6 @@ namespace TheRiptide
         public static void Start()
         {
             round_started = false;
-            old_ff = Server.FriendlyFire;
-            Server.FriendlyFire = false;
             team_a.Clear();
             team_b.Clear();
             zone = new List<FacilityZone>
@@ -159,6 +157,9 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.RoundStart)]
         void OnRoundStart()
         {
+            old_ff = Server.FriendlyFire;
+            Server.FriendlyFire = false;
+
             RoomIdentifier surface = RoomIdentifier.AllRoomIdentifiers.Where((r) => r.Zone == FacilityZone.Surface).First();
             HashSet<RoomIdentifier> checkpoint_a = RoomIdentifier.AllRoomIdentifiers.Where(r => r.Name == RoomName.HczCheckpointA || r.Name == RoomName.LczCheckpointA).ToHashSet();
             HashSet<RoomIdentifier> checkpoint_b = RoomIdentifier.AllRoomIdentifiers.Where(r => r.Name == RoomName.HczCheckpointB || r.Name == RoomName.LczCheckpointB).ToHashSet();

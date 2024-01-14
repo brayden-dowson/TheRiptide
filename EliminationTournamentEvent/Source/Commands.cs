@@ -17,13 +17,46 @@ namespace TheRiptide.Source
     //save log (test)
 
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentUnsetTeam : ICommand
+    public class Tournament : ParentCommand
     {
-        public string Command { get; } = "tour_unset_team";
+        public override string Command => "tournament";
 
-        public string[] Aliases { get; } = new string[] { "tut" };
+        public override string[] Aliases { get; } = new string[] { "tour", "t" };
 
-        public string Description { get; } = "removes player from team. usage: tst <player_id>";
+        public override string Description => "Parent command for tournament related commands. usage t <sub_command> <parameters>...";
+
+        public Tournament() => LoadGeneratedCommands();
+
+        public override void LoadGeneratedCommands()
+        {
+            RegisterCommand(new UnsetTeam());
+            RegisterCommand(new SaveLog());
+            RegisterCommand(new UndoWin());
+            RegisterCommand(new ForceWin());
+            RegisterCommand(new Predefined());
+            RegisterCommand(new RunMatch());
+            RegisterCommand(new AutoRun());
+            RegisterCommand(new Scrimmage());
+            RegisterCommand(new SetTeam());
+            RegisterCommand(new CreateTeam());
+            RegisterCommand(new RemoveTeam());
+            RegisterCommand(new TournamentListTeams());
+        }
+
+        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        {
+            response = $"Invalid subcommand. Valid subcommands are:\n{string.Join("\n", Commands.Values.Select(c => c.Command + " aliases: " + string.Join(", ", c.Aliases) + " description: " + c.Description))}";
+            return false;
+        }
+    }
+
+    public class UnsetTeam : ICommand
+    {
+        public string Command { get; } = "unset_team";
+
+        public string[] Aliases { get; } = new string[] { "ut" };
+
+        public string Description { get; } = "removes player from team. usage: t ut <player_id>";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -54,14 +87,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentSaveLog : ICommand
+    public class SaveLog : ICommand
     {
-        public string Command { get; } = "tour_save_log";
+        public string Command { get; } = "save_log";
 
-        public string[] Aliases { get; } = new string[] { "tsl" };
+        public string[] Aliases { get; } = new string[] { "sl" };
 
-        public string Description { get; } = "saves log. usage: tsl";
+        public string Description { get; } = "saves log. usage: t sl";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -79,14 +111,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentUndoWin : ICommand
+    public class UndoWin : ICommand
     {
-        public string Command { get; } = "tour_undo_win";
+        public string Command { get; } = "undo_win";
 
-        public string[] Aliases { get; } = new string[] { "tuw" };
+        public string[] Aliases { get; } = new string[] { "uw" };
 
-        public string Description { get; } = "undo a teams last win. usage: tuw <team_name> <reason>";
+        public string Description { get; } = "undo a teams last win. usage: t uw <team_name> <reason>";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -112,14 +143,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentForceWin : ICommand
+    public class ForceWin : ICommand
     {
-        public string Command { get; } = "tour_force_win";
+        public string Command { get; } = "force_win";
 
-        public string[] Aliases { get; } = new string[] { "tfw" };
+        public string[] Aliases { get; } = new string[] { "fw" };
 
-        public string Description { get; } = "force a team to win their next match. usage: tfw <team_name>";
+        public string Description { get; } = "force a team to win their next match. usage: t fw <team_name>";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -142,14 +172,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentPredefined : ICommand
+    public class Predefined : ICommand
     {
-        public string Command { get; } = "tour_predefined";
+        public string Command { get; } = "predefined";
 
         public string[] Aliases { get; } = new string[] { "predef" };
 
-        public string Description { get; } = "setup predefined bracket and load log. usage: predef";
+        public string Description { get; } = "setup predefined bracket and load log. usage: t predef";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -167,14 +196,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentRunMatch : ICommand
+    public class RunMatch : ICommand
     {
-        public string Command { get; } = "tour_run_match";
+        public string Command { get; } = "run_match";
 
-        public string[] Aliases { get; } = new string[] { "trm" };
+        public string[] Aliases { get; } = new string[] { "rm" };
 
-        public string Description { get; } = "run match by specifing a team. usage: trm <team_name>";
+        public string Description { get; } = "run match by specifing a team. usage: t rm <team_name>";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -197,14 +225,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentAutoRun : ICommand
+    public class AutoRun : ICommand
     {
-        public string Command { get; } = "tour_auto_run";
+        public string Command { get; } = "auto_run";
 
-        public string[] Aliases { get; } = new string[] { "tar" };
+        public string[] Aliases { get; } = new string[] { "ar" };
 
-        public string Description { get; } = "Auto runs the tournament";
+        public string Description { get; } = "Auto runs the tournament. usage: t ar";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -222,14 +249,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentScrimmage : ICommand
+    public class Scrimmage : ICommand
     {
-        public string Command { get; } = "tour_scrimmage";
+        public string Command { get; } = "scrimmage";
 
         public string[] Aliases { get; } = new string[] { "scrim" };
 
-        public string Description { get; } = "setup tournament as a scrimmage with a certain amount of teams assigned randomly to players. Usage 'scrim <team_count>'";
+        public string Description { get; } = "setup tournament as a scrimmage with a certain amount of teams assigned randomly to players. Usage 't scrim <team_count>'";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -285,14 +311,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentSetTeam : ICommand
+    public class SetTeam : ICommand
     {
-        public string Command { get; } = "tour_set_team";
+        public string Command { get; } = "set_team";
 
-        public string[] Aliases { get; } = new string[] { "tst" };
+        public string[] Aliases { get; } = new string[] { "st" };
 
-        public string Description { get; } = "assign player to team. usage: tst <player_id> <team_name>";
+        public string Description { get; } = "assign player to team. usage: t st <player_id> <team_name>";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -332,14 +357,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentCreateTeam : ICommand
+    public class CreateTeam : ICommand
     {
-        public string Command { get; } = "tour_create_team";
+        public string Command { get; } = "create_team";
 
-        public string[] Aliases { get; } = new string[] { "tct" };
+        public string[] Aliases { get; } = new string[] { "ct" };
 
-        public string Description { get; } = "create a new team. usage: tct <team_name>";
+        public string Description { get; } = "create a new team. usage: t ct <team_name>";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -362,14 +386,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class TournamentRemoveTeam : ICommand
+    public class RemoveTeam : ICommand
     {
-        public string Command { get; } = "tour_remove_team";
+        public string Command { get; } = "remove_team";
 
-        public string[] Aliases { get; } = new string[] { "trt" };
+        public string[] Aliases { get; } = new string[] { "rt" };
 
-        public string Description { get; } = "removes a team. usage: trt <team_name>";
+        public string Description { get; } = "removes a team. usage: t rt <team_name>";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -392,14 +415,13 @@ namespace TheRiptide.Source
         }
     }
 
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     public class TournamentListTeams : ICommand
     {
-        public string Command { get; } = "tour_list_team";
+        public string Command { get; } = "list_team";
 
-        public string[] Aliases { get; } = new string[] { "tlt" };
+        public string[] Aliases { get; } = new string[] { "lt" };
 
-        public string Description { get; } = "list all teams. usage: tlt";
+        public string Description { get; } = "list all teams. usage: t lt";
 
         public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
         {

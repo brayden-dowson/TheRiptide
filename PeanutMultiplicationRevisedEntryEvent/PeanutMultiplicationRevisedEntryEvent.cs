@@ -83,18 +83,32 @@ namespace TheRiptide
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
-                        player.SetRole(RoleTypeId.Scp173);
+                        try
+                        {
+                            player.SetRole(RoleTypeId.Scp173);
+                        }
+                        catch (System.Exception e)
+                        {
+                            Log.Error(e.ToString());
+                        }
                     });
                     return false;
                 }
             }
             else
             {
-                if (new_role.GetTeam() != Team.ChaosInsurgency || new_role != RoleTypeId.ClassD)
+                if (new_role.GetTeam() != Team.ChaosInsurgency && new_role != RoleTypeId.ClassD)
                 {
                     Timing.CallDelayed(0.0f, () =>
                     {
-                        player.SetRole(RoleTypeId.ClassD);
+                        try
+                        {
+                            player.SetRole(RoleTypeId.ClassD);
+                        }
+                        catch(System.Exception e)
+                        {
+                            Log.Error(e.ToString());
+                        }
                     });
                     return false;
                 }

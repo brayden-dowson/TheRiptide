@@ -172,7 +172,10 @@ namespace TheRiptide
                 if (InventoryItemLoader.TryGetItem(type, out firearm))
                 {
                     if (grant_ammo)
-                        player.SetAmmo(firearm.AmmoType, (ushort)player.GetAmmoLimit(firearm.AmmoType));
+                    {
+                        BodyArmor bodyArmor;
+                        player.SetAmmo(firearm.AmmoType, GetStandardAmmoLimit(!player.ReferenceHub.inventory.TryGetBodyArmor(out bodyArmor) ? null : bodyArmor, firearm.AmmoType));
+                    }
                     Transform t = player.GameObject.transform;
                     FirearmPickup pickup = Object.Instantiate(firearm.PickupDropModel, t.position, t.rotation) as FirearmPickup;
                     if (pickup != null)

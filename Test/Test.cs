@@ -1,6 +1,7 @@
 ﻿using Achievements;
 using CommandSystem;
 using MapGeneration;
+using Mirror.LiteNetLib4Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using PluginAPI.Core;
@@ -41,7 +42,11 @@ namespace TheRiptide
         }
 
 
-
+        [PluginEvent(PluginAPI.Enums.ServerEventType.PlayerDryfireWeapon)]
+        public void OnDryfireWeapon(PlayerDryfireWeaponEvent e)
+        {
+            Log.Info("dryfired " + e.Firearm.name);
+        }
 
     }
 
@@ -84,7 +89,7 @@ namespace TheRiptide
         {
             Player player = Player.Get(sender);
             int id;
-            if(!int.TryParse(arguments.At(0),out id))
+            if (!int.TryParse(arguments.At(0), out id))
             {
                 response = "Failed: invalid id: " + arguments.At(0);
                 return false;
@@ -94,6 +99,41 @@ namespace TheRiptide
             RoomIdentifier target = RoomIdentifier.AllRoomIdentifiers.First(r => r.Name == td.n);
             player.ReferenceHub.TryOverridePosition(target.transform.TransformPoint(td.p), Quaternion.LookRotation(target.transform.TransformDirection(td.r)).eulerAngles - player.Rotation);
             response = "Success";
+            return true;
+        }
+    }
+
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
+    public class vanish : ICommand
+    {
+        public string Command { get; } = "vanish";
+
+        public string[] Aliases { get; } = new string[] { };
+
+        public string Description { get; } = "vanish";
+
+        public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
+        {
+            Player player = Player.Get(sender);
+            player.ReferenceHub.authManager.InstanceMode = CentralAuth.ClientInstanceMode.Host;
+            ServerConsole.RefreshOnlinePlayers();
+            response = "Success";
+            return true;
+        }
+    }
+
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
+    public class connected : ICommand
+    {
+        public string Command { get; } = "connected";
+
+        public string[] Aliases { get; } = new string[] { };
+
+        public string Description { get; } = "conection count";
+
+        public bool Execute(System.ArraySegment<string> arguments, ICommandSender sender, out string response)
+        {
+            response = $"{LiteNetLib4MirrorCore.Host.ConnectedPeersCount} | {ServerConsole._playersAmount.ToString() + "/" + CustomNetworkManager.slots.ToString()} | + {ServerConsole._verificationPlayersList} | Player.Count: {Player.Count} Player.Connections: {Player.ConnectionsCount} Player.NonVerified: {Player.NonVerifiedCount}";
             return true;
         }
     }

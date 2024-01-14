@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static TheRiptide.StaticTranslation;
 
 namespace TheRiptide
 {
@@ -277,9 +278,9 @@ namespace TheRiptide
             //string hint = "<align=left><size=18>" + background + "<line-height=50%><mspace=0.5em>\n<voffset=" + ((max_line - min_line) / 1.5f) + "em>";
             string hint = "<voffset=6em><size=96><color=#d4af37><b>Bracket</b></color></size><line-height=100%>\n" +
                 "</line-height><size=18><color=#FF0000><mspace=0.75em><line-height=75%><mark=#073811FF>|" +
-                ToLatinChars("If this appears midgame type .ch in your game console or press p to disable your HUD") +
+                ToLatinChars(Translation.BracketGlitchWarning) +
                 "|</mark></mspace></color>\n";
-            hint += "</line-height><mark=#00000050><line-height=50%><mspace=0.5em>\n";
+            hint += "</line-height><mark=#02131aFF><line-height=50%><mspace=0.5em>\n";
             for (int l = min_line; l <= max_line; l++)
             {
                 string line = "";
@@ -298,7 +299,7 @@ namespace TheRiptide
                 hint += "|" + line.PadLeft(total_width) + "|\n";
             }
             hint += "</voffset></mark>";
-            return hint;
+            return hint.Replace(' ', '‎');
         }
 
         private string ToLatinChars(string str)

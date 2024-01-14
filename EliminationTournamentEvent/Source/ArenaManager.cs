@@ -16,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static TheRiptide.Utility;
+using static TheRiptide.StaticTranslation;
 
 namespace TheRiptide
 {
@@ -512,7 +513,7 @@ namespace TheRiptide
                         }
 
                         p.EffectsManager.ChangeState<Poisoned>(1, 0);
-                        p.SendBroadcast("<b><color=#FF0000>You are out of bounds!</b></color>", 2, shouldClearPrevious: true);
+                        p.SendBroadcast(Translation.OutOfBounds, 2, shouldClearPrevious: true);
                     }
                 }
                 catch(System.Exception ex)

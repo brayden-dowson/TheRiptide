@@ -15,6 +15,7 @@ using PlayerRoles.PlayableScps.HumeShield;
 using CustomPlayerEffects;
 using MEC;
 using CedMod.Addons.Events.Interfaces;
+using PluginAPI.Events;
 
 namespace TheRiptide
 {
@@ -35,10 +36,13 @@ namespace TheRiptide
         }
 
         [PluginEvent(ServerEventType.PlayerDamage)]
-        void OnPlayerDamage(Player victim, Player attacker, DamageHandlerBase damage)
+        void OnPlayerDamage(PlayerDamageEvent e)
         {
-            if (victim.IsHuman && attacker != null && attacker.IsHuman && victim != attacker)
-                if (damage is StandardDamageHandler standard)
+            if (e.Player == null || e.Target == null)
+                return;
+
+            if (e.Target.IsHuman && e.Player.IsHuman && e.Target != e.Player)
+                if (e.DamageHandler is StandardDamageHandler standard)
                     standard.Damage = 0.0f;
         }
 

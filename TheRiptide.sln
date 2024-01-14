@@ -172,6 +172,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scp3114Chance", "Scp3114Cha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Follow", "Follow\Follow.csproj", "{7FE82A5C-6938-4F05-AFAE-45516CCFDF10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlamingoInfection", "FlamingoInfection\FlamingoInfection.csproj", "{55D29ECB-F790-4593-BEDE-E339C1AD9C02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -482,6 +484,10 @@ Global
 		{7FE82A5C-6938-4F05-AFAE-45516CCFDF10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FE82A5C-6938-4F05-AFAE-45516CCFDF10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FE82A5C-6938-4F05-AFAE-45516CCFDF10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55D29ECB-F790-4593-BEDE-E339C1AD9C02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55D29ECB-F790-4593-BEDE-E339C1AD9C02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55D29ECB-F790-4593-BEDE-E339C1AD9C02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55D29ECB-F790-4593-BEDE-E339C1AD9C02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -563,6 +569,7 @@ Global
 		{FFAC8E4D-3A8E-46E0-AB8F-10B21F639409} = {FB130073-908D-40D7-9BE8-2F146197BE89}
 		{245BF44D-9AC5-4EC0-A33F-557DFE62AFA8} = {FB130073-908D-40D7-9BE8-2F146197BE89}
 		{7FE82A5C-6938-4F05-AFAE-45516CCFDF10} = {FB130073-908D-40D7-9BE8-2F146197BE89}
+		{55D29ECB-F790-4593-BEDE-E339C1AD9C02} = {17EB0A11-5662-4889-8E6D-F2837EF8A601}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D2D457D1-0E1D-4EFE-B959-856512B0718A}

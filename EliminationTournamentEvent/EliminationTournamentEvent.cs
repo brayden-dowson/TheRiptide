@@ -23,6 +23,7 @@ using System.Linq;
 using UnityEngine;
 using static TheRiptide.EnumExtensions;
 using static TheRiptide.Utility;
+using static TheRiptide.StaticTranslation;
 
 //end of game state reset
 //log spectators?
@@ -163,13 +164,13 @@ namespace TheRiptide
                 if (player != null)
                 {
                     if (team != null)
-                        player.SendBroadcast("<color=#00bbff>Team:</color> <b>" + team.BadgeColor + team.BadgeName + "</color></b>", 15, shouldClearPrevious: true);
+                        player.SendBroadcast(Translation.TeamAssigned.Replace("{team}", team.BadgeColor + team.BadgeName), 15, shouldClearPrevious: true);
                     else
                     {
                         Timing.CallDelayed(0.0f, () =>
                         {
                             if (tournament.mode == TournamentMode.Predefined)
-                                player.SendBroadcast("<b><color=#FF0000>Your team: " + BadgeColors.ColorNameToTag(e.Group.BadgeColor) + e.Group.BadgeText + "</color> is not apart of the predefined bracket for this tournament. If you believe this is an error speak to a tournament organiser", 60, shouldClearPrevious: true);
+                                player.SendBroadcast(Translation.TeamMissingOut.Replace("{local_group}", BadgeColors.ColorNameToTag(e.Group.BadgeColor) + e.Group.BadgeText), 60, shouldClearPrevious: true);
                         });
                     }
                 }
@@ -191,7 +192,7 @@ namespace TheRiptide
             else
             {
                 if (tournament.mode == TournamentMode.Predefined)
-                    player.SendBroadcast("<b><color=#FF0000>Could not assign a team because you have either\n1. Not linked your dicord to steam\n2. Not logged into Cedmod", 60, shouldClearPrevious: true);
+                    player.SendBroadcast(Translation.PlayerFailureToLinkCedmod, 60, shouldClearPrevious: true);
             }
         }
 
@@ -226,7 +227,7 @@ namespace TheRiptide
             });
 
             Server.Instance.SetRole(RoleTypeId.Scp939);
-            Server.Instance.ReferenceHub.nicknameSync.SetNick("[Tournament Bracket]");
+            Server.Instance.ReferenceHub.nicknameSync.SetNick(Translation.NpcBracketName);
             Server.Instance.Position = new Vector3(128.8f, 994.0f, 18.0f);
         }
 
@@ -309,12 +310,12 @@ namespace TheRiptide
                     Loadout loadout = Loadout.Get(e.Player);
                     if (!CheckTeamItemLimit(team, e.Item.Info.ItemId))
                     {
-                        loadout.Broadcast(e.Player, "\nYour team has reached the limit for " + e.Item.Info.ItemId.ToString().Replace("Gun", "") + " of " + config.TeamItemLimit[e.Item.Info.ItemId]);
+                        loadout.Broadcast(e.Player, Translation.ExtraStringTeamItemLimitHit.Replace("{type}", e.Item.Info.ItemId.ToString().Replace("Gun", "")).Replace("{limit}", config.TeamItemLimit[e.Item.Info.ItemId].ToString()));
                         return false;
                     }
                     loadout.SetItem(e.Item.Info.ItemId);
                     loadout.UpdateInventoy(e.Player, false);
-                    loadout.Broadcast(e.Player, "\n<color=#87e8de>Zone: </color><color=#b7eb8f>" + tournament.GetMatch(team).zone + "</color>");
+                    loadout.Broadcast(e.Player, Translation.ExtraStringZone.Replace("{zone}", tournament.GetMatch(team).zone.ToString()));
                     return false;
                 }
                 else if(team.State == TeamState.BanSelection)
@@ -354,7 +355,7 @@ namespace TheRiptide
                         else
                             loadout.RemoveCandy((e.Item as Scp330Bag).Candies.First());
                         loadout.UpdateInventoy(e.Player, false);
-                        loadout.Broadcast(e.Player, "\n<color=#87e8de>Zone: </color><color=#b7eb8f>" + tournament.GetMatch(team).zone + "</color>");
+                        loadout.Broadcast(e.Player, Translation.ExtraStringZone.Replace("{zone}", tournament.GetMatch(team).zone.ToString()));
                     }
                     return false;
                 }
@@ -465,7 +466,7 @@ namespace TheRiptide
                     Loadout loadout = Loadout.Get(player);
                     loadout.SetCandy(pickup.ExposedCandy);
                     loadout.UpdateInventoy(player, false);
-                    loadout.Broadcast(player, "\n<color=#87e8de>Zone: </color><color=#b7eb8f>" + tournament.GetMatch(team).zone + "</color>");
+                    loadout.Broadcast(player, Translation.ExtraStringZone.Replace("{zone}", tournament.GetMatch(team).zone.ToString()));
                     return false;
                 }
                 else if (team.State == TeamState.BanSelection)
@@ -598,6 +599,9 @@ namespace TheRiptide
         [PluginConfig("team_cache.yml")]
         public TeamCache team_cache;
 
+        [PluginConfig("translation.yml")]
+        public TranslationConfig translation;
+
         private Harmony harmony;
 
         public void PrepareEvent()
@@ -606,6 +610,7 @@ namespace TheRiptide
             IsRunning = true;
             harmony = new Harmony("EliminationTournamentEvent");
             harmony.PatchAll();
+            Translation = translation;
             EventHandler.Start(this, EventConfig, log, team_cache);
             PluginAPI.Core.Log.Info(EventName + " event is prepared");
             PluginAPI.Events.EventManager.RegisterEvents<EventHandler>(this);

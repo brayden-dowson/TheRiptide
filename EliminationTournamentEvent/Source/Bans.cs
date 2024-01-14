@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static TheRiptide.EnumExtensions;
 using static TheRiptide.Utility;
+using static TheRiptide.StaticTranslation;
 
 namespace TheRiptide
 {
@@ -157,13 +158,20 @@ namespace TheRiptide
             string scp_votes = "[" + string.Join(", ", items[Category.SCP].ToList().ConvertAll(t => t.ToString().Replace("SCP", ""))) + "]";
             string other_votes = "[" + string.Join(", ", items[Category.Other]) + "]";
             string candy_votes = "[" + string.Join(", ", candies) + "]";
+            string your_votes = string.Join(" ", weapon_votes, medical_votes, scp_votes, other_votes, candy_votes);
 
-            string info = "<size=29><color=#ff8a62>Bans - " +
-                "</color><color=#b6ff61>Your votes: " + string.Join(" ", weapon_votes, medical_votes, scp_votes, other_votes, candy_votes) + "\n" +
-                "</color><color=#ffb84c>Team votes: <color=#ffb84c>" + team_votes + "</color>\n" +
-                "</color><color=#ff6565>Item Bans: <color=#ff6565>" + team_bans + "</color>\n" +
-                "</color><color=#f5ff5b>Zones: <color=#b6ff61>[" + string.Join("", zones) + "]</color> <color=#ffb84c>Votes: " + zone_votes + "</color> <color=#ff6565>Ban: " + zone_ban;
-            player.SendBroadcast(info, 300, shouldClearPrevious: true);
+            //string info = "<size=29><color=#ff8a62>Bans - " +
+            //    "</color><color=#b6ff61>Your votes: " + string.Join(" ", weapon_votes, medical_votes, scp_votes, other_votes, candy_votes) + "\n" +
+            //    "</color><color=#ffb84c>Team votes: <color=#ffb84c>" + team_votes + "</color>\n" +
+            //    "</color><color=#ff6565>Item Bans: <color=#ff6565>" + team_bans + "</color>\n" +
+            //    "</color><color=#f5ff5b>Zones: <color=#b6ff61>[" + string.Join("", zones) + "]</color> <color=#ffb84c>Votes: " + zone_votes + "</color> <color=#ff6565>Ban: " + zone_ban;
+            player.SendBroadcast(Translation.VoteBanFormat.
+                Replace("{your_votes}", your_votes).
+                Replace("{team_votes}", team_votes).
+                Replace("{team_bans}", team_bans).
+                Replace("{your_zone_vote}", string.Join("", zones)).
+                Replace("{team_zone_votes}", zone_votes).
+                Replace("{zone_bans}", zone_ban), 300, shouldClearPrevious: true);
         }
 
         public static Bans Get(Player player)

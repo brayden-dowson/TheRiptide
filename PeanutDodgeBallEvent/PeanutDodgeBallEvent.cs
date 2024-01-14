@@ -211,6 +211,7 @@ namespace TheRiptide
                     modes.Add("[" + gm.ToString() + "]");
             mode_str = "<color=#FFFF00>" + (room_name != RoomName.Unnamed ? "Room: " + room_name.ToString() : "Zone: " + room_zone.ToString() + ", Shape: " + room_shape.ToString()) + " " + string.Join(", ", modes) + "</color>";
             late_spawn = false;
+            Log.Info(mode_str, "PDB Mode");
         }
 
         public static void Stop()
@@ -325,6 +326,7 @@ namespace TheRiptide
         [PluginEvent(ServerEventType.PlayerSpawn)]
         void OnPlayerSpawn(Player player, RoleTypeId role)
         {
+            Log.Info($"on player spawned called for {player.Nickname} with role {role}");
             if (player == null || !Round.IsRoundStarted)
                 return;
 
@@ -384,9 +386,16 @@ namespace TheRiptide
                         return;
 
                     if (custom_offset.ContainsKey(room_name))
+                    {
                         Teleport.RoomPos(player, room, custom_offset[room_name]);
+                        Log.Info($"Teleported player to {room.Name} {room.Shape} {room.Zone} at {custom_offset[room_name].ToPreciseString()}");
+                    }
                     else
+                    {
                         Teleport.Room(player, room);
+                        Log.Info($"Teleported player to {room.Name} {room.Shape} {room.Zone} at {player.Position.ToPreciseString()}");
+                    }
+
 
                     if (mode.HasFlag(GameMode.Child))
                         SetScale(player, config.ChildSize);

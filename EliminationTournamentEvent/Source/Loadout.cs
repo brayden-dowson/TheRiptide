@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static TheRiptide.EnumExtensions;
 using static TheRiptide.Utility;
+using static TheRiptide.StaticTranslation;
 
 namespace TheRiptide
 {
@@ -154,13 +155,19 @@ namespace TheRiptide
 
         public void Broadcast(Player player, string extra)
         {
-            string info = "<color=#b7eb8f>Loadout\n" +
-    "</color><color=#87e8de>Weapon:</color> " + (weapon == WeaponType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + weapon +
-    "</color> <color=#87e8de>Medical:</color> " + (medical == MedicalType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + medical +
-    "</color>\n<color=#87e8de> Candy:</color> " + (candy == CandyKindID.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + candy +
-    "</color> <color=#87e8de> SCP:</color> " + (scp == ScpType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + scp.ToString().Replace("SCP", "") +
-    "</color> <color=#87e8de> Other:</color> " + (other == OtherType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + other + "</color>" + extra;
-            player.SendBroadcast(info, 300, shouldClearPrevious: true);
+    //        string info = "<color=#b7eb8f>Loadout\n" +
+    //"</color><color=#87e8de>Weapon:</color> " + (weapon == WeaponType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + weapon +
+    //"</color> <color=#87e8de>Medical:</color> " + (medical == MedicalType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + medical +
+    //"</color>\n<color=#87e8de> Candy:</color> " + (candy == CandyKindID.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + candy +
+    //"</color> <color=#87e8de> SCP:</color> " + (scp == ScpType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + scp.ToString().Replace("SCP", "") +
+    //"</color> <color=#87e8de> Other:</color> " + (other == OtherType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + other + "</color>" + extra;
+            player.SendBroadcast(Translation.LoadoutFormat
+                .Replace("{weapon}", (weapon == WeaponType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + weapon + "</color>")
+                .Replace("{medical}", (medical == MedicalType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + medical + "</color>")
+                .Replace("{candy}", (candy == CandyKindID.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + candy + "</color>")
+                .Replace("{scp}", (scp == ScpType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + scp.ToString().Replace("SCP", "") + "</color>")
+                .Replace("{other}", (other == OtherType.None ? "<color=#FF0000>" : "<color=#b7eb8f>") + other + "</color>")
+                .Replace("{extra}", extra), 300, shouldClearPrevious: true);
         }
 
         private void AddWeapon(Player player, ItemType type, bool grant_ammo)

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static TheRiptide.Utility;
+using static TheRiptide.StaticTranslation;
 
 namespace TheRiptide
 {
@@ -179,13 +180,13 @@ namespace TheRiptide
                 {
                     Player p;
                     if (Player.TryGet(user, out p))
-                        p.SendBroadcast("Waiting for Zone: " + zone, 2, shouldClearPrevious: true);
+                        p.SendBroadcast(Translation.WaitingForZone.Replace("{zone}", zone.ToString()), 2, shouldClearPrevious: true);
                 }
                 foreach (var user in team_b.Users)
                 {
                     Player p;
                     if (Player.TryGet(user, out p))
-                        p.SendBroadcast("Waiting for Zone: " + zone, 2, shouldClearPrevious: true);
+                        p.SendBroadcast(Translation.WaitingForZone.Replace("{zone}", zone.ToString()), 2, shouldClearPrevious: true);
                 }
                 yield return Timing.WaitForSeconds(1.0f);
             }
@@ -315,22 +316,22 @@ namespace TheRiptide
                 {
                     team_a_score++;
                     team_b_score++;
-                    team_a_msg = "<b>Draw</b>\n";
-                    team_b_msg = "<b>Draw</b>\n";
+                    team_a_msg = Translation.Draw;
+                    team_b_msg = Translation.Draw;
                     break;
                 }
                 if (team_a_alive == 0)
                 {
                     team_b_score++;
-                    team_a_msg = "<b>You Lost</b>\n";
-                    team_b_msg = "<b>You Won!</b>\n";
+                    team_a_msg = Translation.Lost;
+                    team_b_msg = Translation.Won;
                     break;
                 }
                 if (team_b_alive == 0)
                 {
                     team_a_score++;
-                    team_a_msg = "<b>You Won!</b>\n";
-                    team_b_msg = "<b>You Lost</b>\n";
+                    team_a_msg = Translation.Won;
+                    team_b_msg = Translation.Lost;
                     break;
                 }
                 yield return Timing.WaitForOneFrame;
@@ -545,7 +546,7 @@ namespace TheRiptide
                         p.ClearInventory();
                         p.AddItem(ItemType.ArmorCombat);
                         Loadout.Get(p).UpdateInventoy(p, false);
-                        Loadout.Get(p).Broadcast(p, "\n<color=#87e8de>Zone: </color><color=#b7eb8f>" + zone + "</color>");
+                        Loadout.Get(p).Broadcast(p, Translation.ExtraStringZone.Replace("{zone}", zone.ToString()));
                         room.TeleportPlayer(p);
                         SpectatorVisibility.SetMatchup(p, team, opponent);
                     });
@@ -561,7 +562,8 @@ namespace TheRiptide
 
         private void SendReadyStateHint(Player player, bool ready, int total_time)
         {
-            player.ReceiveHint("<b><size=48>" + (ready ? "<color=#00FF00>YOU ARE READY</color>" : "<color=#FF0000>YOU ARE NOT READY</color>") + "\n<color=#87ceeb>" + (total_time - elapsed).ToString("0") + "</color></size></b>", 2);
+            player.ReceiveHint("<b><size=48>" + (ready ? Translation.YouAreReady : Translation.YouAreNotReady) + Translation.TimeLeftFormat.Replace("{time}", (total_time - elapsed).ToString("0")) + "</size></b>", 2);
+            //player.ReceiveHint("<b><size=48>" + (ready ? "<color=#00FF00>YOU ARE READY</color>" : "<color=#FF0000>YOU ARE NOT READY</color>") + "\n<color=#87ceeb>" + (total_time - elapsed).ToString("0") + "</color></size></b>", 2);
         }
     }
 }
