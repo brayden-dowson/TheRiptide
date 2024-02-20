@@ -26,7 +26,7 @@
  - [Shy Guy XK](https://github.com/brayden-dowson/TheRiptide#shy-guy-xk)
  - [Switch Team Deathmatch](https://github.com/brayden-dowson/TheRiptide#switch-team-deathmatch)
  - [Team Deathmatch](https://github.com/brayden-dowson/TheRiptide#team-deathmatch)
- - [The Last Stand](https://github.com/brayden-dowson/TheRiptide#the-last-stand)(curently broken not included int release)
+ - [The Last Stand](https://github.com/brayden-dowson/TheRiptide#the-last-stand)(curently broken not included in release)
  - [Traitor Among Us](https://github.com/brayden-dowson/TheRiptide#traitor-among-us)
  - [Zombie Escape](https://github.com/brayden-dowson/TheRiptide#zombie-escape)
  - [Zombie Infection](https://github.com/brayden-dowson/TheRiptide#zombie-infection)
@@ -40,11 +40,10 @@
  - [Coin 914](https://github.com/brayden-dowson/TheRiptide#candy-override)
  - [Discord Message](https://github.com/brayden-dowson/TheRiptide#discord-message)
  - [Escape Rewards](https://github.com/brayden-dowson/TheRiptide#escape-rewards)
- - [Faction Custom Info](https://github.com/brayden-dowson/TheRiptide#faction-custom-info)(broken)
+ - [Faction Custom Info](https://github.com/brayden-dowson/TheRiptide#faction-custom-info)(might be a little busted)
  - [Follow](https://github.com/brayden-dowson/TheRiptide#follow)
- - [MVP](https://github.com/brayden-dowson/TheRiptide#mvp)(might be a little busted)
+ - [MVP](https://github.com/brayden-dowson/TheRiptide#mvp)
  - [Normal Locker Ammo](https://github.com/brayden-dowson/TheRiptide#normal-locker-ammo)
- - [Pink Candy](https://github.com/brayden-dowson/TheRiptide#pink-candy)
  - [Research Card In 173](https://github.com/brayden-dowson/TheRiptide#research-card-in-173-out-dated-game-play-wise)
  - [Scp 127](https://github.com/brayden-dowson/TheRiptide#scp-127)
  - [Scp Door Break](https://github.com/brayden-dowson/TheRiptide#scp-door-break)
@@ -86,22 +85,22 @@ Elimination style tournament. PvP fights contained inside a zone. Preround item/
 Tournament can be run in 3 different ways. Role, Predefined and Scrimmage.
  - ``Role`` the default, sets up bracket randomly based on the roles of joined players(all roles are included in the bracket) players without a role will not be assigned a team. used for serious well organized events.
  - ``Predefined`` use the ``predef`` command. sets up the the bracket based on the config, will use the players Role to assign teams. players that do not have a role that is defined in the predefined bracket will not be assigned a team. used for serious well organized events.
- - ``Scrimmage`` use the ``scim <team_count>`` command. sets up a bracket assigning players randomly to all the teams based on the ``team_count``. Roles wont be used to assign the team. good for quick casual unorganized events.
+ - ``Scrimmage`` use the ``scrim <team_count>`` command. sets up a bracket assigning players randomly to all the teams based on the ``team_count``. Roles wont be used to assign the team. good for quick casual unorganized events.
 
 The idea behind ``Role`` and ``Predefined`` is that you can role sync with a different system e.g. ``CedMod``, ``config_remoteadmin.txt`` etc. to allow quick setup of organized matches.
 Note. ``team_name`` is not the ``Badge Text``(what you see when you press N). ``team_name`` does not contain white space so it can be used for commands and does not have to be the same as the badge. e.g. Badge = ``My Team``, team_name = ``mt``. you defined the ``team_name`` and ``Badge Text`` when you set up the Roles i.e. ``CedMod``, ``config_remoteadmin.txt`` etc. use the ``tour_list_team`` to see the ``Badge Text`` and ``team_name`` for each team.
 #### commands
- - ``tour_save_log`` - ``tsl`` saves log
- - ``tour_undo_win <team_name> <reason>`` undo a teams last win. usage: ``tuw <team_name> <reason> ``
- - ``tour_force_win <team_name>`` force a team to win their next match. usage: ``tfw <team_name>``
  - ``tour_predefined`` setup predefined bracket defined in the config and load log. usage: ``predef``
+ - ``tour_scrimmage <team_count>`` setup tournament as a scrimmage with a certain amount of teams assigned randomly to players. usage: ``scrim <team_count>``
+ - ``tour_list_team`` list all teams. shows the ``Badge Name`` and the ``team_name``. usage: ``tlt``
  - ``tour_run_match <team name>`` run match by specifing a team. usage: ``trm <team_name>``
  - ``tour_auto_run`` Auto runs the tournament(do not use this unless all teams are present e.g. finals) usage: ``tar``
- - ``tour_scrimmage <team_count>`` setup tournament as a scrimmage with a certain amount of teams assigned randomly to players. usage: ``scrim <team_count>``
- - ``tour_set_team <player_id> <team_name>`` assign player to team. usage: ``tst <player_id> <team_name>``
  - ``tour_create_team <team_name>`` create a new team. usage: ``tct <team_name>``
  - ``tour_remove_team <team_name>`` removes a team. usage: ``trt <team_name>``
- - ``tour_list_team`` list all teams. shows the ``Badge Name`` and the ``team_name``. usage: ``tlt``
+ - ``tour_set_team <player_id> <team_name>`` assign player to team. usage: ``tst <player_id> <team_name>``
+ - ``tour_force_win <team_name>`` force a team to win their next match. usage: ``tfw <team_name>``
+ - ``tour_undo_win <team_name> <reason>`` undo a teams last win. usage: ``tuw <team_name> <reason> ``
+ - ``tour_save_log`` saves log. kinda pointless since the logs are saved automatically. usage: ``tsl``
  - ``clear_hint`` clears hints(any player can use this) sometimes the bracket can appear even when not invoked due to NW spaghetti code this cmd can fix it. usage: ``ch``
 > [SLOC Loader](https://github.com/Axwabo/slocLoader) must be installed  
 > [Ultra Quaternion](https://github.com/brayden-dowson/UltraQuaternion) must be installed  
@@ -244,9 +243,6 @@ Tracks players statistics during the round and displays any achievements at the 
 
 ### Normal Locker Ammo
 Adds 30x 9mm ammo to a random light containment locker.
-
-### Pink Candy
-Adds pink candy back (can only be obtained with the candy bowl).
 
 ### Research Card In 173 (out dated game play wise)
 30% chance of a research card to spawn in 173s old room on the computer desk.
