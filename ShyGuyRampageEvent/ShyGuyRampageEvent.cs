@@ -132,6 +132,10 @@ namespace TheRiptide
                 return HandleGameOverRoleChange(player, new_role);
 
             int player_id = player.PlayerId;
+
+            if (player_id != selected && new_role == RoleTypeId.Scp096 && reason == RoleChangeReason.RemoteAdmin)
+                selected = player_id;
+
             if (player.PlayerId == selected)
             {
                 if (new_role != RoleTypeId.Scp096)

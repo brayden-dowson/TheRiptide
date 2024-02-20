@@ -3,6 +3,7 @@ using CedMod.Addons.Events.Interfaces;
 using CommandSystem;
 using CustomPlayerEffects;
 using HarmonyLib;
+using InventorySystem.Items.Armor;
 using InventorySystem.Items.Firearms;
 using MEC;
 using Mirror;
@@ -411,7 +412,7 @@ namespace TheRiptide
         void OnReloadWeapon(Player player, Firearm gun)
         {
             if (gun.ItemTypeId != ItemType.ParticleDisruptor && gun.ItemTypeId != ItemType.GunCOM15)
-                player.SetAmmo(gun.AmmoType, (ushort)player.GetAmmoLimit(gun.AmmoType));
+                player.SetAmmo(gun.AmmoType, GetStandardAmmoLimit(player.ReferenceHub.inventory.TryGetBodyArmor(out BodyArmor armor) ? armor : null, gun.AmmoType));
         }
 
         [PluginEvent(ServerEventType.PlayerDropAmmo)]

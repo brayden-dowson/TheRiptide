@@ -217,7 +217,7 @@ namespace TheRiptide
             if (grant_ammo)
             {
                 BodyArmor bodyArmor;
-                ammo_reserve = GetStandardAmmoLimit(!player.ReferenceHub.inventory.TryGetBodyArmor(out bodyArmor) ? null : bodyArmor, GunAmmoType(type));//  player.GetAmmoLimit(firearm.AmmoType);
+                ammo_reserve = GetStandardAmmoLimit(!player.ReferenceHub.inventory.TryGetBodyArmor(out bodyArmor) ? null : bodyArmor, GunAmmoType(type));
             }
             else
                 ammo_reserve = player.GetAmmo(firearm.AmmoType);

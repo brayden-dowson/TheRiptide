@@ -140,6 +140,13 @@ namespace TheRiptide
             if (player == null || !Round.IsRoundStarted || new_role == RoleTypeId.Filmmaker || new_role == RoleTypeId.Spectator || new_role == RoleTypeId.Tutorial || new_role == RoleTypeId.Overwatch)
                 return true;
 
+            if (new_role == RoleTypeId.Scientist && reason == RoleChangeReason.RemoteAdmin)
+                site_manager = player.PlayerId;
+            else if (new_role == RoleTypeId.NtfPrivate && reason == RoleChangeReason.RemoteAdmin)
+                guards.Add(player.PlayerId);
+            else if (guards.Contains(player.PlayerId) && new_role != RoleTypeId.NtfPrivate && reason == RoleChangeReason.RemoteAdmin)
+                guards.Remove(player.PlayerId);
+
             if(player.PlayerId == site_manager)
             {
                 if(new_role != RoleTypeId.Scientist)

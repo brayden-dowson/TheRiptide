@@ -5,6 +5,7 @@ using HarmonyLib;
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
+using InventorySystem.Items.Armor;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Usables.Scp330;
 using MapGeneration;
@@ -472,7 +473,7 @@ namespace TheRiptide
         void OnReloadWeapon(Player player, Firearm gun)
         {
             if (gun.ItemTypeId != ItemType.ParticleDisruptor)
-                player.SetAmmo(gun.AmmoType, (ushort)player.GetAmmoLimit(gun.AmmoType));
+                player.SetAmmo(gun.AmmoType, GetStandardAmmoLimit(player.ReferenceHub.inventory.TryGetBodyArmor(out BodyArmor armor) ? armor : null, gun.AmmoType));
         }
 
         [PluginEvent(ServerEventType.PlayerInteractDoor)]

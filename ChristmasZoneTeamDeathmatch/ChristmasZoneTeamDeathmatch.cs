@@ -384,7 +384,7 @@ namespace TheRiptide
                             {
                                 ItemType ammo = GunAmmoType(weapon);
                                 if (ammo != ItemType.None)
-                                    player.SetAmmo(ammo, (ushort)player.GetAmmoLimit(ammo));
+                                    player.SetAmmo(ammo, GetStandardAmmoLimit(player.ReferenceHub.inventory.TryGetBodyArmor(out BodyArmor armor) ? armor : null, ammo));
                             }
                             else
                             {

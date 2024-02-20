@@ -4,6 +4,7 @@ using CustomPlayerEffects;
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
+using InventorySystem.Items.Armor;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
@@ -349,7 +350,7 @@ namespace TheRiptide
                             {
                                 ItemType ammo = GunAmmoType(weapon);
                                 if(ammo != ItemType.None)
-                                    player.SetAmmo(ammo, (ushort)player.GetAmmoLimit(ammo));
+                                    player.SetAmmo(ammo, GetStandardAmmoLimit(player.ReferenceHub.inventory.TryGetBodyArmor(out BodyArmor armor) ? armor : null, ammo));
                             }
                             else
                             {
